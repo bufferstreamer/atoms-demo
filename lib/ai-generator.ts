@@ -159,8 +159,14 @@ function systemPrompt(previous?: AppSpec) {
   return `你是 Atomize 的应用生成团队。把用户需求转成安全的 AppSpec v1 JSON。只输出符合 schema 的 JSON，不输出 Markdown。四个 steps 必须依次是 product、architecture、design、engineering，每个摘要说明本角色实际做出的决定。应用必须有真实可操作的筛选、卡片状态、表单或 toast，文案使用用户语言。不要输出 HTML、CSS、JavaScript 或 URL。${previous ? `这是当前版本，返回完整修改版并保留未要求改变的能力：${JSON.stringify(previous)}` : ""}`;
 }
 
-function timeoutAfter(ms: number): Promise<never> {
-  return new Promise((_, reject) => setTimeout(() => reject(new ModelOutputError("MODEL_TIMEOUT")), ms));
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new ModelOutputError("MODEL_TIMEOUT")), ms);
+    promise.then(
+      (value) => { clearTimeout(timer); resolve(value); },
+      (error) => { clearTimeout(timer); reject(error); },
+    );
+  });
 }
 
 function failureCode(error: unknown) {
@@ -177,16 +183,13 @@ export async function generateAppWithAI(
   const started = Date.now();
   if (runner) {
     try {
-      const raw = await Promise.race([
-        runner.run(WORKERS_AI_MODEL, {
+      const raw = await withTimeout(runner.run(WORKERS_AI_MODEL, {
           messages: [{ role: "system", content: systemPrompt(previous) }, { role: "user", content: prompt }],
           max_completion_tokens: 2200,
           temperature: 0.35,
           reasoning_effort: "low",
           response_format: { type: "json_schema", json_schema: { name: "atomize_app", strict: true, schema: responseSchema } },
-        }),
-        timeoutAfter(timeoutMs),
-      ]);
+        }), timeoutMs);
       const text = extractText(raw);
       if (new TextEncoder().encode(text).byteLength > MAX_RESPONSE_BYTES) throw new ModelOutputError("RESPONSE_TOO_LARGE");
       return { ...parseEnvelope(text), generation: { source: "workers_ai", model: WORKERS_AI_MODEL, outcome: "SUCCESS", failureCode: null, durationMs: Date.now() - started } };
