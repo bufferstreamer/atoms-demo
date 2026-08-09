@@ -35,6 +35,15 @@ pnpm test
 
 `pnpm test` runs a production build followed by the deterministic generator tests.
 
+## Cloudflare deployment
+
+The production Worker uses `wrangler.deploy.jsonc` and the `DB` D1 binding.
+
+```bash
+pnpm exec wrangler d1 execute atomize-demo-db --remote --file=drizzle/0000_ambitious_gargoyle.sql
+pnpm deploy:cloudflare
+```
+
 ## Architecture
 
 - `app/workspace.tsx` contains the three-pane product experience and safe AppSpec renderer.
