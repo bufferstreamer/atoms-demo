@@ -89,10 +89,10 @@ function checkCapabilities(spec: AppSpec, product: ReturnType<typeof parseProduc
 
 function stageSystem(role: StageRole, context: string, schema: unknown) {
   const common = "只输出符合 JSON Schema 的 JSON，不要 Markdown、HTML、CSS、JavaScript、URL 或额外字段。使用用户的语言。";
-  const contract = `\n输出契约:${JSON.stringify(schema)}`;
-  if (role === "product") return `你是产品 Agent。提炼受众、目标、必须和禁止的交互能力。requiredCapabilities 只能使用英文 token filter/form/toggle/stats/toast；forbiddenCapabilities 只能使用这些 token 或 external_script；没有禁止项时返回空数组，不得翻译或创造枚举。${common}${contract}`;
-  if (role === "architecture") return `你是架构 Agent。基于已验证产品简报规划 AppSpec 组件、交互与持久化。kind 只能是 dashboard/tracker/landing；components 只能是 stats/filters/cards/form/actions；interactionPlan 只能是 set_filter/toggle_item/add_item/show_toast。${common}${contract}\n上下文:${context}`;
-  if (role === "design") return `你是设计 Agent。基于已验证产品与架构产物定义布局、视觉和交互状态。layout 只能是 dashboard-grid/tracker-list/landing-sections；interactionStates 只能是 default/filtered/completed/form-valid/form-error/toast。${common}${contract}\n上下文:${context}`;
+  const contract = `\n以下是约束定义，仅用于约束。必须输出满足它的数据实例，绝对禁止返回 $schema/type/properties/required/additionalProperties 等 Schema 定义字段:${JSON.stringify(schema)}`;
+  if (role === "product") return `你是产品 Agent。提炼受众、目标、必须和禁止的交互能力。requiredCapabilities 只能使用英文 token filter/form/toggle/stats/toast；forbiddenCapabilities 只能使用这些 token 或 external_script；没有禁止项时返回空数组，不得翻译或创造枚举。实例形状示意：{"summary":"决策摘要","audience":"目标用户","goal":"产品目标","requiredCapabilities":["filter"],"forbiddenCapabilities":[]}。${common}${contract}`;
+  if (role === "architecture") return `你是架构 Agent。基于已验证产品简报规划 AppSpec 组件、交互与持久化。kind 只能是 dashboard/tracker/landing；components 只能是 stats/filters/cards/form/actions；interactionPlan 只能是 set_filter/toggle_item/add_item/show_toast。实例必须是业务数据，不是 Schema 定义。${common}${contract}\n上下文:${context}`;
+  if (role === "design") return `你是设计 Agent。基于已验证产品与架构产物定义布局、视觉和交互状态。layout 只能是 dashboard-grid/tracker-list/landing-sections；interactionStates 只能是 default/filtered/completed/form-valid/form-error/toast。实例必须是业务数据，不是 Schema 定义。${common}${contract}\n上下文:${context}`;
   return `你是工程 Agent。基于全部已验证产物返回完整安全 AppSpec。所有 id 全局唯一，action target/value 必须存在；必须严格满足 Product required/forbidden capabilities。${common}${contract}\n上下文:${context}`;
 }
 
@@ -110,7 +110,8 @@ export async function generateAppWithAgents(prompt: string, previous: AppSpec | 
     const responseFormat = role === "engineering" ? { type: "json_schema", json_schema: schema } : { type: "json_object" };
     const raw = await timeout(aiRunner.run(WORKERS_AI_MODEL, { messages: [{ role: "system", content: stageSystem(role, context, schema) }, { role: "user", content: prompt }], max_tokens: maxTokens, temperature: role === "engineering" ? 0.25 : 0.2, response_format: responseFormat }), Math.min(configured, remaining));
     if (now() - started >= MODEL_DEADLINE_MS) throw new ModelOutputError("MODEL_BUDGET_EXHAUSTED");
-    const parsed = parser(extract(raw, role === "engineering" ? MAX_ENGINEERING_BYTES : MAX_STAGE_BYTES));
+    const extracted = extract(raw, role === "engineering" ? MAX_ENGINEERING_BYTES : MAX_STAGE_BYTES);
+    const parsed = parser(extracted);
     return { parsed, durationMs: now() - stageStarted };
   }
 
