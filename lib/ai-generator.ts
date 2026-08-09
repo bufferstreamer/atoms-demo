@@ -56,7 +56,7 @@ function text(value: unknown, max: number, code: string) { if (typeof value !== 
 function list(value: unknown, allowed: readonly string[], max: number, code: string, min = 0) { if (!Array.isArray(value) || value.length < min || value.length > max || new Set(value).size !== value.length || value.some((item) => typeof item !== "string" || !allowed.includes(item))) throw new ModelOutputError(code); return value as string[]; }
 function assertBytes(value: unknown, max: number, code: string) { let json: string; try { json = JSON.stringify(value); } catch { throw new ModelOutputError(code); } if (new TextEncoder().encode(json).byteLength > max) throw new ModelOutputError(code); return json; }
 
-function parseProduct(value: unknown) { const code = "INVALID_PRODUCT_ARTIFACT"; const v = record(value, code); exact(v, ["summary", "audience", "goal", "requiredCapabilities", "forbiddenCapabilities"], code); const artifact = { summary: text(v.summary, 180, code), audience: text(v.audience, 120, code), goal: text(v.goal, 180, code), requiredCapabilities: list(v.requiredCapabilities, ["filter", "form", "toggle", "stats", "toast"], 6, code), forbiddenCapabilities: list(v.forbiddenCapabilities, ["filter", "form", "toggle", "stats", "toast", "external_script"], 6, code) }; assertBytes(artifact, MAX_STAGE_BYTES, code); return artifact; }
+function parseProduct(value: unknown) { const code = "INVALID_PRODUCT_ARTIFACT"; const v = record(value, code); exact(v, ["summary", "audience", "goal", "requiredCapabilities", "forbiddenCapabilities"], code); const artifact = { summary: text(v.summary, 180, code), audience: text(v.audience, 120, code), goal: text(v.goal, 180, code), requiredCapabilities: list(v.requiredCapabilities, ["filter", "form", "toggle", "stats", "toast"], 6, code), forbiddenCapabilities: list(v.forbiddenCapabilities, ["filter", "form", "toggle", "stats", "toast", "external_script"], 6, code) }; if (artifact.requiredCapabilities.some((capability) => artifact.forbiddenCapabilities.includes(capability))) throw new ModelOutputError(code, "CAPABILITY_CONFLICT"); assertBytes(artifact, MAX_STAGE_BYTES, code); return artifact; }
 function parseArchitecture(value: unknown) { const code = "INVALID_ARCHITECTURE_ARTIFACT"; const v = record(value, code); exact(v, ["summary", "kind", "components", "interactionPlan", "persistencePlan"], code); const kind = list([v.kind], ["dashboard", "tracker", "landing"], 1, code, 1)[0] as AppSpec["kind"]; const artifact = { summary: text(v.summary, 180, code), kind, components: list(v.components, ["stats", "filters", "cards", "form", "actions"], 8, code, 1), interactionPlan: list(v.interactionPlan, ["set_filter", "toggle_item", "add_item", "show_toast"], 6, code, 1), persistencePlan: text(v.persistencePlan, 180, code) }; assertBytes(artifact, MAX_STAGE_BYTES, code); return artifact; }
 function parseDesign(value: unknown) { const code = "INVALID_DESIGN_ARTIFACT"; const v = record(value, code); exact(v, ["summary", "visualDirection", "layout", "interactionStates", "accessibilityNotes"], code); const layout = list([v.layout], ["dashboard-grid", "tracker-list", "landing-sections"], 1, code, 1)[0]; const artifact = { summary: text(v.summary, 180, code), visualDirection: text(v.visualDirection, 180, code), layout, interactionStates: list(v.interactionStates, ["default", "filtered", "completed", "form-valid", "form-error", "toast"], 6, code, 1), accessibilityNotes: Array.isArray(v.accessibilityNotes) ? v.accessibilityNotes.map((item) => text(item, 120, code)) : (() => { throw new ModelOutputError(code); })() }; if (artifact.accessibilityNotes.length < 1 || artifact.accessibilityNotes.length > 4 || new Set(artifact.accessibilityNotes).size !== artifact.accessibilityNotes.length) throw new ModelOutputError(code); assertBytes(artifact, MAX_STAGE_BYTES, code); return artifact; }
 
@@ -64,36 +64,40 @@ function assertAppSpec(value: unknown) {
   const code = "INVALID_APP_SPEC"; const spec = record(value, code);
   exact(spec, ["schemaVersion", "kind", "title", "subtitle", "theme", "stats", "filters", "cards", "actions", ...(spec.form === undefined ? [] : ["form"])], code);
   const candidate = structuredClone(spec) as AppSpec;
-  for (const stat of candidate.stats ?? []) if (stat.delta && /^(null|undefined)$/i.test(stat.delta.trim())) delete stat.delta;
+  const normalizationCodes: string[] = [];
+  const normalized = (value: string) => { if (!normalizationCodes.includes(value)) normalizationCodes.push(value); };
+  for (const stat of candidate.stats ?? []) if (stat.delta && /^(null|undefined)$/i.test(stat.delta.trim())) { delete stat.delta; normalized("STAT_NULL_SENTINEL"); }
   for (const filter of candidate.filters ?? []) {
-    if (filter.options.length && !filter.options.includes(filter.defaultValue)) filter.defaultValue = filter.options[0];
-    if (filter.allValue !== undefined && !filter.options.includes(filter.allValue)) filter.allValue = filter.defaultValue;
+    if (filter.options.length && !filter.options.includes(filter.defaultValue)) { filter.defaultValue = filter.options[0]; normalized("FILTER_DEFAULT_VALUE"); }
+    if (filter.allValue !== undefined && !filter.options.includes(filter.allValue)) { filter.allValue = filter.defaultValue; normalized("FILTER_ALL_VALUE"); }
   }
   for (const [cardIndex, card] of (candidate.cards ?? []).entries()) {
     card.filterValues = card.filterValues ?? {};
     for (const filter of candidate.filters ?? []) {
       const choices = filter.options.filter((option) => option !== filter.allValue);
-      if (!filter.options.includes(card.filterValues[filter.id]) || card.filterValues[filter.id] === filter.allValue) card.filterValues[filter.id] = choices[cardIndex % choices.length] ?? filter.defaultValue;
+      if (!filter.options.includes(card.filterValues[filter.id]) || card.filterValues[filter.id] === filter.allValue) { card.filterValues[filter.id] = choices[cardIndex % choices.length] ?? filter.defaultValue; normalized("CARD_FILTER_VALUES"); }
     }
   }
   for (const action of candidate.actions ?? []) {
     if (action.kind === "set_filter") {
       const target = candidate.filters.find((filter) => filter.id === action.targetId) ?? candidate.filters[0];
       if (target) {
+        const targetChanged = action.targetId !== target.id;
         action.targetId = target.id;
         const choices = target.options.filter((option) => option !== target.allValue);
+        if (targetChanged || !target.options.includes(action.value) || action.value === target.allValue) normalized("SET_FILTER_REFERENCE");
         if (!target.options.includes(action.value) || action.value === target.allValue) action.value = choices[0] ?? target.defaultValue;
       }
     }
-    if (action.kind === "add_item" && candidate.form) action.targetId = candidate.form.id;
+    if (action.kind === "add_item" && candidate.form && action.targetId !== candidate.form.id) { action.targetId = candidate.form.id; normalized("ADD_ITEM_REFERENCE"); }
   }
   try { validateAppSpec(candidate); } catch (error) {
     const detail = error instanceof Error ? text(error.message, 120, code) : "规格关系校验失败";
     throw new ModelOutputError(code, detail);
   }
-  return candidate;
+  return { spec: candidate, normalizationCodes };
 }
-function parseEngineering(value: unknown) { const v = record(value, "INVALID_ENGINEERING_ARTIFACT"); exact(v, ["spec", "summary"], "INVALID_ENGINEERING_ARTIFACT"); assertBytes(v, MAX_ENGINEERING_BYTES, "RESPONSE_TOO_LARGE"); return { spec: assertAppSpec(v.spec), summary: text(v.summary, 180, "INVALID_ENGINEERING_ARTIFACT") }; }
+function parseEngineering(value: unknown) { const v = record(value, "INVALID_ENGINEERING_ARTIFACT"); exact(v, ["spec", "summary"], "INVALID_ENGINEERING_ARTIFACT"); assertBytes(v, MAX_ENGINEERING_BYTES, "RESPONSE_TOO_LARGE"); return { ...assertAppSpec(v.spec), summary: text(v.summary, 180, "INVALID_ENGINEERING_ARTIFACT") }; }
 
 function extract(raw: unknown, max: number) {
   let value = raw;
@@ -105,7 +109,13 @@ function timeout<T>(promise: Promise<T>, ms: number): Promise<T> { return new Pr
 function errorCode(error: unknown) { if (error instanceof ModelOutputError) return error.code; if (error instanceof Error && /JSON Mode couldn't be met/i.test(error.message)) return "JSON_MODE_UNMET"; return "MODEL_ERROR"; }
 
 function abilityPresent(spec: AppSpec, ability: string) {
-  if (ability === "filter") return spec.filters.length > 0 && spec.actions.some((a) => a.kind === "set_filter");
+  if (ability === "filter") return spec.actions.some((action) => {
+    if (action.kind !== "set_filter") return false;
+    const filter = spec.filters.find((candidate) => candidate.id === action.targetId);
+    if (!filter || action.value === filter.allValue || !filter.options.includes(action.value)) return false;
+    const visible = spec.cards.filter((card) => card.filterValues?.[filter.id] === action.value).length;
+    return visible > 0 && visible < spec.cards.length;
+  });
   if (ability === "form") return Boolean(spec.form) && spec.actions.some((a) => a.kind === "add_item");
   if (ability === "toggle") return spec.actions.some((a) => a.kind === "toggle_item");
   if (ability === "stats") return spec.stats.length > 0;
@@ -116,21 +126,22 @@ function checkCapabilities(spec: AppSpec, product: ReturnType<typeof parseProduc
 
 function completeRequiredCapabilities(input: AppSpec, product: ReturnType<typeof parseProduct>) {
   const spec = structuredClone(input);
+  const normalizationCodes: string[] = [];
   const ids = new Set([...spec.stats, ...spec.filters, ...spec.cards, ...spec.actions, ...(spec.form ? [spec.form, ...spec.form.fields] : [])].map((item) => item.id));
   const actionId = (base: string) => { let id = base; let suffix = 2; while (ids.has(id)) id = `${base}-${suffix++}`; ids.add(id); return id; };
   const add = (action: AppSpec["actions"][number]) => { if (spec.actions.length < 8) spec.actions.push(action); };
   if (product.requiredCapabilities.includes("filter") && !abilityPresent(spec, "filter") && spec.filters[0]) {
-    const filter = spec.filters[0]; add({ id: actionId("agent-filter"), label: `筛选${filter.label}`, kind: "set_filter", targetId: filter.id, value: filter.defaultValue });
+    const filter = spec.filters[0]; const choices = filter.options.filter((option) => option !== filter.allValue); add({ id: actionId("agent-filter"), label: `筛选${filter.label}`, kind: "set_filter", targetId: filter.id, value: choices[0] ?? filter.defaultValue }); normalizationCodes.push("ADD_FILTER_ACTION");
   }
-  if (product.requiredCapabilities.includes("form") && !abilityPresent(spec, "form") && spec.form) add({ id: actionId("agent-submit"), label: spec.form.submitLabel, kind: "add_item", targetId: spec.form.id });
-  if (product.requiredCapabilities.includes("toggle") && !abilityPresent(spec, "toggle") && spec.cards[0]) add({ id: actionId("agent-toggle"), label: "切换状态", kind: "toggle_item", targetId: spec.cards[0].id });
-  if (product.requiredCapabilities.includes("toast") && !abilityPresent(spec, "toast")) add({ id: actionId("agent-toast"), label: "查看提示", kind: "show_toast", message: "操作已完成。" });
+  if (product.requiredCapabilities.includes("form") && !abilityPresent(spec, "form") && spec.form) { add({ id: actionId("agent-submit"), label: spec.form.submitLabel, kind: "add_item", targetId: spec.form.id }); normalizationCodes.push("ADD_FORM_ACTION"); }
+  if (product.requiredCapabilities.includes("toggle") && !abilityPresent(spec, "toggle") && spec.cards[0]) { add({ id: actionId("agent-toggle"), label: "切换状态", kind: "toggle_item", targetId: spec.cards[0].id }); normalizationCodes.push("ADD_TOGGLE_ACTION"); }
+  if (product.requiredCapabilities.includes("toast") && !abilityPresent(spec, "toast")) { add({ id: actionId("agent-toast"), label: "查看提示", kind: "show_toast", message: "操作已完成。" }); normalizationCodes.push("ADD_TOAST_ACTION"); }
   validateAppSpec(spec);
-  return spec;
+  return { spec, normalizationCodes };
 }
 
 type MutableSchema = { properties?: Record<string, MutableSchema>; required?: string[]; items?: MutableSchema; oneOf?: MutableSchema[]; const?: string; minItems?: number; maxItems?: number };
-function engineeringSchemaFor(product: ReturnType<typeof parseProduct>) {
+export function engineeringSchemaFor(product: { requiredCapabilities: string[]; forbiddenCapabilities: string[] }) {
   const schema = structuredClone(STAGE_SCHEMAS.engineering) as unknown as MutableSchema;
   const spec = schema.properties!.spec;
   if (product.requiredCapabilities.includes("form") && !spec.required!.includes("form")) spec.required!.push("form");
@@ -143,6 +154,11 @@ function engineeringSchemaFor(product: ReturnType<typeof parseProduct>) {
   const actionItems = spec.properties!.actions.items!;
   if (forbiddenActions.size) actionItems.oneOf = actionItems.oneOf!.filter((branch) => !forbiddenActions.has(branch.properties!.kind.const));
   return schema;
+}
+
+async function sha256Json(value: unknown) {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(JSON.stringify(value)));
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
 function stageSystem(role: StageRole, context: string, schema: unknown) {
@@ -179,9 +195,11 @@ export async function generateAppWithAgents(prompt: string, previous: AppSpec | 
     const designResult = await call("design", STAGE_SCHEMAS.design, 420, (value) => parseDesign(value)); const design = designResult.parsed as ReturnType<typeof parseDesign>; artifacts.design = design; await progress({ role: "design", status: "COMPLETED", summary: design.summary, artifact: design, source: "workers_ai", model: WORKERS_AI_MODEL, durationMs: designResult.durationMs, attemptNo: 1 }); steps.push({ role: "design", name: ROLE_NAMES.design, summary: design.summary, status: "COMPLETED", source: "workers_ai", model: WORKERS_AI_MODEL, durationMs: designResult.durationMs, attemptNo: 1, artifact: design });
     const engineeringSchema = engineeringSchemaFor(product);
     let engineering: ReturnType<typeof parseEngineering>; let engineeringDuration = 0; let repaired = false;
-    try { const result = await call("engineering", engineeringSchema, 2200, (value) => parseEngineering(value)); engineering = result.parsed as ReturnType<typeof parseEngineering>; engineering.spec = completeRequiredCapabilities(engineering.spec, product); engineeringDuration += result.durationMs; checkCapabilities(engineering.spec, product); }
-    catch (firstError) { const code = errorCode(firstError); if (!["INVALID_ENGINEERING_ARTIFACT", "INVALID_APP_SPEC", "MISSING_REQUIRED_CAPABILITY", "FORBIDDEN_CAPABILITY"].includes(code)) throw firstError; const reason = `${code}${firstError instanceof ModelOutputError && firstError.path ? `:${firstError.path}` : ""}`; const result = await call("engineering", engineeringSchema, 2200, (value) => parseEngineering(value), 2, reason); engineering = result.parsed as ReturnType<typeof parseEngineering>; engineering.spec = completeRequiredCapabilities(engineering.spec, product); engineeringDuration += result.durationMs; checkCapabilities(engineering.spec, product); repaired = true; }
-    const engineeringArtifact = { summary: engineering.summary, repaired }; await progress({ role: "engineering", status: "COMPLETED", summary: engineering.summary, artifact: engineeringArtifact, source: "workers_ai", model: WORKERS_AI_MODEL, durationMs: engineeringDuration, attemptNo: repaired ? 2 : 1 }); steps.push({ role: "engineering", name: ROLE_NAMES.engineering, summary: engineering.summary, status: "COMPLETED", source: "workers_ai", model: WORKERS_AI_MODEL, durationMs: engineeringDuration, attemptNo: repaired ? 2 : 1, artifact: engineeringArtifact });
+    try { const result = await call("engineering", engineeringSchema, 2200, (value) => parseEngineering(value)); engineering = result.parsed as ReturnType<typeof parseEngineering>; const completed = completeRequiredCapabilities(engineering.spec, product); engineering.spec = completed.spec; engineering.normalizationCodes.push(...completed.normalizationCodes); engineeringDuration += result.durationMs; checkCapabilities(engineering.spec, product); }
+    catch (firstError) { const code = errorCode(firstError); if (!["INVALID_ENGINEERING_ARTIFACT", "INVALID_APP_SPEC", "MISSING_REQUIRED_CAPABILITY", "FORBIDDEN_CAPABILITY"].includes(code)) throw firstError; const reason = `${code}${firstError instanceof ModelOutputError && firstError.path ? `:${firstError.path}` : ""}`; const result = await call("engineering", engineeringSchema, 2200, (value) => parseEngineering(value), 2, reason); engineering = result.parsed as ReturnType<typeof parseEngineering>; const completed = completeRequiredCapabilities(engineering.spec, product); engineering.spec = completed.spec; engineering.normalizationCodes.push(...completed.normalizationCodes); engineeringDuration += result.durationMs; checkCapabilities(engineering.spec, product); repaired = true; }
+    const normalizationCodes = [...new Set(engineering.normalizationCodes)];
+    const completedCapabilities = normalizationCodes.flatMap((code) => ({ ADD_FILTER_ACTION: ["filter"], ADD_FORM_ACTION: ["form"], ADD_TOGGLE_ACTION: ["toggle"], ADD_TOAST_ACTION: ["toast"] }[code] ?? []));
+    const engineeringArtifact = { summary: engineering.summary, repaired, normalized: normalizationCodes.length > 0, normalizationVersion: "appspec-normalizer-v1", normalizationCodes, completedCapabilities, baseAppSpecSchemaSha: await sha256Json(APP_SPEC_SCHEMA), derivedEngineeringSchemaSha: await sha256Json(engineeringSchema) }; await progress({ role: "engineering", status: "COMPLETED", summary: engineering.summary, artifact: engineeringArtifact, source: "workers_ai", model: WORKERS_AI_MODEL, durationMs: engineeringDuration, attemptNo: repaired ? 2 : 1 }); steps.push({ role: "engineering", name: ROLE_NAMES.engineering, summary: engineering.summary, status: "COMPLETED", source: "workers_ai", model: WORKERS_AI_MODEL, durationMs: engineeringDuration, attemptNo: repaired ? 2 : 1, artifact: engineeringArtifact });
     return { spec: engineering.spec, summary: engineering.summary, steps, generation: { source: "workers_ai", model: WORKERS_AI_MODEL, outcome: "SUCCESS", failureCode: null, durationMs: now() - started } };
   } catch (error) { return fallback(errorCode(error)); }
 

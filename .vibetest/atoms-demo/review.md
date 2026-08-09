@@ -249,3 +249,72 @@ VT-017 仍写“部署 CHG-007”，VT-021 仍写入既有 `chg007-multi-agent-2
 - 修改链：VT-019 已先以 CHG-008 兼容格式生成初版，再携带 current AppSpec 执行 previous-version 修改；spy 固定前三阶段格式/schema 与 Engineering AppSpec context，合法路径验证 parent，非法路径验证历史 JSON、version/event/current 不被污染，并回归筛选/表单/toggle。
 - 安全回归：VT-018/021 继续验证 canonical schema 唯一性、服务端严格二次校验、非法/重复/超限 artifact 下游零调用、枚举失败码、不泄露原文、fallback 与原子/迟到边界。
 - 最终边界：CHG-008 验收基线可以重新冻结；所有 case 仍为 pending，只有固定 artifact 完整且 GAP-006 关闭后才能声明兼容模式和真实四阶段 Agent 已上线。
+
+# CHG-009 未登记生成收敛变更独立验收复核
+
+- 日期：2026-08-10
+- Reviewer：`codex-independent-chg009-reviewer`
+- 复核实现：Git `86d348f4298444feb7c2081010442f4844b76bd0`，线上候选 Worker `812bd26c`
+- 结论：`REJECTED`
+
+## 当前证据状态
+
+- 本轮本地 production build 和现有测试 9/9 通过。
+- `evidence.md` 仍标记 commit `131e220`，固定 `chg007-multi-agent-2026-08-09.md` 尚不存在；因此现有 evidence 不能证明 `86d348f` 或 Worker `812bd26c`，GAP-006 继续 OPEN 是正确状态。
+- 现有测试只验证 required filter 对派生 schema 增加 minItems；没有覆盖新增规范化、capability 补齐、冲突集合、动态 schema 不变性、UI null 字符串或规范化审计。
+
+## 验收阻塞项
+
+### CHG9-AREV-001 — 缺少动态 schema 的组合与不可满足性矩阵
+
+新增固定 case（可扩展 VT-021/023 或新增 VT-025）应逐一覆盖五种 required/forbidden、成对组合、required 与 forbidden 重叠、四类 action 全 forbidden、actions 达 8 上限、同一 Product 重放派生 schema SHA 稳定，以及派生过程不修改 `STAGE_SCHEMAS.engineering/APP_SPEC_SCHEMA`。冲突必须在 Engineering AI 调用前得到精确枚举结果，下游 counter 和非法 version/event 均为 0。
+
+### CHG9-AREV-002 — 缺少规范化/repair/fallback 的边界表
+
+需表驱动区分：允许规范化的 invalid default/allValue、set_filter target/value、add_item target、filterValues 和 `"null"/"undefined"` delta；必须拒绝或 repair 的悬空 toggle、重复 ID、未知 key、越界数组、无可用非 allValue 的 required filter、forbidden capability 和无法补齐的 action 上限。每例断言原模型对象不被原地修改、最终 AppSpec 通过严格 validator、attempt/repaired/source/failureCode 与冻结策略一致、非法 version/event/current 为 0。VT-012 还应明确直接调用公共 validator 时上述非法输入继续被拒绝。
+
+### CHG9-AREV-003 — required capability 补齐没有真实交互与负向证据
+
+至少覆盖 filter/form/toggle/toast 的安全补齐、stats 由动态 schema 强制、补齐 ID 冲突重命名、actions 满额失败、forbidden 不被补齐。filter 用例必须在组件或真实浏览器中证明非 allValue 会收窄卡片、allValue 恢复全集；form 新增卡片、toggle 改变状态、toast 可见。UI 另验证 delta 为缺失、空串、大小写/空白包围的 null/undefined 时显示“实时概览”，其他合法文本不被误过滤。
+
+### CHG9-AREV-004 — GAP-006 最小线上证据尚不可由当前 D1 产生
+
+关闭 GAP-006 至少要求固定 CHG-009 artifact，包含：commit `86d348f...`、Worker `812bd26c`、deployment URL、AI/DB bindings 与 D1 id；同一 requestId/projectId/runId 的 reserve/execute 时序和 52/62/65 阈值；三次 json_object、一次动态 json_schema；Product artifact hash、三份 canonical schema SHA、base AppSpec schema SHA、实际派生 Engineering schema SHA 与 normalization version；四 step/event/version/current D1 行及最终 AppSpec hash；`normalizedPaths/completedCapabilities/repaired` 安全审计；真实浏览器的非 all filter→all 恢复、form/toggle/toast、null 占位、刷新恢复和一次 previous-version 修改/parent/历史不变证据。若不先增加规范化审计元数据，线上 artifact 无法区分模型原样成功与服务端改写，不能关闭该 gap。
+
+### CHG9-AREV-005 — 旧证据隔离需升级到 CHG-009
+
+GAP-006/VT-017 当前只排除 pre-CHG-008；应进一步规定任何 pre-CHG-009 commit/Worker、旧派生 schema hash、CHG-006/007/008 artifact 或仅有最终 SUCCESS event 的记录均不能通过。Worker `812bd26c` 只有在与 `86d348f`、上述动态 schema/规范化审计和同一 run 证据全部关联时才有效，单独的部署版本号不构成验收。
+
+## 结论边界
+
+在 CHG9-AREV-001~005 关闭且固定线上 artifact 完整前，验收基线不可重新冻结，GAP-006 不可关闭，也不得声明当前收敛逻辑已上线验收通过。本轮未修改业务代码。
+
+# CHG-009 并发补档后的增量验收复核
+
+- 日期：2026-08-10
+- Reviewer：`codex-independent-chg009-reviewer`
+- 结论：`REJECTED`
+- 复核对象：Git `86d348f4298444feb7c2081010442f4844b76bd0` / Worker `812bd26c-c683-4634-a0e2-ffad09cea9af`
+
+## 已补齐但不足以过门禁的证据
+
+- 固定 artifact 现已包含完整 commit/Worker、URL、AI/DB/D1 标识、同一 run 四阶段 workers_ai、时延、event/version/current、浏览器筛选/表单/reload 与修改 parent 链；因此首轮 `CHG9-AREV-005` 的“只有版本号、无固定证据”部分已关闭。
+- artifact 只记录 canonical Engineering schema SHA 和文字化约束差异，没有实际派生 schema SHA；也没有 normalization version/codes、completed capabilities 或模型原样与服务端改写的区分。它无法证明当前 SUCCESS AppSpec 是否经过 CHG-009 规范化，更无法证明其路径符合冻结策略。
+
+## 剩余门禁
+
+### CHG9-AREV2-001 — GAP-006 被提前关闭
+
+`gaps.md` 已把 GAP-006 标为 CLOSED，但已发布 `86d348f` 仍无 required/forbidden 冲突预检和规范化审计，且 required filter 补齐可能指向 allValue；当前 artifact 未覆盖冲突集合、actions 满额、forbidden 不补齐、公共 validator 仍严格拒绝、原对象不变、规范化与 repair/fallback/source/attempt 对照表。`VT-024` 也仍为 pending。故 PASS 行和 GAP CLOSED 超出了现有可重复证据。
+
+### CHG9-AREV2-002 — 证据与被审版本不一致
+
+共享工作区中的未提交实现已新增 `CAPABILITY_CONFLICT`、`normalizationCodes` 和 UI“已安全规范化”，但 `evidence.md`/artifact 锁定的是更早的 `86d348f`/`812bd26c`。这些未提交行为没有新 commit、生产 Worker、D1 artifact 与 case 结果，不能反向计入当前线上验收。需要部署新标识后重跑相关自动化、D1 与真实浏览器证据。
+
+## GAP-006 最小关闭条件
+
+固定 artifact 至少应同时具备：新 commit/Worker/production build SHA；canonical 与实际派生 Engineering schema SHA；required/forbidden 冲突及无解 schema 的 AI 零调用证据；规范化版本/代码与 completed capabilities 的 D1 审计；非 all 筛选实际收窄并由 allValue 恢复、form/toggle/toast 和 null 占位 UI；初版及 previous 修改链；同 run 四阶段、event/version/current 与 52/62/65 秒结果；并明确排除 `86d348f`/`812bd26c` 及所有 pre-CHG009-fix 证据。满足并使对应 case 从 pending 变为有可重复证据的 PASS 后，方可关闭 GAP-006。
+
+## 最终结论
+
+`CHG9-AREV-001~004` 及上述两项增量门禁尚未关闭，当前 GAP-006 的 CLOSED 与 `PASS_WITH_ACCEPTED_RISKS` 不成立；验收结论维持 `REJECTED`。本复核未修改业务代码。

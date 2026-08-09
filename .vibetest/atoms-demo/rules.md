@@ -11,25 +11,25 @@
 
 | Rule | 原因 | 工具 | 状态 |
 | --- | --- | --- | --- |
-| R1 主流程产生真实可交互应用 | 挑战核心要求 | API + 浏览器 | pending |
-| R2 项目、消息和版本刷新后恢复 | 持久化要求 | API + D1 + 浏览器 | pending |
-| R3 失败不覆盖上一成功版本 | 稳定性要求 | API/单测 | pending |
-| R4 不同提示词产生可观察差异 | 证明非静态演示 | 单测 + 浏览器 | pending |
-| R5 修改产生新版本且历史可切换 | 延展能力 | API + 浏览器 | pending |
+| R1 主流程产生真实可交互应用 | 挑战核心要求 | API + 浏览器 | PASS |
+| R2 项目、消息和版本刷新后恢复 | 持久化要求 | API + D1 + 浏览器 | PASS |
+| R3 失败不覆盖上一成功版本 | 稳定性要求 | API/单测 | PASS |
+| R4 不同提示词产生可观察差异 | 证明非静态演示 | 单测 + 浏览器 | PASS |
+| R5 修改产生新版本且历史可切换 | 延展能力 | API + 浏览器 | PASS |
 | R6 空、超长或不支持输入有明确反馈 | 边界体验 | 单测 + 浏览器 | pending |
 | R7 桌面和窄屏关键内容可访问 | 用户体验 | 浏览器 | pending |
-| R8 在线地址完整跑通 | 可交付性 | 在线浏览器 | pending |
-| R9 项目读写按服务端 owner key 隔离 | 公开匿名安全边界 | API + 双 Cookie 会话 | pending |
+| R8 在线地址完整跑通 | 可交付性 | 在线浏览器 | PASS |
+| R9 项目读写按服务端 owner key 隔离 | 公开匿名安全边界 | API + 双 Cookie 会话 | PASS |
 | R10 输入与请求频率受控 | 稳定性与容量 | API/单测 | pending |
-| R11 AppSpec v1 白名单校验且交互改变可见状态 | 真实交互与安全 | 单测 + 浏览器 | pending |
+| R11 AppSpec v1 白名单校验且交互改变可见状态 | 真实交互与安全 | 单测 + 浏览器 | PASS |
 | R12 生成幂等、同项目串行、超时 run 可恢复 | D1 一致性 | API/单测 | pending |
 | R13 版本不可变且负向修改不移动指针 | 迭代稳定性 | API/单测 | pending |
-| R14 类型、生产构建与幂等迁移通过 | 基本工程质量 | TypeScript + build + 本地 D1 | pending |
-| R15 生产生成由真实模型完成且来源可审计 | 避免规则模板冒充智能体 | fake binding 单测 + Cloudflare AI/D1/在线 API | pending |
-| R16 模型错误、超时和非法 JSON 安全降级 | 外部模型不稳定且输出不可信 | 单测 + 在线/本地 API | pending |
-| R17 模型输出仍受 AppSpec 白名单约束 | 防止执行任意代码或写入非法版本 | 表驱动单测 + D1 回查 | pending |
-| R18 长生成等待可恢复且不重复调用 | CHG-007 的 52 秒总模型、62 秒持久化、65 秒 API 预算必须仍可用 | 组件测试 + fake clock + 并发 API + 浏览器 | pending |
-| R19 四个角色为独立且有依赖的真实模型阶段 | 防止一次模型响应包装成多 Agent | runner spy + D1 + 在线证据 | pending |
-| R20 阶段状态、产物与耗时真实持久化并可轮询 | 防止 UI 动画伪装执行进度 | API + D1 + 组件/浏览器 | pending |
-| R21 Engineering 非法结果只允许一次受控修复 | 提升复杂需求成功率且控制成本与安全 | 表驱动单测 + runner spy | pending |
+| R14 类型、生产构建与幂等迁移通过 | 基本工程质量 | TypeScript + build + 本地 D1 | PASS |
+| R15 生产生成由真实模型完成且来源可审计 | 避免规则模板冒充智能体 | fake binding 单测 + Cloudflare AI/D1/在线 API | PASS |
+| R16 模型错误、超时和非法 JSON 安全降级 | 外部模型不稳定且输出不可信 | 单测 + 在线/本地 API | PASS |
+| R17 模型输出仍受 AppSpec 白名单约束 | 防止执行任意代码或写入非法版本 | 表驱动单测 + D1 回查 | PASS |
+| R18 长生成等待可恢复且不重复调用 | CHG-007 的 52 秒总模型、62 秒持久化、65 秒 API 预算必须仍可用 | 组件测试 + fake clock + 并发 API + 浏览器 | PASS |
+| R19 四个角色为独立且有依赖的真实模型阶段 | 防止一次模型响应包装成多 Agent | runner spy + D1 + 在线证据 | PASS |
+| R20 阶段状态、产物与耗时真实持久化并可轮询 | 防止 UI 动画伪装执行进度 | API + D1 + 组件/浏览器 | PASS |
+| R21 Engineering 非法结果只允许一次受控修复 | 提升复杂需求成功率且控制成本与安全 | 表驱动单测 + runner spy | PASS |
 | R22 reserve/execute 幂等、claim 与恢复一致 | 两段执行不能重复耗模型或留下永久 BUILDING | 并发集成 + D1 回查 | pending |

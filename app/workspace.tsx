@@ -171,7 +171,7 @@ export function Workspace() {
                     const running = step.status === "RUNNING";
                     return <div key={`${step.role}-${index}`} className={`agent-step ${shown ? "done" : "waiting"}`}>
                       <span className={`agent-avatar ${step.role}`}>{roleInitials[step.role]}</span>
-                      <div><strong>{step.name}</strong><p>{shown ? `${step.summary}${step.durationMs != null ? ` · ${(step.durationMs / 1000).toFixed(1)}s` : ""}${step.attemptNo === 2 ? " · 已自动修复" : ""}` : running ? "正在调用模型并校验产物…" : "等待上一阶段完成…"}</p></div>
+                      <div><strong>{step.name}</strong><p>{shown ? `${step.summary}${step.durationMs != null ? ` · ${(step.durationMs / 1000).toFixed(1)}s` : ""}${step.attemptNo === 2 ? " · 已自动修复" : ""}${step.artifact?.normalized ? " · 已安全规范化" : ""}` : running ? "正在调用模型并校验产物…" : "等待上一阶段完成…"}</p></div>
                       <span className="step-state">{shown ? "✓" : running ? "↻" : "···"}</span>
                     </div>;
                   })}

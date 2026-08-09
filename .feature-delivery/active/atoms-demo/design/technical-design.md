@@ -322,8 +322,8 @@ API 日志只记录 requestId、route、status、duration、projectId 和脱敏 
   },
   "engineeringArtifact": {
     "$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","additionalProperties":false,
-    "required":["summary","repaired"],
-    "properties":{"summary":{"type":"string","minLength":1,"maxLength":180},"repaired":{"type":"boolean"}}
+    "required":["summary","repaired","normalized","normalizationVersion","normalizationCodes","completedCapabilities","baseAppSpecSchemaSha","derivedEngineeringSchemaSha"],
+    "properties":{"summary":{"type":"string","minLength":1,"maxLength":180},"repaired":{"type":"boolean"},"normalized":{"type":"boolean"},"normalizationVersion":{"const":"appspec-normalizer-v1"},"normalizationCodes":{"type":"array","uniqueItems":true,"items":{"enum":["STAT_NULL_SENTINEL","FILTER_DEFAULT_VALUE","FILTER_ALL_VALUE","CARD_FILTER_VALUES","SET_FILTER_REFERENCE","ADD_ITEM_REFERENCE","ADD_FILTER_ACTION","ADD_FORM_ACTION","ADD_TOGGLE_ACTION","ADD_TOAST_ACTION"]}},"completedCapabilities":{"type":"array","uniqueItems":true,"items":{"enum":["filter","form","toggle","toast"]}},"baseAppSpecSchemaSha":{"type":"string","pattern":"^[a-f0-9]{64}$"},"derivedEngineeringSchemaSha":{"type":"string","pattern":"^[a-f0-9]{64}$"}}
   }
 }
 ```
@@ -361,7 +361,7 @@ const ENGINEERING_RESPONSE_SCHEMA = {
 
 ### 11.3 一次安全修复与遵循度校验
 
-Engineering 第一次响应通过结构解析后还必须检查 AppSpec 语义与 ProductBrief。五个能力的唯一映射为：`filter => filters.length>0 && 存在 set_filter`、`form => 存在 form && add_item`、`toggle => 存在 toggle_item`、`stats => stats.length>0`、`toast => 存在 show_toast`；`external_script` 因 AppSpec 白名单天然禁止。所有 required 映射必须为真，所有 forbidden 映射必须为假。失败只向第二次 Engineering 调用提供枚举错误码与安全字段路径，不提供数据库错误、原始响应或内部堆栈。每个 run 最多修复一次，repair 使用相同已验证上游产物，step 记录 `attempt_no=2` 和两次调用总耗时。
+Engineering 第一次响应通过结构解析后先执行 §11.6 的有限关系规范化，再检查 AppSpec 语义与 ProductBrief。五个能力的唯一映射为：`filter => filters.length>0 && 存在 set_filter`、`form => 存在 form && add_item`、`toggle => 存在 toggle_item`、`stats => stats.length>0`、`toast => 存在 show_toast`；`external_script` 因 AppSpec 白名单天然禁止。所有 required 映射必须为真，所有 forbidden 映射必须为假。Product 的 required/forbidden 非 external 能力有交集时直接 `INVALID_PRODUCT_ARTIFACT/CAPABILITY_CONFLICT`，不调用下游。规范化可完成时仍为 `workers_ai/SUCCESS`，但 Engineering artifact 必须持久化 `normalized=true` 与固定枚举 `normalizationCodes[]`，UI 显示“已安全规范化”，不得静默冒充纯模型输出；无法规范化或其后校验失败才向第二次 Engineering 调用提供枚举错误码与安全字段路径，不提供数据库错误、原始响应或内部堆栈。每个 run 最多修复一次，repair 使用相同已验证上游产物，step 记录 `attempt_no=2` 和两次调用总耗时。
 
 修复成功仍记为 `workers_ai/SUCCESS`，并在 Engineering artifact 中记录 `repaired:true`；修复仍失败或任一上游阶段失败时，才调用既有确定性生成器。fallback 成功时四个 step 用明确的 deterministic 安全摘要完成，event 为 `deterministic/FALLBACK/<stage_or_validation_code>`；fallback 失败走 DESIGN-004 failure batch，不产生成功 event/version/assistant message。任何 completion/event 回查失败仍按原 token-guarded failure 协议处理。
 
@@ -376,3 +376,9 @@ API 的 `AgentStep` 增加可选 `source/model/durationMs/attemptNo/artifact/err
 两次线上 Product 严格 schema 调用均被平台在约 0.9 秒拒绝。为遵循 Cloudflare 官方“schema 可能无法满足并返回 JSON Mode couldn't be met”的事实，Product/Architecture/Design 使用 `response_format:{type:"json_object"}`，并把对应 `STAGE_SCHEMAS[role]` 完整序列化后置于 system prompt；Engineering 继续使用 `response_format:{type:"json_schema",json_schema:STAGE_SCHEMAS.engineering}`，最终 AppSpec 约束不变。
 
 服务端 canonical schema、exact-key/类型/枚举/长度/数组上限与唯一性、12 KiB 限制和 D1 artifact 契约不变。前三阶段收到 null/数组/primitive、额外/缺失字段、非法枚举、越界或重复数组、超长/控制字符、不可序列化或超限对象仍拒绝且不启动下游。`json_object` 只是平台生成兼容层，不是验证边界；平台的 `JSON Mode couldn't be met` 只映射为 `JSON_MODE_UNMET` 枚举，不保存上游原文。
+
+### 11.6 Product 约束下推与 AppSpec 关系规范化（CHG-009）
+
+Engineering 调用前从 canonical `STAGE_SCHEMAS.engineering` 深拷贝本次请求 schema，仅按已验证 ProductBrief 收紧：required `form` 时把 `form` 加入必填；required `filter/stats` 时设置对应 `minItems=1`；forbidden `form/filter/stats` 时删除或置零对应分支；forbidden `filter/form/toggle/toast` 时移除对应 action `oneOf` 分支。canonical 常量不被修改，前三阶段仍为三次 `json_object`，Engineering 仍为一次 `json_schema`。验收同时记录 canonical hash 与实际 Engineering schema 的约束差异。
+
+Engineering 响应先通过平台 schema、48 KiB、exact-key 与类型边界，随后只允许以下确定性关系规范化：无效 `defaultValue` 收敛到首个合法 option；无效 `allValue` 收敛到合法 `defaultValue`；卡片缺失、无效或等于 allValue 的 `filterValues` 按非 all option 稳定分配；`set_filter` target/value 收敛到现有 filter 与首个非 all option；`add_item` target 收敛到现有 form；字符串 `null/undefined` 的可选统计备注按缺省处理。Product required capability 已有目标组件但缺动作时，在 action 上限内补固定白名单动作并生成全局唯一 ID；补 `set_filter` 必须使用首个非 all option，且该 option 对应的可见卡片数必须 `>0` 且 `<cards.length`，否则视为不可完成并进入 repair。每项实际变换追加唯一枚举审计码，未改变时 `normalized=false/codes=[]`。Engineering artifact 还固定写入 `normalizationVersion=appspec-normalizer-v1`、由 ADD_* 映射的 `completedCapabilities[]`、canonical AppSpec schema SHA-256 与本次实际派生 Engineering schema SHA-256；这些值均由服务端计算，不由模型提供。规范化后必须重新执行 `validateAppSpec` 与 required/forbidden capability 检查；无法安全收敛仍最多 repair 一次，之后透明 fallback/FAILED。该层不创建脚本、URL、外部请求或 schema 外字段，也不绕过 validator。

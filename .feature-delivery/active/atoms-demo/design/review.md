@@ -243,3 +243,63 @@ CHG-008 的 change-log 只登记 FR-002/003/004、NFR-001/002/003/004 和 VT-017
 - 影响闭环：change-log 已覆盖 FR-002/003/004/006、NFR-001/002/003/004/005/007、TASK-007、VT-002/003/005/016~021/023/024 与 GAP-006；traceability 已新增 CHG-008 `CHANGE_PENDING_FREEZE` 行，并把 DESIGN-005 §11.5、VT-019 修改链和必要回归纳入。
 - 设计边界：Product/Architecture/Design 的 `json_object` 仅为平台兼容层，canonical `STAGE_SCHEMAS` 与服务端 exact-key/type/enum/length/unique/12 KiB 校验仍是唯一准入边界；Engineering/AppSpec 保持 `json_schema`，预算、D1、API、UI、owner、版本与迟到协议不变。
 - 声明边界：CHG-008 设计基线可以重新冻结；本结论不代表业务代码或线上四阶段证据已完成。
+
+# CHG-009 未登记生成收敛变更独立设计复核
+
+- 日期：2026-08-10
+- Reviewer：`codex-independent-chg009-reviewer`
+- 复核实现：Git `86d348f4298444feb7c2081010442f4844b76bd0`，线上候选 Worker `812bd26c`
+- 结论：`REJECTED`
+
+## 已确认事实
+
+- CHG-008 冻结后，`0e71098..86d348f` 实际新增 Product 驱动的 Engineering 派生 schema、AppSpec 关系规范化、required capability action 补齐、筛选可操作性修正和 UI `null/undefined` 字符串过滤；这不是单纯实现细节，已改变模型输出的接受、repair 和成功审计语义。
+- 基础 AppSpec 白名单、对象 exact-key、最终 `validateAppSpec`、48 KiB/12 KiB、owner/D1/API/52-62-65 秒协议仍在；UI 仅隐藏精确的空值占位字符串，本身不扩大渲染能力。
+- 本轮执行 production build 与现有测试成功，9/9 通过；该结果只证明现有回归未失败，不证明新增策略已被充分验收。
+
+## 与冻结基线的冲突/阻塞
+
+### CHG9-DREV-001 — 非法关系从“拒绝并 repair”变为静默改写，尚无冻结决策
+
+DESIGN-002/005 与 VT-012/023 当前约定非法 `defaultValue/allValue`、action target/value、`filterValues` 关系应被 validator 拒绝，Engineering 缺 required capability 后最多 repair 一次。当前 `assertAppSpec` 会改写 default/allValue、set_filter target/value、add_item target 和 card filterValues；`completeRequiredCapabilities` 会在第一次 Engineering 输出后直接补 set_filter/add_item/toggle/show_toast，随后仍可能记录 `workers_ai/SUCCESS`、`attemptNo=1`、`repaired=false`。这改变了 FR-003/004/006、NFR-001/002/004/007 与 DESIGN-005 §11.3 的失败和来源语义，必须先登记并冻结“允许规范化的白名单、不可规范化错误、何时 repair、何时 fallback”。公开/API `validateAppSpec` 仍应保持严格拒绝，不能把 AI adapter 的修复扩散为通用宽松验证。
+
+### CHG9-DREV-002 — 动态 schema 对冲突能力集合可生成不可满足契约
+
+Product schema 允许同一 capability 同时出现在 required/forbidden。当前派生顺序可能先把 `form` 加入 required、随后删除 `form` property，或把 required filter/stats 的 minItems 与 forbidden maxItems=0 同时写入；若 filter/form/toggle/toast 全部 forbidden，actions 的 oneOf 可被过滤为空，但基础 AppSpec 又要求 actions 至少 1 项。应在 Product artifact 进入 Engineering 前固定冲突/可满足性校验与枚举错误码，并定义是 repair Product、直接 fallback 还是拒绝；不能把无解 schema 交给平台后笼统记为 MODEL_ERROR。
+
+### CHG9-DREV-003 — “required filter 已补齐”不等于真实筛选能力
+
+`completeRequiredCapabilities` 为缺少 set_filter 的已有 filter 添加 action 时使用 `filter.defaultValue`；该值常等于 `allValue`，action 只恢复全集却被 `abilityPresent(filter)` 视为能力已满足。若 options 只有 allValue，也不存在可收窄集合。冻结 DESIGN-002 明确要求筛选改变可见卡片。CHG-009 必须把 filter capability 定义为：至少一个非 allValue option、至少一张卡有对应合法非 all filterValue、set_filter 指向非 allValue 且操作后集合发生变化；无法安全补齐时进入 repair/fallback，而非标 SUCCESS。
+
+### CHG9-DREV-004 — 服务端规范化/补齐没有可审计来源
+
+Engineering artifact 仍只有 `{summary,repaired}`，线上 D1 无法区分模型原样通过、关系规范化或服务端补 action。既然最终 event 仍是 `workers_ai/SUCCESS`，至少应持久化不含模型原文的安全元数据，例如 `normalizationVersion`、`normalizedPaths[]`、`completedCapabilities[]`、base/derived schema SHA；否则 GAP-006 无法证明最终可交互结果来自哪条受控路径，也无法回放 CHG-009 行为。
+
+## CHG-009 建议登记
+
+- 变更原因：CHG-008 后线上输出仍出现可安全收敛的 AppSpec 关系/能力缺口；实现已部署候选 Worker `812bd26c`。
+- 影响范围：FR-002/003/004/006，NFR-001/002/003/004/005/007，DESIGN-002/004/005（建议新增 §11.6 或 DESIGN-006），TASK-001/003/004/007，VT-002/003/005/012/017/018/019/021/023/024，GAP-006。
+- 变更内容：Product 派生 Engineering schema、冲突能力预检、AI-adapter 专属安全规范化、required capability 安全补齐、规范化审计元数据、UI 空值占位过滤；AppSpec/API/D1 owner 与版本不变量保持兼容。
+- 回滚：登记 CHG-008 最后已冻结且已验证的确切 commit/Worker；新增审计字段若采用 artifact JSON 扩展则向后兼容保留，不删除历史版本。
+- 状态：`CHANGE_PENDING_FREEZE`；在设计/验收复核关闭前，`86d348f`/`812bd26c` 只能称候选实现，不能作为已冻结完成版本。
+
+## 结论边界
+
+在 CHG9-DREV-001~004 关闭前，当前实现与冻结设计不一致，CHG-009 不可冻结，也不能关闭 GAP-006。本轮未修改业务代码。
+
+# CHG-009 并发补档后的增量设计复核
+
+- 日期：2026-08-10
+- Reviewer：`codex-independent-chg009-reviewer`
+- 结论：`REJECTED`
+- 复核对象仍为已声明发布标识：Git `86d348f4298444feb7c2081010442f4844b76bd0` / Worker `812bd26c-c683-4634-a0e2-ffad09cea9af`
+
+## 增量结论
+
+- `change-log.md`、`traceability.md` 与 DESIGN-005 §11.6 已补 CHG-009 的原因、影响面、回滚和规范化白名单，故首轮所述“完全未登记”已关闭。
+- 但这些补档没有关闭 `CHG9-DREV-001~004` 的实现与审计门禁。尤其已发布 commit `86d348f` 的 Product artifact 未拒绝 required/forbidden 重叠；required filter 补 action 仍使用 `defaultValue`，可能等于 `allValue`；Engineering D1 artifact 仍只有 `summary/repaired`，没有 normalization 版本、路径/代码、补齐能力或实际派生 schema hash。因此 §11.6 所述“已验证 ProductBrief”“安全补齐”和可审计关系不能由该 commit/Worker 证明。
+- 共享工作区中另有未提交的 `lib/ai-generator.ts`/`app/workspace.tsx` 修改，加入 `CAPABILITY_CONFLICT` 与 `normalizationCodes`。它们不属于 `86d348f`，也没有对应新 Worker，不能用于证明当前发布版本关闭阻塞；本复核未修改这些业务文件。
+
+## 冻结条件
+
+CHG-009 需以新的确切 commit/Worker 重新登记并验证：Product 能力集合可满足性预检；required filter 的非 all option、卡片分布与实际收窄不变量；规范化与补齐对 repair/source/attempt 的唯一语义；持久化的 normalization 版本/代码、completed capabilities、base/derived schema SHA。完成前维持 `CHANGE_PENDING_FREEZE`，设计不可 CONFIRMED。

@@ -26,6 +26,7 @@
 | FR-002/003/004/006, NFR-001/002/003/004/005 | CHG-006 首次 Llama `INVALID_ENVELOPE` 与官方 JSON Schema/对象响应示例 | DESIGN-004 完整 schema、对象/字符串适配与服务端二次校验 | TASK-006 | VT-017/018/019/020，并回归 VT-002/003/005 | pending | CHANGE_PENDING_FREEZE |
 | FR-002/003/004/006, NFR-001/002/003/004/005/007 | CHG-007 评分复核与用户批准满分改进 | DESIGN-005 四阶段独立调用、reserve/execute、阶段持久化、一次修复 | TASK-007 | VT-021/022/023/024，并回归 VT-002/003/004/006/014/016~020 | pending | CHANGE_PENDING_FREEZE |
 | FR-002/003/004/006, NFR-001/002/003/004/005/007 | CHG-008 两次 Product strict-schema 线上拒绝与 Cloudflare JSON Mode 官方限制 | DESIGN-005 §11.5 中间阶段 json_object + canonical schema 服务端严格校验，Engineering 保持 json_schema | TASK-007 | VT-017/018/019/021，并回归 VT-002/003/005/016/020/023/024 | pending | CHANGE_PENDING_FREEZE |
+| FR-002/003/004/006, NFR-001/002/003/004/005/007 | CHG-009 线上跨字段 AppSpec 失败与浏览器交互复验 | DESIGN-005 §11.6 Product 约束下推、关系规范化与 required capability 安全补齐 | TASK-007 | VT-017/018/019/021/023，并回归 VT-002/003/005/020/024 | `.vibetest/atoms-demo/artifacts/chg007-multi-agent-2026-08-09.md` | CHANGE_PENDING_FREEZE |
 
 ## 安全决策追踪
 

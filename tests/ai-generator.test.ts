@@ -52,6 +52,65 @@ test("repairs engineering exactly once when a required capability is missing", a
   assert.equal(result.steps[3].artifact?.repaired, true);
 });
 
+test("rejects conflicting product capabilities before downstream calls", async () => {
+  let calls = 0;
+  const runner: AiRunner = { run: async () => { calls++; return { response: { ...product, forbiddenCapabilities: ["filter"] } }; } };
+  const result = await generateAppWithAgents("做一个筛选看板", undefined, runner);
+  assert.equal(calls, 1);
+  assert.equal(result.generation.source, "deterministic");
+  assert.equal(result.generation.failureCode, "INVALID_PRODUCT_ARTIFACT");
+});
+
+test("audits bounded AppSpec normalization and completes required actions", async () => {
+  const requiredProduct = { ...product, requiredCapabilities: ["filter", "form", "stats"], forbiddenCapabilities: ["toggle", "external_script"] };
+  const normalizedEngineering = {
+    ...engineering,
+    spec: {
+      ...engineering.spec,
+      stats: [{ id: "total", label: "总数", value: "2", delta: "null" }],
+      filters: [{ ...engineering.spec.filters[0], defaultValue: "未知", allValue: "不存在" }],
+      cards: engineering.spec.cards.map((card) => ({ ...card, filterValues: { weather: "不存在" } })),
+      form: { id: "entry-form", title: "新增观测", fields: [{ id: "entry-name", label: "名称", placeholder: "请输入", required: true }], submitLabel: "提交" },
+      actions: [{ id: "notice", label: "提示", kind: "show_toast", message: "完成" }],
+    },
+  };
+  const originalEngineeringJson = JSON.stringify(normalizedEngineering);
+  const values = [requiredProduct, architecture, design, normalizedEngineering]; let calls = 0;
+  const runner: AiRunner = { run: async () => ({ response: values[calls++] }) };
+  const result = await generateAppWithAgents("做一个带筛选、表单和统计的观测台", undefined, runner);
+  assert.equal(result.generation.source, "workers_ai");
+  assert.equal(calls, 4);
+  assert.equal(result.steps[3].artifact?.normalized, true);
+  assert.equal(result.steps[3].artifact?.normalizationVersion, "appspec-normalizer-v1");
+  assert.deepEqual(result.steps[3].artifact?.normalizationCodes, ["STAT_NULL_SENTINEL", "FILTER_DEFAULT_VALUE", "FILTER_ALL_VALUE", "CARD_FILTER_VALUES", "ADD_FILTER_ACTION", "ADD_FORM_ACTION"]);
+  assert.deepEqual(result.steps[3].artifact?.completedCapabilities, ["filter", "form"]);
+  assert.match(String(result.steps[3].artifact?.baseAppSpecSchemaSha), /^[a-f0-9]{64}$/);
+  assert.match(String(result.steps[3].artifact?.derivedEngineeringSchemaSha), /^[a-f0-9]{64}$/);
+  assert.equal(JSON.stringify(normalizedEngineering), originalEngineeringJson);
+  assert.equal(result.spec.stats[0].delta, undefined);
+  assert.ok(result.spec.actions.some((action) => action.kind === "set_filter" && action.value !== result.spec.filters[0].allValue));
+  assert.ok(result.spec.actions.some((action) => action.kind === "add_item" && action.targetId === result.spec.form?.id));
+  assert.ok(result.spec.actions.every((action) => action.kind !== "toggle_item"));
+});
+
+test("required filter without a narrowing result cannot be normalized as success", async () => {
+  const oneCardEngineering = {
+    ...engineering,
+    spec: {
+      ...engineering.spec,
+      filters: [{ id: "only", label: "状态", options: ["全部"], defaultValue: "全部", allValue: "全部" }],
+      cards: [{ id: "single", title: "唯一卡片", description: "没有可收窄集合", tag: "全部", filterValues: { only: "全部" } }],
+      actions: [{ id: "notice", label: "提示", kind: "show_toast", message: "完成" }],
+    },
+  };
+  const values = [product, architecture, design, oneCardEngineering, oneCardEngineering]; let calls = 0;
+  const runner: AiRunner = { run: async () => ({ response: values[calls++] }) };
+  const result = await generateAppWithAgents("做一个必须可筛选的看板", undefined, runner);
+  assert.equal(calls, 5);
+  assert.equal(result.generation.source, "deterministic");
+  assert.equal(result.generation.failureCode, "MISSING_REQUIRED_CAPABILITY");
+});
+
 test("invalid upstream artifact stops downstream AI and falls back safely", async () => {
   let calls = 0; const runner: AiRunner = { run: async () => { calls++; return { response: { ...product, debug: true } }; } };
   const result = await generateAppWithAgents("做一个旅行计划看板", undefined, runner);
