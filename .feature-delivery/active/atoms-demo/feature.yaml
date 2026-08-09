@@ -4,12 +4,12 @@ feature:
   title: Atoms AI App Builder Demo
   risk: high
   delivery_mode: full
-  status: IMPLEMENTING
+  status: ACCEPTANCE_FROZEN
   owner_repository: atoms-demo
   participating_repositories:
   - atoms-demo
   created_at: '2026-08-09T15:50:06+08:00'
-  updated_at: '2026-08-09T23:54:16+08:00'
+  updated_at: '2026-08-10T01:06:55+08:00'
 artifacts:
   context: .feature-delivery/active/atoms-demo/_context.md
   progress: .feature-delivery/active/atoms-demo/progress.md
@@ -43,12 +43,12 @@ freeze:
       .feature-delivery/active/atoms-demo/scope.md: e1005c9dafb788e8bec8b0cd3704a5702df0f2af4635db1bee15c06970efa5a1
       .feature-delivery/active/atoms-demo/open-questions.md: d6dca385665d8225c9502b92782dfc5ae32ac2a450159c9f0ddb2d3dfa813d52
       .feature-delivery/active/atoms-demo/reference/prd.md: 5b7d44cf91196d31f52088461f987740c50d35d9aa123bec98b2618abb26e7b0
-      .feature-delivery/active/atoms-demo/traceability.md: 8317c2336e12aed2e8e2daf150a8dfb04001e080ab6d96fa0ceb34b9d1e6e844
+      .feature-delivery/active/atoms-demo/traceability.md: 59be292319e3739d38ef465b3530182040308d529151fd01a0f21a80f00584ba
       .feature-delivery/active/atoms-demo/source/register.yaml: 2add64b2e30745b9a9a4b05305e93a47bcf342f04672abe5c9438d8c54b95fa0
       .feature-delivery/active/atoms-demo/source/units.jsonl: 7d06581503d40f30f8d685be435fe003b421f2c5b20e7feff33a701ee5e1ca49
       .feature-delivery/active/atoms-demo/source/coverage.yaml: 2617e8be2c138f711221ed9555c57e8a64f22a7af777b2f5877c919b2897ad8d
       .feature-delivery/active/atoms-demo/source/review.md: 9308ae6cb0b121d18210462da8f3ce9d5d39aae4e5f592909035a2f31d8fde6f
-    at: '2026-08-09T23:54:08+08:00'
+    at: '2026-08-10T01:06:48+08:00'
     by: codex
   design:
     status: FROZEN
@@ -57,14 +57,14 @@ freeze:
       .feature-delivery/active/atoms-demo/scope.md: e1005c9dafb788e8bec8b0cd3704a5702df0f2af4635db1bee15c06970efa5a1
       .feature-delivery/active/atoms-demo/open-questions.md: d6dca385665d8225c9502b92782dfc5ae32ac2a450159c9f0ddb2d3dfa813d52
       .feature-delivery/active/atoms-demo/reference/prd.md: 5b7d44cf91196d31f52088461f987740c50d35d9aa123bec98b2618abb26e7b0
-      .feature-delivery/active/atoms-demo/traceability.md: 8317c2336e12aed2e8e2daf150a8dfb04001e080ab6d96fa0ceb34b9d1e6e844
+      .feature-delivery/active/atoms-demo/traceability.md: 59be292319e3739d38ef465b3530182040308d529151fd01a0f21a80f00584ba
       .feature-delivery/active/atoms-demo/source/register.yaml: 2add64b2e30745b9a9a4b05305e93a47bcf342f04672abe5c9438d8c54b95fa0
       .feature-delivery/active/atoms-demo/source/units.jsonl: 7d06581503d40f30f8d685be435fe003b421f2c5b20e7feff33a701ee5e1ca49
       .feature-delivery/active/atoms-demo/source/coverage.yaml: 2617e8be2c138f711221ed9555c57e8a64f22a7af777b2f5877c919b2897ad8d
       .feature-delivery/active/atoms-demo/source/review.md: 9308ae6cb0b121d18210462da8f3ce9d5d39aae4e5f592909035a2f31d8fde6f
-      .feature-delivery/active/atoms-demo/design/technical-design.md: 4b21181c70dc7b6f1cf17684b9921bcbe949a0134471bf48e81c980306c1163d
+      .feature-delivery/active/atoms-demo/design/technical-design.md: 7dbab72c712271a055b6a562e2e0871d1e6f64fd90d09e580cd0f6faabc3f9bb
       .feature-delivery/active/atoms-demo/implementation-plan.md: 7906e9825edfb7da4cd591e8f0a93269773fca716010e8b1130c1c0602682f8c
-    at: '2026-08-09T23:54:08+08:00'
+    at: '2026-08-10T01:06:52+08:00'
     by: codex
   acceptance:
     status: FROZEN
@@ -73,22 +73,22 @@ freeze:
       .feature-delivery/active/atoms-demo/scope.md: e1005c9dafb788e8bec8b0cd3704a5702df0f2af4635db1bee15c06970efa5a1
       .feature-delivery/active/atoms-demo/open-questions.md: d6dca385665d8225c9502b92782dfc5ae32ac2a450159c9f0ddb2d3dfa813d52
       .feature-delivery/active/atoms-demo/reference/prd.md: 5b7d44cf91196d31f52088461f987740c50d35d9aa123bec98b2618abb26e7b0
-      .feature-delivery/active/atoms-demo/traceability.md: 8317c2336e12aed2e8e2daf150a8dfb04001e080ab6d96fa0ceb34b9d1e6e844
+      .feature-delivery/active/atoms-demo/traceability.md: 59be292319e3739d38ef465b3530182040308d529151fd01a0f21a80f00584ba
       .feature-delivery/active/atoms-demo/source/register.yaml: 2add64b2e30745b9a9a4b05305e93a47bcf342f04672abe5c9438d8c54b95fa0
       .feature-delivery/active/atoms-demo/source/units.jsonl: 7d06581503d40f30f8d685be435fe003b421f2c5b20e7feff33a701ee5e1ca49
       .feature-delivery/active/atoms-demo/source/coverage.yaml: 2617e8be2c138f711221ed9555c57e8a64f22a7af777b2f5877c919b2897ad8d
       .feature-delivery/active/atoms-demo/source/review.md: 9308ae6cb0b121d18210462da8f3ce9d5d39aae4e5f592909035a2f31d8fde6f
-      .feature-delivery/active/atoms-demo/design/technical-design.md: 4b21181c70dc7b6f1cf17684b9921bcbe949a0134471bf48e81c980306c1163d
+      .feature-delivery/active/atoms-demo/design/technical-design.md: 7dbab72c712271a055b6a562e2e0871d1e6f64fd90d09e580cd0f6faabc3f9bb
       .feature-delivery/active/atoms-demo/implementation-plan.md: 7906e9825edfb7da4cd591e8f0a93269773fca716010e8b1130c1c0602682f8c
-      .vibetest/atoms-demo/rules.md: 08831b17b4a44806365b84c156badb729a4d940ccee621e3743dffa8020a6263
-      .vibetest/atoms-demo/cases.md: 9d3c65bf023ee84e4b9a447842971b15e47f8015afffdc515848e7f5ffef0577
-      .vibetest/atoms-demo/evidence.md: 4e7f4fa9a83139bbd6e43d75a38c4e88f4f3635b7d27d61f3dd0078395be54ba
-      .vibetest/atoms-demo/gaps.md: e54586a19a8220ec6c6ba5d949133b927eab90e2ecb2cb20ad517e22c5dbe3f1
+      .vibetest/atoms-demo/rules.md: d66115b0ef4389b75ace9c6b8ea5cd159c3671f053b63e610baed44d6f9a1b5d
+      .vibetest/atoms-demo/cases.md: 736029a4f172b17d2cf5c62392977feb71f57c13dbe60262eebaa9535e703cc0
+      .vibetest/atoms-demo/evidence.md: 13a0c94a4cd73469d7704f88640bf4c3ce83c0840f05e6b0ca3884b1836b9929
+      .vibetest/atoms-demo/gaps.md: 699d452fa73aad3917f4eaa1df0345200d7590094ca449ac73099290a2cfa693
       .feature-delivery/active/atoms-demo/agent-work-packet.md: ec47dd4b1f63b8a172ff9d9f2756ee92a9ca4ff2b01452a3cfb0fed300969a50
-    at: '2026-08-09T23:54:08+08:00'
+    at: '2026-08-10T01:06:55+08:00'
     by: codex
 baseline:
-  status: FROZEN
+  status: SUPERSEDED
   commit: 2c08238f43a712d40b35d9c5384876f9f503b604
   at: '2026-08-09T23:54:16+08:00'
 verification:
