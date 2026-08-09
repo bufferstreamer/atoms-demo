@@ -51,3 +51,11 @@
 - 最终结论：`CONFIRMED`
 - 确认范围：官方模型与免费额度事实快照、严格 generation envelope、两阶段 request/run reservation、AI 前幂等/限流/容量/RUNNING 锁、attempt token 完成与迟到守卫、generation event 原子一致性、completion/failure/超时收敛、首版旧库升级、线上 requestId→runId→event 证据链。
 - 声明边界：只确认 CHG-003 设计与验收基线可重新冻结，不代表代码已实现或线上模型已接通。
+# CHG-004 模型时延与长等待体验独立复核
+
+- 日期：2026-08-09
+- Reviewer：`codex-independent-source-reviewer`
+- 轮次：4
+- 最终结论：`CONFIRMED`
+- 确认范围：55 秒模型预算与 65 秒 API E2E 预算、2 分钟 RUNNING 回收、BUILDING 刷新轮询、重复提交保护、timer 清理、composer 恢复，以及 READY workers_ai / READY deterministic fallback / FAILED no-event 三类终态语义。
+- 声明边界：只确认 CHG-004 可重新冻结；VT-017 仍需真实线上 `workers_ai/SUCCESS`。

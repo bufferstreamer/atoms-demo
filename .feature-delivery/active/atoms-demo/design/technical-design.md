@@ -30,7 +30,8 @@ flowchart LR
 - 生产模型固定为 Cloudflare Workers AI `@cf/zai-org/glm-4.7-flash`，通过 Worker `AI` binding 调用；不保存外部 API Key。
 - 一次调用输出严格 envelope `{ spec, summary, steps }`，顶层和子对象均拒绝额外字段。`summary` 为去控制字符后的 1..160 字符；`steps` 长度必须为 4，按顺序且不重复地包含 `product`、`architecture`、`design`、`engineering`，每项只允许 `{ role, summary }`，摘要为 1..180 字符；服务端补固定角色显示名与 `COMPLETED` 状态，不允许模型控制身份或状态。不得再使用固定摘要冒充模型产出。
 - 服务端只接受 AppSpec v1 白名单 JSON。模型输出先验证完整 envelope，再执行与规则生成相同的 `validateAppSpec`；未知/额外字段、错误类型、悬空引用、越界数组、非法枚举、超长摘要或错误角色顺序均不进入 D1 version。
-- 请求设置 `max_completion_tokens=2200` 和 25 秒应用级超时；提取后的文本响应 UTF-8 最大 48 KiB。binding 缺失、平台错误、超时、空响应、响应过大、JSON 解析失败或 envelope/AppSpec 校验失败时，只记录枚举失败码并尝试确定性生成；若确定性生成也不支持该修改，则返回既有 422 且不移动当前版本。日志不记录 prompt、模型原文或异常堆栈中的外部响应。
+- 请求设置 `max_completion_tokens=2200` 和 55 秒模型调用超时；该预算来自 25 秒在三个独立线上 Worker version 均超时的实测，并为 envelope 校验、D1 completion batch/回查与网络响应预留 10 秒，完整 API E2E 预算为 65 秒。提取后的文本响应 UTF-8 最大 48 KiB。binding 缺失、平台错误、超时、空响应、响应过大、JSON 解析失败或 envelope/AppSpec 校验失败时，只记录枚举失败码并尝试确定性生成；若确定性生成也不支持该修改，则返回既有 422 且不移动当前版本。日志不记录 prompt、模型原文或异常堆栈中的外部响应。
+- UI 在请求期间持续显示 BUILDING、保留 composer 输入并禁用提交。页面刷新或并发重放读到 BUILDING 项目时，不新建 requestId、不再调用生成 API，而是每 1.5 秒读取同一 project。READY 后停止轮询并根据成功 event 展示 `workers_ai/SUCCESS` 或 `deterministic/FALLBACK/<failureCode>`；FAILED 后停止轮询，展示 run/request error_code 与重试入口，不得伪造 generation 来源，因为模型与 fallback 都失败时没有成功 event/version/assistant message。轮询读取失败保留画面并允许下次轮询恢复；组件卸载必须清理 timer。
 - 每次成功写入的 run 必须在 `generation_events(run_id, source, model, outcome, failure_code, duration_ms, created_at)` 留下唯一来源审计。event 与 project/run/version/messages/steps/current pointer 位于同一 D1 batch；event 插入失败则整批失败，不能出现已发布 version 无来源或来源成功但 version 不存在。`source` 仅为 `workers_ai` 或 `deterministic`；前端展示最近一次生成来源，线上验收必须证明至少一次 `workers_ai/SUCCESS`，不能用降级结果冒充模型已接通。
 - 初版继续生成把当前 AppSpec 连同用户修改请求传给模型；模型必须返回完整新 AppSpec，版本仍遵守 parent/base/current 的既有乐观并发契约。
 - 模型名称集中配置，后续升级 Kimi 只替换适配层和重新验收，不改变 AppSpec/Renderer/D1 项目契约。
@@ -41,7 +42,7 @@ flowchart LR
 
 模型与确定性降级均失败、completion batch 抛错或 completion 回查不一致时，都必须立即执行 token-guarded failure batch：只在原 run 仍为 RUNNING 且 token 匹配时把 run/request/steps 标为 FAILED、写枚举 error_code、清空 attempt_token，并将 project 恢复为上一成功版本的 READY，首次无版本项目标为 FAILED。D1 completion batch 内的 version/event/current/run-complete 更新按事务语义整体回滚；阶段一已经提交的 user message 保留为失败尝试的审计输入，不新增 assistant 成功消息，后续 UI 可显示失败并允许用新 requestId 重试。failure batch 后回查最终状态；若 failure batch 自身失败则返回 500 且依赖读取超时回收，不得报告成功。
 
-读取路径用一个 D1 batch 回收超过 2 分钟的 RUNNING：run 更新为 `FAILED/RUN_TIMEOUT` 并清空 `attempt_token`，关联 request 和 PENDING steps 标为 FAILED；project 有 current version 时从 BUILDING 恢复为 READY，无 current version 时改为 FAILED，同时更新 updated_at。回收 batch 后回查 project/run/request/steps，禁止项目永久停留 BUILDING。调用中断后相同 requestId 重放返回该 ledger 的 FAILED 状态而不二次调用模型，用户明确重新生成时使用新 requestId。25 秒模型超时后先使本次 runner 进入降级；任何迟到模型结果因 attempt token/run 状态守卫不能插入 version 或 event。`PROJECT_BUSY`、`RATE_LIMITED`、项目容量拒绝、重复 RUNNING requestId 均必须在调用前返回，AI 调用次数为 0。
+读取路径用一个 D1 batch 回收超过 2 分钟的 RUNNING：run 更新为 `FAILED/RUN_TIMEOUT` 并清空 `attempt_token`，关联 request 和 PENDING steps 标为 FAILED；project 有 current version 时从 BUILDING 恢复为 READY，无 current version 时改为 FAILED，同时更新 updated_at。回收 batch 后回查 project/run/request/steps，禁止项目永久停留 BUILDING。调用中断后相同 requestId 重放返回该 ledger 的 FAILED 状态而不二次调用模型，用户明确重新生成时使用新 requestId。55 秒模型超时后先使本次 runner 进入降级；任何迟到模型结果因 attempt token/run 状态守卫不能插入 version 或 event。`PROJECT_BUSY`、`RATE_LIMITED`、项目容量拒绝、重复 RUNNING requestId 均必须在调用前返回，AI 调用次数为 0。
 
 ## 3. AppSpec v1 与真实交互契约（DESIGN-002）
 

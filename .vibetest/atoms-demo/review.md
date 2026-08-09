@@ -35,3 +35,10 @@
 - 结论：`CONFIRMED`
 - 新增门禁：R15-R17、VT-017-VT-019，并将模型表/旧数据升级接入 VT-016。
 - 最高风险开放项：GAP-004。没有同一部署 commit、Worker version、AI/DB binding、requestId→runId→`workers_ai/SUCCESS` event 的在线证据，不得声明模型已接通。
+# CHG-004 验收基线独立复核
+
+- 日期：2026-08-09
+- Reviewer：`codex-independent-source-reviewer`
+- 结论：`CONFIRMED`
+- 新增门禁：R18、VT-020；VT-017/018 增加 55 秒模型与 65 秒 API 双预算证据。
+- 完成边界：线上 artifact 必须关联同次 requestId/runId/event、部署 commit/version/bindings，并提供真实浏览器长等待证据。
