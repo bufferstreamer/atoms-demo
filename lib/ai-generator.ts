@@ -63,7 +63,10 @@ function parseDesign(value: unknown) { const code = "INVALID_DESIGN_ARTIFACT"; c
 function assertAppSpec(value: unknown) {
   const code = "INVALID_APP_SPEC"; const spec = record(value, code);
   exact(spec, ["schemaVersion", "kind", "title", "subtitle", "theme", "stats", "filters", "cards", "actions", ...(spec.form === undefined ? [] : ["form"])], code);
-  try { validateAppSpec(spec as AppSpec); } catch { throw new ModelOutputError(code); }
+  try { validateAppSpec(spec as AppSpec); } catch (error) {
+    const detail = error instanceof Error ? text(error.message, 120, code) : "规格关系校验失败";
+    throw new ModelOutputError(code, detail);
+  }
   return spec as AppSpec;
 }
 function parseEngineering(value: unknown) { const v = record(value, "INVALID_ENGINEERING_ARTIFACT"); exact(v, ["spec", "summary"], "INVALID_ENGINEERING_ARTIFACT"); assertBytes(v, MAX_ENGINEERING_BYTES, "RESPONSE_TOO_LARGE"); return { spec: assertAppSpec(v.spec), summary: text(v.summary, 180, "INVALID_ENGINEERING_ARTIFACT") }; }
@@ -93,7 +96,7 @@ function stageSystem(role: StageRole, context: string, schema: unknown) {
   if (role === "product") return `你是产品 Agent。提炼受众、目标、必须和禁止的交互能力。requiredCapabilities 只能使用英文 token filter/form/toggle/stats/toast；forbiddenCapabilities 只能使用这些 token 或 external_script；没有禁止项时返回空数组，不得翻译或创造枚举。实例形状示意：{"summary":"决策摘要","audience":"目标用户","goal":"产品目标","requiredCapabilities":["filter"],"forbiddenCapabilities":[]}。${common}${contract}`;
   if (role === "architecture") return `你是架构 Agent。基于已验证产品简报规划 AppSpec 组件、交互与持久化。kind 只能是 dashboard/tracker/landing；components 只能是 stats/filters/cards/form/actions；interactionPlan 只能是 set_filter/toggle_item/add_item/show_toast。实例必须是业务数据，不是 Schema 定义。${common}${contract}\n上下文:${context}`;
   if (role === "design") return `你是设计 Agent。基于已验证产品与架构产物定义布局、视觉和交互状态。layout 只能是 dashboard-grid/tracker-list/landing-sections；interactionStates 只能是 default/filtered/completed/form-valid/form-error/toast。实例必须是业务数据，不是 Schema 定义。${common}${contract}\n上下文:${context}`;
-  return `你是工程 Agent。基于全部已验证产物返回完整安全 AppSpec。所有 id 全局唯一，action target/value 必须存在；必须严格满足 Product required/forbidden capabilities。${common}${contract}\n上下文:${context}`;
+  return `你是工程 Agent。基于全部已验证产物返回完整安全 AppSpec。所有 stat/filter/card/form/field/action 的 id 必须全局唯一；filter.defaultValue 和可选 allValue 必须出现在该 filter.options；set_filter.targetId 必须引用 filter.id 且 value 必须出现在 options；add_item.targetId 必须引用 form.id；toggle_item.targetId 必须引用 card.id；card.filterValues 的 key 必须引用 filter.id；必须严格满足 Product required/forbidden capabilities。若上下文 repair 非空，必须针对其中的校验错误修复并返回完整新实例。${common}${contract}\n上下文:${context}`;
 }
 
 export async function generateAppWithAgents(prompt: string, previous: AppSpec | undefined, runner: AiRunner | undefined, options: GenerationOptions = {}): Promise<GeneratedApp> {
