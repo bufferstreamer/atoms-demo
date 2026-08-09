@@ -4,12 +4,12 @@ feature:
   title: Atoms AI App Builder Demo
   risk: high
   delivery_mode: full
-  status: IMPLEMENTING
+  status: RELEASED
   owner_repository: atoms-demo
   participating_repositories:
   - atoms-demo
   created_at: '2026-08-09T15:50:06+08:00'
-  updated_at: '2026-08-09T19:47:43+08:00'
+  updated_at: '2026-08-09T19:47:59+08:00'
 artifacts:
   context: .feature-delivery/active/atoms-demo/_context.md
   progress: .feature-delivery/active/atoms-demo/progress.md
@@ -92,13 +92,13 @@ baseline:
   commit: 801a22099396e7a817a92e5b1ebf38529c722d1f
   at: '2026-08-09T19:47:43+08:00'
 verification:
-  status: NOT_RUN
-  evidence: []
-  open_gaps:
-  - CHG-003-WORKERS-AI
-  at: null
+  status: PASS
+  evidence:
+  - .vibetest/atoms-demo/artifacts/chg006-online-model-2026-08-09.md
+  open_gaps: []
+  at: '2026-08-09T19:47:54+08:00'
 release:
-  status: NOT_STARTED
-  deployment: null
-  rollback: cloudflare:atomize-ai-builder-demo@2802d500-e9f5-467b-a1fc-a9d118693243;sites:appgdep_6a7842c73bc88191a2bce106c7044842
-  at: null
+  status: RELEASED
+  deployment: cloudflare:atomize-ai-builder-demo@a1fae919-0b2d-477c-acec-a3787f577975
+  rollback: cloudflare:atomize-ai-builder-demo@683d8674-a4cb-4986-8e42-b9a3c95130b7
+  at: '2026-08-09T19:47:59+08:00'
