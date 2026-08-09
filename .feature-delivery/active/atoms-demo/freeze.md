@@ -25,3 +25,6 @@
 | 2026-08-09T19:47:31+08:00 | `scope` | codex | `FROZEN` | 静态门禁通过并记录 SHA-256 |
 | 2026-08-09T19:47:31+08:00 | `design` | codex | `FROZEN` | 静态门禁通过并记录 SHA-256 |
 | 2026-08-09T19:47:31+08:00 | `acceptance` | codex | `FROZEN` | 静态门禁通过并记录 SHA-256 |
+| 2026-08-09T23:37:31+08:00 | `scope` | codex | `FROZEN` | 静态门禁通过并记录 SHA-256 |
+| 2026-08-09T23:37:31+08:00 | `design` | codex | `FROZEN` | 静态门禁通过并记录 SHA-256 |
+| 2026-08-09T23:37:31+08:00 | `acceptance` | codex | `FROZEN` | 静态门禁通过并记录 SHA-256 |

@@ -28,4 +28,8 @@
 | R15 生产生成由真实模型完成且来源可审计 | 避免规则模板冒充智能体 | fake binding 单测 + Cloudflare AI/D1/在线 API | pending |
 | R16 模型错误、超时和非法 JSON 安全降级 | 外部模型不稳定且输出不可信 | 单测 + 在线/本地 API | pending |
 | R17 模型输出仍受 AppSpec 白名单约束 | 防止执行任意代码或写入非法版本 | 表驱动单测 + D1 回查 | pending |
-| R18 长生成等待可恢复且不重复调用 | 55 秒模型预算必须仍可用 | 组件测试 + 并发 API + 浏览器 | pending |
+| R18 长生成等待可恢复且不重复调用 | CHG-007 的 52 秒总模型、62 秒持久化、65 秒 API 预算必须仍可用 | 组件测试 + fake clock + 并发 API + 浏览器 | pending |
+| R19 四个角色为独立且有依赖的真实模型阶段 | 防止一次模型响应包装成多 Agent | runner spy + D1 + 在线证据 | pending |
+| R20 阶段状态、产物与耗时真实持久化并可轮询 | 防止 UI 动画伪装执行进度 | API + D1 + 组件/浏览器 | pending |
+| R21 Engineering 非法结果只允许一次受控修复 | 提升复杂需求成功率且控制成本与安全 | 表驱动单测 + runner spy | pending |
+| R22 reserve/execute 幂等、claim 与恢复一致 | 两段执行不能重复耗模型或留下永久 BUILDING | 并发集成 + D1 回查 | pending |

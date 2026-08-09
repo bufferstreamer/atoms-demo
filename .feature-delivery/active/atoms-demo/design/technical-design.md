@@ -287,3 +287,86 @@ API 日志只记录 requestId、route、status、duration、projectId 和脱敏 
 ## 10. 外部前提与开放项
 
 引用 `open-questions.md` Q-002，以及 `.vibetest/atoms-demo/gaps.md`。UI 明确标注“可解释的 Agent 工作流”，不宣称调用未接入的外部大模型。
+
+## 11. CHG-007 真实多阶段智能体协议（DESIGN-005）
+
+### 11.1 四个真实阶段与受控产物
+
+生成不再由一次模型响应同时伪装四个角色。每个 run 固定依次执行四次独立 Workers AI 调用，只有前一阶段通过对应服务端 schema 后才能进入下一阶段：
+
+1. `product` 输出 `ProductBrief`：`summary`、`audience`、`goal`、`requiredCapabilities[]`、`forbiddenCapabilities[]`，数组最多 6 项、文本去控制字符并限长；
+2. `architecture` 输入原始需求和已验证 ProductBrief，输出 `ArchitecturePlan`：`summary`、`kind`、`components[]`、`interactionPlan[]`、`persistencePlan`；
+3. `design` 输入前两阶段产物，输出 `DesignPlan`：`summary`、`visualDirection`、`layout`、`interactionStates[]`、`accessibilityNotes[]`；
+4. `engineering` 输入前三阶段产物、原始需求和可选当前 AppSpec，输出既有严格 `{spec,summary}`；AppSpec 继续通过 DESIGN-002 的完整 schema 与语义 validator。
+
+每个阶段使用独立 JSON Schema、独立调用计时和固定角色身份；下游 prompt 只包含已清洗的用户需求及已验证的上游 JSON，不包含上游原始模型响应。单阶段成功即以 attempt-token 守卫把 `run_steps` 更新为 `COMPLETED`，写入 `source/model/duration_ms/attempt_no/artifact_json`；`artifact_json` 只保存对应 schema 允许的安全对象，最多 12 KiB。原始 prompt、模型原文、Cookie 和异常响应不持久化。若阶段失败，尚未开始的后续步骤保持 PENDING，最终 failure/fallback 收敛后统一为 COMPLETED 或 FAILED。
+
+生产代码中 `STAGE_SCHEMAS` 是四阶段结构化输出与 artifact 的唯一权威对象，全部使用 JSON Schema 2020-12、`additionalProperties:false`。`engineeringResponse.properties.spec` 必须在 TypeScript 对象图中直接指向 DESIGN-004 唯一 `APP_SPEC_SCHEMA` 常量（即 `APP_SPEC_ENVELOPE_SCHEMA.properties.spec`，不得复制后漂移）；传给 binding 时这个对象会自然序列化为完整、无 `$ref` 的有效 JSON Schema。模型响应 schema 比持久化 artifact 多 `spec`，持久化时 AppSpec 只进入 version，Engineering artifact 固定为 `{summary,repaired}`。其余三个响应与持久化 artifact 完全相同：
+
+```json
+{
+  "product": {
+    "$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","additionalProperties":false,
+    "required":["summary","audience","goal","requiredCapabilities","forbiddenCapabilities"],
+    "properties":{"summary":{"type":"string","minLength":1,"maxLength":180},"audience":{"type":"string","minLength":1,"maxLength":120},"goal":{"type":"string","minLength":1,"maxLength":180},"requiredCapabilities":{"type":"array","maxItems":6,"uniqueItems":true,"items":{"enum":["filter","form","toggle","stats","toast"]}},"forbiddenCapabilities":{"type":"array","maxItems":6,"uniqueItems":true,"items":{"enum":["filter","form","toggle","stats","toast","external_script"]}}}
+  },
+  "architecture": {
+    "$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","additionalProperties":false,
+    "required":["summary","kind","components","interactionPlan","persistencePlan"],
+    "properties":{"summary":{"type":"string","minLength":1,"maxLength":180},"kind":{"enum":["dashboard","tracker","landing"]},"components":{"type":"array","minItems":1,"maxItems":8,"uniqueItems":true,"items":{"enum":["stats","filters","cards","form","actions"]}},"interactionPlan":{"type":"array","minItems":1,"maxItems":6,"uniqueItems":true,"items":{"enum":["set_filter","toggle_item","add_item","show_toast"]}},"persistencePlan":{"type":"string","minLength":1,"maxLength":180}}
+  },
+  "design": {
+    "$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","additionalProperties":false,
+    "required":["summary","visualDirection","layout","interactionStates","accessibilityNotes"],
+    "properties":{"summary":{"type":"string","minLength":1,"maxLength":180},"visualDirection":{"type":"string","minLength":1,"maxLength":180},"layout":{"enum":["dashboard-grid","tracker-list","landing-sections"]},"interactionStates":{"type":"array","minItems":1,"maxItems":6,"uniqueItems":true,"items":{"enum":["default","filtered","completed","form-valid","form-error","toast"]}},"accessibilityNotes":{"type":"array","minItems":1,"maxItems":4,"uniqueItems":true,"items":{"type":"string","minLength":1,"maxLength":120}}}
+  },
+  "engineeringArtifact": {
+    "$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","additionalProperties":false,
+    "required":["summary","repaired"],
+    "properties":{"summary":{"type":"string","minLength":1,"maxLength":180},"repaired":{"type":"boolean"}}
+  }
+}
+```
+
+Engineering response 的唯一可执行定义（与上方 JSON 中其他三阶段共同组成 `STAGE_SCHEMAS`）为：
+
+```ts
+const ENGINEERING_RESPONSE_SCHEMA = {
+  $schema: "https://json-schema.org/draft/2020-12/schema",
+  type: "object",
+  additionalProperties: false,
+  required: ["spec", "summary"],
+  properties: {
+    spec: APP_SPEC_SCHEMA,
+    summary: { type: "string", minLength: 1, maxLength: 180 },
+  },
+} as const;
+```
+
+服务端除平台 JSON Schema 外再次执行 exact-key、类型、枚举、长度、数组上限与 12 KiB 序列化限制；任一阶段收到 null/数组/primitive/额外字段/缺字段/越界/非法枚举/不可序列化或超限对象均以 `INVALID_<ROLE>_ARTIFACT` 失败，不写该 artifact，不启动下游模型。
+
+阶段模型固定使用 `@cf/meta/llama-3.1-8b-instruct-fast`。Product/Architecture/Design/Engineering/Repair 的输出上限分别为 420/520/420/2200/2200 tokens，配置调用上限分别为 7/9/7/22/7 秒。execute claim 成功的单调时钟为 `t0`，三个固定截止点为 `modelDeadline=t0+52,000ms`、`persistenceDeadline=t0+62,000ms`、`apiDeadline=t0+65,000ms`；52 秒模型上限满足既有 `<55s` 验收并固定预留 10 秒给 fallback/completion，再预留 3 秒给 failure 收敛与响应。每次（含 repair）实际 timeout 精确为 `min(configuredStageTimeout, modelDeadline-now)`；结果 `<=0` 时不调用模型并进入 `MODEL_BUDGET_EXHAUSTED` fallback。模型等待、序列化与验证都计入 52 秒，每次解析后复查 modelDeadline，超界结果丢弃；52 秒后不发起模型或 repair。fallback、completion batch 与成功回查必须在 62 秒前结束，否则立即中止成功路径并执行 `GENERATION_DEADLINE_EXCEEDED` failure batch。failure batch 使用 `min(2,000ms, apiDeadline-now-500ms)` 硬超时并在成功后做一次最终回查；剩余 `<=500ms` 时不再发起 D1 操作，返回 504 且由读取回收兜底。正常验收要求 failure batch 与回查在 64,500ms 前结束、序列化响应在 65,000ms 前完成；达到任一截止点即 case 失败，不能声明受控完成。`generation_events.duration_ms` 记录 `t0` 到 completion 回查的总耗时，而每个 step 保存该阶段从调用前到验证完成的耗时；reserve 是独立短请求，不计入 execute 65 秒但单独要求 `<2s`。
+
+### 11.2 reserve / execute 与真实进度
+
+`POST /api/projects` 和 `POST /api/projects/:id/generate` 只执行 DESIGN-004 阶段一：幂等、限流、容量、base/current 与 busy 检查后原子预占 project/run/四个 PENDING step/user message，立即返回 `202 BUILDING` 快照，不调用 AI。新增 `POST /api/projects/:id/execute`，请求 `{requestId}`，只执行已预占 run：
+
+- 以原子条件 `status=RUNNING AND runner_claimed_at IS NULL AND attempt_token IS NOT NULL` 写入 `runner_claimed_at`；只有影响 1 行的调用者可以执行模型；
+- 同 owner、project、requestId 的重复 execute 在 claim 已存在时返回同一 BUILDING/终态快照，AI 调用次数为 0；不匹配的 owner/project/requestId 返回 404；
+- execute 保持 HTTP 连接执行四阶段；与此同时客户端已有 projectId，每 1.5 秒 GET 同一 project，展示 D1 中 PENDING/RUNNING/COMPLETED/FAILED 的真实状态、已完成摘要和耗时；不使用本地定时器伪造阶段完成；
+- 刷新时从同一 project 与最后一条 user message 恢复 composer，只轮询，不自动 POST execute；若 claim 已存在但调用中断，2 分钟读取回收继续按 DESIGN-004 收敛；用户用新 requestId 重试；
+- execute 完成后客户端以返回快照或下一次 GET 进入 READY/FAILED，停止轮询并展示真实来源或错误。
+
+为兼容首次 reserve 后浏览器断连，未 claim 的 RUNNING run 也纳入 2 分钟回收。`runs` 新增 nullable `runner_claimed_at`；旧行默认为 null。claim 和所有 step 更新都要求原 attempt token 与 RUNNING 状态。读取回收把该 run 下所有 `status IN ('PENDING','RUNNING')` 的 step 原子更新为 `FAILED/RUN_TIMEOUT`，保留此前 COMPLETED artifact 不变；随后清 run token、收敛 request/project。超时回收、失败或新 run 后的迟到结果因 step/run token 守卫不能写入 stage、version 或 event。
+
+### 11.3 一次安全修复与遵循度校验
+
+Engineering 第一次响应通过结构解析后还必须检查 AppSpec 语义与 ProductBrief。五个能力的唯一映射为：`filter => filters.length>0 && 存在 set_filter`、`form => 存在 form && add_item`、`toggle => 存在 toggle_item`、`stats => stats.length>0`、`toast => 存在 show_toast`；`external_script` 因 AppSpec 白名单天然禁止。所有 required 映射必须为真，所有 forbidden 映射必须为假。失败只向第二次 Engineering 调用提供枚举错误码与安全字段路径，不提供数据库错误、原始响应或内部堆栈。每个 run 最多修复一次，repair 使用相同已验证上游产物，step 记录 `attempt_no=2` 和两次调用总耗时。
+
+修复成功仍记为 `workers_ai/SUCCESS`，并在 Engineering artifact 中记录 `repaired:true`；修复仍失败或任一上游阶段失败时，才调用既有确定性生成器。fallback 成功时四个 step 用明确的 deterministic 安全摘要完成，event 为 `deterministic/FALLBACK/<stage_or_validation_code>`；fallback 失败走 DESIGN-004 failure batch，不产生成功 event/version/assistant message。任何 completion/event 回查失败仍按原 token-guarded failure 协议处理。
+
+### 11.4 D1 兼容升级与读取契约
+
+`run_steps` 以可重复迁移新增 nullable `source TEXT`、`model TEXT`、`duration_ms INTEGER`、`attempt_no INTEGER`、`artifact_json TEXT`、`error_code TEXT`；`runs` 新增 nullable `runner_claimed_at TEXT`。初始化先读 `PRAGMA table_info`，对缺失列逐条执行 `ALTER TABLE ADD COLUMN`；若并发初始化产生 duplicate-column 错误，必须立即重读对应 `PRAGMA table_info`，只有目标列已存在时才把该错误视为成功，其他错误一律抛出。所有列处理后再完整回读并断言七个目标列齐全，schema promise 失败时清空以允许重试。旧 run/step 可保持 null 且必须可读。
+
+API 的 `AgentStep` 增加可选 `source/model/durationMs/attemptNo/artifact/errorCode`；只对项目 owner 返回。前端默认只展示安全摘要、来源、阶段耗时和修复标识，不展示完整 artifact；artifact 用于验收和后续扩展。旧项目缺少这些字段时仍按旧摘要正常展示。

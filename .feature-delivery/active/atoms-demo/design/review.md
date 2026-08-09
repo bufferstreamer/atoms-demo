@@ -130,3 +130,84 @@ DESIGN-004 仍写作 `json_schema:<完整 envelope schema>`，后文只用自然
 - 对象响应边界：只接受字符串或非 null、非数组的普通 JSON object；对象安全序列化后与字符串统一进入 48 KiB、JSON 解析、exact-keys 和 AppSpec validator，失败保持枚举错误与透明 fallback，不放宽 D1 写入边界。
 - 事实与追踪：模型事实快照已明确覆盖 CHG-006；change-log、traceability、TASK-006 与 VT-017~020 的 FR/NFR 影响和回归关系一致。
 - 声明边界：CHG-006 设计基线可以重新冻结；本结论不代表业务代码已完成，也不代表线上 JSON Schema 路径已经成功。
+
+# CHG-007 真实四阶段 Agent 独立设计复核
+
+- 日期：2026-08-09
+- Reviewer：`codex-independent-chg007-reviewer`
+- 结论：`REJECTED`
+
+## 已确认
+
+- change-log、traceability 与 TASK-007 已把 CHG-007 追到 FR-002/003/004/006、NFR-001/002/003/004/005/007、DESIGN-005、VT-021~024 及既有关键回归；`feature.yaml` 仍保留旧冻结哈希，符合“待独立复核后重新冻结”的状态边界。
+- reserve 不调用 AI、execute 原子 claim、重复 execute 零模型调用、attempt token 迟到保护、四阶段串行、一次 Engineering repair、55 秒共享模型预算和 65 秒 API 预算的总体方向合理；CHG-006 的 owner、限流、版本、fallback 与原子 completion 协议未被主动放宽。
+
+## 阻塞项
+
+### CHG7-DREV-001 — 四份上下游 artifact 没有唯一可实现契约
+
+DESIGN-005 只列出 `ProductBrief`、`ArchitecturePlan`、`DesignPlan` 和 Engineering envelope 的字段名称及少量数组/文本描述，没有内联或引用四份受冻结保护的 JSON Schema。required/optional、exact keys、字段类型、枚举、每个数组 item、文本长度和 12 KiB 计量口径均不能唯一确定；因此“前序已验证 artifact 才能进入下游”和 VT-021 的 exact-key/schema spy 没有可对照的权威对象。应固定四份完整 schema（或受控 schema artifact 与哈希），并明确每阶段输入 envelope、清洗规则和服务端二次语义校验。
+
+### CHG7-DREV-002 — 超时回收对正在执行的 step 存在冲突
+
+DESIGN-004 的一处协议只把 `PENDING` step 标为 FAILED，而后续章节写“尚未完成的 step”全部 FAILED；CHG-007 执行中必然存在 `RUNNING` step，并引用该旧回收协议。Worker 中断后若只更新 PENDING，当前阶段会永久停在 RUNNING，与 run/project 已 FAILED 冲突。应给出 CHG-007 唯一回收 batch：对同 run 且非终态的 `PENDING/RUNNING` step 统一写 `FAILED/RUN_TIMEOUT`，同步 run/request/project、清 attempt token，并规定已完成 artifact 是否保留及迟到 step/completion 写入的影响行回查。
+
+### CHG7-DREV-003 — D1 加列迁移的并发可重复性未闭合
+
+“先 `PRAGMA table_info`，缺列再 `ALTER TABLE ADD COLUMN`”只能保证顺序重复；两个 Worker 冷启动并发时可同时观察缺列，随后一个 `ALTER` 因 duplicate column 失败。设计应规定单写迁移/部署期迁移，或把 duplicate-column 竞争视为可接受结果并重新读取精确 schema 后继续；否则 CHG-006 旧库升级在生产并发初始化时不具备可重复性。
+
+### CHG7-DREV-004 — repair 的共享截止时间仍有多种实现
+
+四个阶段上限合计 49 秒，repair 复用 Engineering 时最多再需 23 秒。当前只写“共享 55 秒、调用前剩余不足则不再调用”，未定义单调 deadline、何谓“不足”、repair 实际 timeout 是否为 `min(23s, remaining)`，以及为 completion/fallback 保留的 10 秒是否从模型预算中隔离。应把每次调用的可用 timeout、达到/超过边界的比较规则、repair 放弃错误码和 generation/API duration 起止点写成唯一时序，确保任何五调用路径不突破 55/65 秒。
+
+## 结论边界
+
+在 CHG7-DREV-001~004 关闭前，CHG-007 设计不可重新冻结。本结论不评价业务代码实现，也不代表真实四阶段流水线已上线。
+
+# CHG-007 真实四阶段 Agent 独立设计复核（第二轮）
+
+- 日期：2026-08-09
+- Reviewer：`codex-independent-chg007-reviewer`
+- 结论：`REJECTED`
+- 已关闭：`CHG7-DREV-002`、`CHG7-DREV-003`
+- 部分关闭：`CHG7-DREV-001`、`CHG7-DREV-004`
+
+## 已确认
+
+- CHG-007 已给出 Product/Architecture/Design/Engineering response 与 Engineering artifact 的字段、required、枚举、数组和长度约束；非法 artifact 的服务端二次校验、12 KiB 限制及下游零调用边界已明确。
+- 读取回收现在明确把同 run 的 `PENDING/RUNNING` step 原子收敛为 `FAILED/RUN_TIMEOUT`，保留 COMPLETED artifact，并以 run token 阻止迟到写入，关闭 DREV-002。
+- D1 迁移已规定 duplicate-column 竞争后重读对应列、最终回读七个目标列及失败 promise 可重试，关闭 DREV-003。
+- `t0/modelDeadline/apiDeadline`、单调时钟、每次模型 timeout 裁剪、超界结果丢弃及 repair 最多一次均比首轮唯一明确。
+
+## 剩余阻塞项
+
+### CHG7-DREV2-001 — Engineering schema 的 APP_SPEC 引用仍不是有效的唯一序列化契约
+
+DESIGN-005 一方面要求 `engineering.properties.spec` 直接复用 `APP_SPEC_SCHEMA` 对象，另一方面内联的权威 JSON 却写 `"$ref":"APP_SPEC_SCHEMA"`。该值既不是可解析的本地 JSON Pointer，也没有对应 `$id/$defs`，若按文档逐字段传给 Workers AI 会形成未解析引用；若生产代码实际把常量对象直接嵌入，则又无法与文档 JSON exact deep-equal。应选择一种唯一的可序列化表达：直接把 `APP_SPEC_SCHEMA` 对象作为 `spec` 属性值，或在同一 schema 用 `$defs` 和 `#/$defs/...` 有效引用，并让文档、生产对象和 VT-021 对照同一表达。同时 `requiredCapabilities` 已允许 `toast`，但语义遵循校验只列 `filter/form/toggle/stats`；应补 `toast` 映射或从允许集合移除，避免 Product 声明必需能力却可被 Engineering 忽略。
+
+### CHG7-DREV2-002 — API 到期后才执行 failure batch 无法保证 `<65s`
+
+DESIGN-005 规定 55~65 秒用于 fallback/completion，且“到 `apiDeadline` 尚未安全完成则执行 token-guarded failure”。一旦到达 65,000ms 后才开始 D1 failure batch、回查和 HTTP 响应，最终 API 必然超过 `<65s`。应在 `apiDeadline` 前保留明确的失败收敛/响应预算（例如独立 `finalizeDeadline < apiDeadline`），或重新定义并获批预算口径；需给出在 completion/fallback 卡住时何时取消、何时落 FAILED、何时返回的唯一时序，不能以 65 秒时才启动补偿同时声称响应小于 65 秒。
+
+## 结论边界
+
+在 CHG7-DREV2-001/002 关闭前，CHG-007 设计仍不可重新冻结。其余首轮设计阻塞已关闭。
+
+# CHG-007 真实四阶段 Agent 独立设计复核（第三轮）
+
+- 日期：2026-08-09
+- Reviewer：`codex-independent-chg007-reviewer`
+- 结论：`CONFIRMED`
+- 关闭项：`CHG7-DREV2-001`、`CHG7-DREV2-002`
+- Schema：Engineering response 已改为唯一 TypeScript 对象图，`properties.spec` 直接引用 `APP_SPEC_SCHEMA`，序列化后包含完整 AppSpec schema 且不存在悬空 `$ref`；Product required/forbidden 的 filter/form/toggle/stats/toast 五能力映射和 external_script 禁止边界均已唯一化。
+- 时序：DESIGN-005 已固定 `modelDeadline=52s`、`persistenceDeadline=62s`、`apiDeadline=65s`；模型与 repair timeout 由剩余模型预算裁剪，62 秒后取消成功路径，failure batch 最多使用到 64 秒、最终回查要求在 64.5 秒前结束并为响应保留 500ms。剩余不足时返回 504 并由读取回收，未把超预算路径伪装为受控完成。
+- 声明边界：CHG-007 设计基线本身可以重新冻结；本结论不代表验收基线或业务实现已经通过。
+
+# CHG-007 最终设计/验收一致性复核
+
+- 日期：2026-08-09
+- Reviewer：`codex-independent-chg007-reviewer`
+- 结论：`CONFIRMED`
+- 一致性确认：R18、VT-017、VT-018 已统一到 DESIGN-005 的 staged `52s model / 62s persistence / 65s API` 与 `7/9/7/22/7s` 阶段上限，不再把 CHG-006 的单调用 55 秒参数声明为当前生产默认。
+- 回归边界：CHG-006 的非法输出、对象/字符串适配、fallback、completion/event/failure 原子性、迟到守卫以及限流/容量/幂等零调用仍作为行为回归保留；历史 artifact 不能证明 CHG-007 四阶段在线成功。
+- 最终边界：CHG-007 设计与验收基线现已一致，可以重新冻结；实现、运行用例和 GAP-006 线上证据仍需后续完成。

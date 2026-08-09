@@ -24,6 +24,7 @@
 | NFR-003 | CHG-004 三次线上 25 秒超时证据 | DESIGN-004 长生成恢复与 55/65 秒预算 | TASK-001/006 | VT-017/018/020 | pending | CHANGE_PENDING_FREEZE |
 | FR-002/003/004/006, NFR-001/002/003/004/005 | CHG-005 第四次线上 55 秒超时与官方 Fast/JSON Mode 模型事实；产品与安全契约不变，生成实现切模 | DESIGN-004 切换 Llama 3.1 8B Fast，预算与 AppSpec/D1/API 契约不变 | TASK-006 | VT-016/017/018/019/020，并回归 VT-002/003/005 | pending | CHANGE_PENDING_FREEZE |
 | FR-002/003/004/006, NFR-001/002/003/004/005 | CHG-006 首次 Llama `INVALID_ENVELOPE` 与官方 JSON Schema/对象响应示例 | DESIGN-004 完整 schema、对象/字符串适配与服务端二次校验 | TASK-006 | VT-017/018/019/020，并回归 VT-002/003/005 | pending | CHANGE_PENDING_FREEZE |
+| FR-002/003/004/006, NFR-001/002/003/004/005/007 | CHG-007 评分复核与用户批准满分改进 | DESIGN-005 四阶段独立调用、reserve/execute、阶段持久化、一次修复 | TASK-007 | VT-021/022/023/024，并回归 VT-002/003/004/006/014/016~020 | pending | CHANGE_PENDING_FREEZE |
 
 ## 安全决策追踪
 
