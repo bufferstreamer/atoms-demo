@@ -1154,7 +1154,7 @@ units:
       evidence_id: EV-005
 review:
   status: CONFIRMED
-  by: codex-independent-source-reviewer-chg001
-  at: '2026-08-09T17:02:27+08:00'
-  basis_hash: a73d304af83ba585c4b283ae731c8880cf0d6d975e4dd34f73db33a2df779a93
+  by: codex-independent-archive-path-reviewer
+  at: '2026-08-10T01:10:03+08:00'
+  basis_hash: da7d075ffeda09f60dcd3fcb6e282ca310ea13b49c93f04b342d53d93b4a7494
   report_sha256: 9308ae6cb0b121d18210462da8f3ce9d5d39aae4e5f592909035a2f31d8fde6f

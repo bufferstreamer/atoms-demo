@@ -44,9 +44,9 @@ freeze:
       .feature-delivery/archive/atoms-demo/open-questions.md: d6dca385665d8225c9502b92782dfc5ae32ac2a450159c9f0ddb2d3dfa813d52
       .feature-delivery/archive/atoms-demo/reference/prd.md: 5b7d44cf91196d31f52088461f987740c50d35d9aa123bec98b2618abb26e7b0
       .feature-delivery/archive/atoms-demo/traceability.md: 59be292319e3739d38ef465b3530182040308d529151fd01a0f21a80f00584ba
-      .feature-delivery/archive/atoms-demo/source/register.yaml: 2add64b2e30745b9a9a4b05305e93a47bcf342f04672abe5c9438d8c54b95fa0
+      .feature-delivery/archive/atoms-demo/source/register.yaml: d36be30d93045bf456566794f9ab102b2366f9742f647652b47007c474e5f899
       .feature-delivery/archive/atoms-demo/source/units.jsonl: 7d06581503d40f30f8d685be435fe003b421f2c5b20e7feff33a701ee5e1ca49
-      .feature-delivery/archive/atoms-demo/source/coverage.yaml: 2617e8be2c138f711221ed9555c57e8a64f22a7af777b2f5877c919b2897ad8d
+      .feature-delivery/archive/atoms-demo/source/coverage.yaml: 896cb1ce93fdf294b92e31cbf9d8978f7cca31a4299cb274cb07820f9b2d56e6
       .feature-delivery/archive/atoms-demo/source/review.md: 9308ae6cb0b121d18210462da8f3ce9d5d39aae4e5f592909035a2f31d8fde6f
     at: '2026-08-10T01:06:48+08:00'
     by: codex
@@ -58,9 +58,9 @@ freeze:
       .feature-delivery/archive/atoms-demo/open-questions.md: d6dca385665d8225c9502b92782dfc5ae32ac2a450159c9f0ddb2d3dfa813d52
       .feature-delivery/archive/atoms-demo/reference/prd.md: 5b7d44cf91196d31f52088461f987740c50d35d9aa123bec98b2618abb26e7b0
       .feature-delivery/archive/atoms-demo/traceability.md: 59be292319e3739d38ef465b3530182040308d529151fd01a0f21a80f00584ba
-      .feature-delivery/archive/atoms-demo/source/register.yaml: 2add64b2e30745b9a9a4b05305e93a47bcf342f04672abe5c9438d8c54b95fa0
+      .feature-delivery/archive/atoms-demo/source/register.yaml: d36be30d93045bf456566794f9ab102b2366f9742f647652b47007c474e5f899
       .feature-delivery/archive/atoms-demo/source/units.jsonl: 7d06581503d40f30f8d685be435fe003b421f2c5b20e7feff33a701ee5e1ca49
-      .feature-delivery/archive/atoms-demo/source/coverage.yaml: 2617e8be2c138f711221ed9555c57e8a64f22a7af777b2f5877c919b2897ad8d
+      .feature-delivery/archive/atoms-demo/source/coverage.yaml: 896cb1ce93fdf294b92e31cbf9d8978f7cca31a4299cb274cb07820f9b2d56e6
       .feature-delivery/archive/atoms-demo/source/review.md: 9308ae6cb0b121d18210462da8f3ce9d5d39aae4e5f592909035a2f31d8fde6f
       .feature-delivery/archive/atoms-demo/design/technical-design.md: 7dbab72c712271a055b6a562e2e0871d1e6f64fd90d09e580cd0f6faabc3f9bb
       .feature-delivery/archive/atoms-demo/implementation-plan.md: 7906e9825edfb7da4cd591e8f0a93269773fca716010e8b1130c1c0602682f8c
@@ -74,9 +74,9 @@ freeze:
       .feature-delivery/archive/atoms-demo/open-questions.md: d6dca385665d8225c9502b92782dfc5ae32ac2a450159c9f0ddb2d3dfa813d52
       .feature-delivery/archive/atoms-demo/reference/prd.md: 5b7d44cf91196d31f52088461f987740c50d35d9aa123bec98b2618abb26e7b0
       .feature-delivery/archive/atoms-demo/traceability.md: 59be292319e3739d38ef465b3530182040308d529151fd01a0f21a80f00584ba
-      .feature-delivery/archive/atoms-demo/source/register.yaml: 2add64b2e30745b9a9a4b05305e93a47bcf342f04672abe5c9438d8c54b95fa0
+      .feature-delivery/archive/atoms-demo/source/register.yaml: d36be30d93045bf456566794f9ab102b2366f9742f647652b47007c474e5f899
       .feature-delivery/archive/atoms-demo/source/units.jsonl: 7d06581503d40f30f8d685be435fe003b421f2c5b20e7feff33a701ee5e1ca49
-      .feature-delivery/archive/atoms-demo/source/coverage.yaml: 2617e8be2c138f711221ed9555c57e8a64f22a7af777b2f5877c919b2897ad8d
+      .feature-delivery/archive/atoms-demo/source/coverage.yaml: 896cb1ce93fdf294b92e31cbf9d8978f7cca31a4299cb274cb07820f9b2d56e6
       .feature-delivery/archive/atoms-demo/source/review.md: 9308ae6cb0b121d18210462da8f3ce9d5d39aae4e5f592909035a2f31d8fde6f
       .feature-delivery/archive/atoms-demo/design/technical-design.md: 7dbab72c712271a055b6a562e2e0871d1e6f64fd90d09e580cd0f6faabc3f9bb
       .feature-delivery/archive/atoms-demo/implementation-plan.md: 7906e9825edfb7da4cd591e8f0a93269773fca716010e8b1130c1c0602682f8c

@@ -2,8 +2,8 @@ schema_version: 1
 confirmation:
   status: CONFIRMED
   by: codex
-  at: '2026-08-09T17:01:00+08:00'
-  source_set_hash: 6e34165c709387641dff3c0b50ce2d25210ca67bad35bac20a87bb46717e2964
+  at: '2026-08-10T01:09:27+08:00'
+  source_set_hash: 9abb2a1882ecf34f051bce9865e9785edf53259dc4d8bcfb5add5290a9531563
 facets:
   product_requirements:
     status: COVERED
@@ -72,7 +72,7 @@ sources:
 - id: S001
   title: Atoms Demo Challenge Brief
   kind: markdown
-  path: .feature-delivery/active/atoms-demo/reference/user-challenge.md
+  path: .feature-delivery/archive/atoms-demo/reference/user-challenge.md
   authority: user
   required: true
   version: null
@@ -83,7 +83,7 @@ sources:
 - id: S002
   title: MGX Atoms Official Help Observations
   kind: markdown
-  path: .feature-delivery/active/atoms-demo/reference/official-help-observations.md
+  path: .feature-delivery/archive/atoms-demo/reference/official-help-observations.md
   authority: Atoms-official-help
   required: true
   version: null
@@ -94,7 +94,7 @@ sources:
 - id: S003
   title: Current Project Observations
   kind: markdown
-  path: .feature-delivery/active/atoms-demo/reference/current-project-observations.md
+  path: .feature-delivery/archive/atoms-demo/reference/current-project-observations.md
   authority: local-runtime
   required: true
   version: null
@@ -105,7 +105,7 @@ sources:
 - id: S004
   title: Atoms Public Product Experience
   kind: markdown
-  path: .feature-delivery/active/atoms-demo/reference/product-experience-observations.md
+  path: .feature-delivery/archive/atoms-demo/reference/product-experience-observations.md
   authority: atoms-public-product
   required: true
   version: null
@@ -116,7 +116,7 @@ sources:
 - id: S005
   title: Raw Official Help Snapshot
   kind: markdown
-  path: .feature-delivery/active/atoms-demo/reference/raw-official-help-snapshot.md
+  path: .feature-delivery/archive/atoms-demo/reference/raw-official-help-snapshot.md
   authority: Atoms-official-help
   required: true
   version: null
@@ -127,7 +127,7 @@ sources:
 - id: S006
   title: Raw Atoms Public UI Snapshot
   kind: markdown
-  path: .feature-delivery/active/atoms-demo/reference/raw-atoms-public-ui.md
+  path: .feature-delivery/archive/atoms-demo/reference/raw-atoms-public-ui.md
   authority: atoms-public-ui
   required: true
   version: null
@@ -138,7 +138,7 @@ sources:
 - id: S007
   title: Initial Sites Hosting Configuration Snapshot
   kind: json
-  path: .feature-delivery/active/atoms-demo/reference/initial-hosting-config.json
+  path: .feature-delivery/archive/atoms-demo/reference/initial-hosting-config.json
   authority: repository
   required: true
   version: null
@@ -149,7 +149,7 @@ sources:
 - id: S011
   title: Raw Code and Configuration Snapshot
   kind: markdown
-  path: .feature-delivery/active/atoms-demo/reference/raw-code-config-snapshot.md
+  path: .feature-delivery/archive/atoms-demo/reference/raw-code-config-snapshot.md
   authority: repository
   required: true
   version: null
@@ -160,7 +160,7 @@ sources:
 - id: S012
   title: Raw Sites Platform Capability Snapshot
   kind: markdown
-  path: .feature-delivery/active/atoms-demo/reference/raw-sites-platform-capabilities.md
+  path: .feature-delivery/archive/atoms-demo/reference/raw-sites-platform-capabilities.md
   authority: Sites-platform-docs
   required: true
   version: null
