@@ -4,6 +4,98 @@ import type { AgentStep, AppSpec } from "./types";
 export const WORKERS_AI_MODEL = "@cf/meta/llama-3.1-8b-instruct-fast";
 const MAX_RESPONSE_BYTES = 48 * 1024;
 export const DEFAULT_MODEL_TIMEOUT_MS = 55_000;
+const shortId = { type: "string", minLength: 1, maxLength: 60 } as const;
+const label = { type: "string", minLength: 1, maxLength: 120 } as const;
+const step = (role: string) => ({
+  type: "object",
+  additionalProperties: false,
+  required: ["role", "summary"],
+  properties: { role: { const: role }, summary: { type: "string", minLength: 1, maxLength: 180 } },
+});
+
+export const APP_SPEC_ENVELOPE_SCHEMA = {
+  $schema: "https://json-schema.org/draft/2020-12/schema",
+  type: "object",
+  additionalProperties: false,
+  required: ["spec", "summary", "steps"],
+  properties: {
+    spec: {
+      type: "object",
+      additionalProperties: false,
+      required: ["schemaVersion", "kind", "title", "subtitle", "theme", "stats", "filters", "cards", "actions"],
+      properties: {
+        schemaVersion: { const: 1 },
+        kind: { enum: ["dashboard", "tracker", "landing"] },
+        title: { type: "string", minLength: 1, maxLength: 60 },
+        subtitle: { type: "string", maxLength: 140 },
+        theme: {
+          type: "object", additionalProperties: false, required: ["accent", "density"],
+          properties: { accent: { enum: ["violet", "coral", "mint", "blue"] }, density: { enum: ["comfortable", "compact"] } },
+        },
+        stats: {
+          type: "array", maxItems: 4,
+          items: {
+            type: "object", additionalProperties: false, required: ["id", "label", "value"],
+            properties: { id: shortId, label, value: { ...label }, delta: { type: "string", maxLength: 120 } },
+          },
+        },
+        filters: {
+          type: "array", maxItems: 2,
+          items: {
+            type: "object", additionalProperties: false, required: ["id", "label", "options", "defaultValue"],
+            properties: {
+              id: shortId, label,
+              options: { type: "array", minItems: 1, maxItems: 6, items: { type: "string", minLength: 1, maxLength: 80 } },
+              defaultValue: { type: "string", minLength: 1, maxLength: 80 },
+              allValue: { type: "string", minLength: 1, maxLength: 80 },
+            },
+          },
+        },
+        cards: {
+          type: "array", minItems: 1, maxItems: 12,
+          items: {
+            type: "object", additionalProperties: false, required: ["id", "title", "description", "tag"],
+            properties: {
+              id: shortId, title: label, description: { type: "string", maxLength: 240 }, tag: { type: "string", maxLength: 80 },
+              filterValues: { type: "object", additionalProperties: { type: "string", maxLength: 80 } }, done: { type: "boolean" },
+            },
+          },
+        },
+        form: {
+          type: "object", additionalProperties: false, required: ["id", "title", "fields", "submitLabel"],
+          properties: {
+            id: shortId, title: label,
+            fields: {
+              type: "array", minItems: 1, maxItems: 4,
+              items: {
+                type: "object", additionalProperties: false, required: ["id", "label", "placeholder", "required"],
+                properties: { id: shortId, label, placeholder: { type: "string", maxLength: 160 }, required: { type: "boolean" } },
+              },
+            },
+            submitLabel: { type: "string", minLength: 1, maxLength: 80 },
+          },
+        },
+        actions: {
+          type: "array", minItems: 1, maxItems: 8,
+          items: {
+            oneOf: [
+              { type: "object", additionalProperties: false, required: ["id", "label", "kind", "targetId", "value"], properties: { id: shortId, label, kind: { const: "set_filter" }, targetId: shortId, value: { type: "string", minLength: 1, maxLength: 80 } } },
+              { type: "object", additionalProperties: false, required: ["id", "label", "kind", "targetId"], properties: { id: shortId, label, kind: { const: "toggle_item" }, targetId: shortId } },
+              { type: "object", additionalProperties: false, required: ["id", "label", "kind", "targetId"], properties: { id: shortId, label, kind: { const: "add_item" }, targetId: shortId } },
+              { type: "object", additionalProperties: false, required: ["id", "label", "kind", "message"], properties: { id: shortId, label, kind: { const: "show_toast" }, message: { type: "string", minLength: 1, maxLength: 180 } } },
+            ],
+          },
+        },
+      },
+    },
+    summary: { type: "string", minLength: 1, maxLength: 160 },
+    steps: {
+      type: "array", minItems: 4, maxItems: 4,
+      prefixItems: [step("product"), step("architecture"), step("design"), step("engineering")],
+      items: false,
+    },
+  },
+} as const;
 const ROLES = ["product", "architecture", "design", "engineering"] as const;
 const ROLE_NAMES: Record<(typeof ROLES)[number], string> = {
   product: "Emma · Product",
@@ -117,7 +209,18 @@ function parseEnvelope(text: string) {
 function extractText(raw: unknown) {
   if (typeof raw === "string") return raw;
   const result = objectValue(raw);
-  if (typeof result.response === "string") return result.response;
+  if ("response" in result) {
+    if (typeof result.response === "string") return result.response;
+    if (!result.response || typeof result.response !== "object" || Array.isArray(result.response)) throw new ModelOutputError("INVALID_ENVELOPE");
+    try {
+      const serialized = JSON.stringify(result.response);
+      if (typeof serialized !== "string") throw new ModelOutputError("INVALID_ENVELOPE");
+      return serialized;
+    } catch (error) {
+      if (error instanceof ModelOutputError) throw error;
+      throw new ModelOutputError("INVALID_ENVELOPE");
+    }
+  }
   const choices = result.choices;
   if (Array.isArray(choices) && choices.length > 0) {
     const message = objectValue(objectValue(choices[0]).message);
@@ -158,7 +261,7 @@ export async function generateAppWithAI(
           messages: [{ role: "system", content: systemPrompt(previous) }, { role: "user", content: prompt }],
           max_tokens: 2200,
           temperature: 0.35,
-          response_format: { type: "json_object" },
+          response_format: { type: "json_schema", json_schema: APP_SPEC_ENVELOPE_SCHEMA },
         }), timeoutMs);
       const text = extractText(raw);
       if (new TextEncoder().encode(text).byteLength > MAX_RESPONSE_BYTES) throw new ModelOutputError("RESPONSE_TOO_LARGE");

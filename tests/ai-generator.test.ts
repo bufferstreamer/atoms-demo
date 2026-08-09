@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { DEFAULT_MODEL_TIMEOUT_MS, generateAppWithAI, WORKERS_AI_MODEL, type AiRunner } from "../lib/ai-generator";
+import { APP_SPEC_ENVELOPE_SCHEMA, DEFAULT_MODEL_TIMEOUT_MS, generateAppWithAI, WORKERS_AI_MODEL, type AiRunner } from "../lib/ai-generator";
 
 const modelEnvelope = {
   spec: {
@@ -31,7 +31,11 @@ test("uses the real model envelope and exposes auditable generation metadata", a
   const runner: AiRunner = { run: async (model, input) => {
     calledModel = model;
     assert.equal(input.max_tokens, 2200);
-    assert.deepEqual(input.response_format, { type: "json_object" });
+    assert.deepEqual(input.response_format, { type: "json_schema", json_schema: APP_SPEC_ENVELOPE_SCHEMA });
+    assert.equal(APP_SPEC_ENVELOPE_SCHEMA.additionalProperties, false);
+    assert.deepEqual(APP_SPEC_ENVELOPE_SCHEMA.required, ["spec", "summary", "steps"]);
+    assert.equal(APP_SPEC_ENVELOPE_SCHEMA.properties.steps.prefixItems.length, 4);
+    assert.equal(APP_SPEC_ENVELOPE_SCHEMA.properties.spec.properties.actions.items.oneOf.length, 4);
     assert.equal("max_completion_tokens" in input, false);
     assert.equal("reasoning_effort" in input, false);
     return { choices: [{ message: { content: JSON.stringify(modelEnvelope) } }] };
@@ -43,6 +47,37 @@ test("uses the real model envelope and exposes auditable generation metadata", a
   assert.equal(result.generation.source, "workers_ai");
   assert.equal(result.generation.outcome, "SUCCESS");
   assert.equal(result.generation.failureCode, null);
+});
+
+test("accepts equivalent JSON string and object responses", async () => {
+  const fromString = await generateAppWithAI("做一个萤火虫观测协作台", undefined, { run: async () => ({ response: JSON.stringify(modelEnvelope) }) });
+  const fromObject = await generateAppWithAI("做一个萤火虫观测协作台", undefined, { run: async () => ({ response: structuredClone(modelEnvelope) }) });
+  assert.equal(fromString.generation.source, "workers_ai");
+  assert.equal(fromObject.generation.source, "workers_ai");
+  assert.deepEqual(fromObject.spec, fromString.spec);
+  assert.deepEqual(fromObject.steps, fromString.steps);
+});
+
+test("object responses cannot bypass envelope size or validation", async () => {
+  const circular: Record<string, unknown> = {};
+  circular.self = circular;
+  const cases: Array<[string, unknown, string]> = [
+    ["null", null, "INVALID_ENVELOPE"],
+    ["array", [], "INVALID_ENVELOPE"],
+    ["number", 7, "INVALID_ENVELOPE"],
+    ["boolean", true, "INVALID_ENVELOPE"],
+    ["circular", circular, "INVALID_ENVELOPE"],
+    ["oversized", { ...modelEnvelope, summary: "x".repeat(49 * 1024) }, "RESPONSE_TOO_LARGE"],
+    ["extra field", { ...modelEnvelope, debug: true }, "INVALID_ENVELOPE"],
+    ["nested extra field", { ...modelEnvelope, spec: { ...modelEnvelope.spec, debug: true } }, "INVALID_ENVELOPE"],
+    ["invalid app spec", { ...modelEnvelope, spec: { ...modelEnvelope.spec, kind: "database" } }, "INVALID_APP_SPEC"],
+  ];
+  for (const [name, response, code] of cases) {
+    const result = await generateAppWithAI("做一个旅行计划看板", undefined, { run: async () => ({ response }) });
+    assert.equal(result.generation.source, "deterministic", name);
+    assert.equal(result.generation.failureCode, code, name);
+    assert.ok(!JSON.stringify(result.generation).includes("debug"), name);
+  }
 });
 
 test("invalid, oversized and extra-field model responses fall back safely", async () => {
