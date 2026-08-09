@@ -1,0 +1,1170 @@
+schema_version: 1
+units:
+  S001-U0001:
+    content_sha256: 958d6f20d75d1f155d52d583ff4375606d50cfc1a85799ce67d4f95d8b913d4c
+    status: NO_REQUIREMENT
+    reason: 文档标题
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S001-U0002:
+    content_sha256: d47c8fdea4f881d39cd7a1616220d9ed34c154b973a59cde8d429f75fa4a7c99
+    status: NO_REQUIREMENT
+    reason: 来源元数据
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S001-U0003:
+    content_sha256: 950040a4f82d4f3b2ddf3dc8d3db15dcd7587589660b2476bc8dd7d9d36fd357
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-001
+      quote: 先阅读 `https://support.mgx.dev/en`，再结合实际体验设计并实现应用。
+      statement: 设计实现前必须调研 MGX 帮助中心并结合实际体验
+      disposition: SRC
+      src_id: SRC-001
+      requirement_ids:
+      - NFR-006
+  S001-U0004:
+    content_sha256: 2b4adc0dd51bca1173fb7c520d19519386068476edaa95dafe8953633831e650
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-002
+      quote: 实现一个可运行的网页应用，具备类似 Atoms 的能力与 UI 交互体验。
+      statement: 交付可运行且体验类似 Atoms 的网页应用
+      disposition: SRC
+      src_id: SRC-002
+      requirement_ids:
+      - FR-001
+      - FR-002
+      - FR-004
+  S001-U0005:
+    content_sha256: a412462d306bdaa9d6bcc05cf7f8f79e6765c52382a7b0a04ea1f55af36d8445
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-003
+      quote: 用户通过智能体驱动的方式完成代码或应用生成，并以可视化网页展示生成结果。
+      statement: 用户通过智能体驱动生成应用并可视化预览
+      disposition: SRC
+      src_id: SRC-003
+      requirement_ids:
+      - FR-002
+      - FR-003
+      - FR-004
+  S001-U0006:
+    content_sha256: de896cecfbe97d31a61a8a64579c56116db02a80cc4f25b167da896f16ea56fc
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-004
+      quote: Demo 必须具备真实交互，不能是纯静态展示。
+      statement: 生成结果必须具有真实交互
+      disposition: SRC
+      src_id: SRC-004
+      requirement_ids:
+      - FR-004
+  S001-U0007:
+    content_sha256: 4e7e95a8ddc71f426df97587d8160cb5b23eb83d0cda6c8e3b1d3b14929b47a3
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-005
+      quote: Demo 必须具备数据持久化。
+      statement: Demo 数据必须持久化
+      disposition: SRC
+      src_id: SRC-005
+      requirement_ids:
+      - FR-005
+  S001-U0008:
+    content_sha256: 77750ed33dea6420d2280ad24a58890aa9e83608ff58dd92dc9ba00c996e1736
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-006
+      quote: 在资源允许时
+      statement: 初始化和延展范围以时间资源允许为条件
+      disposition: SRC
+      src_id: SRC-006
+      requirement_ids:
+      - NFR-007
+    - id: ATOM-040
+      quote: 覆盖初始化或注册
+      statement: 基本入口可选择初始化或注册中的一种
+      disposition: SRC
+      src_id: SRC-019
+      requirement_ids:
+      - FR-001
+    - id: ATOM-041
+      quote: 、核心主流程，以及至少一个延展能力。
+      statement: 需要覆盖核心生成流程以及至少一个延展能力
+      disposition: SRC
+      src_id: SRC-020
+      requirement_ids:
+      - FR-002
+      - FR-006
+  S001-U0009:
+    content_sha256: c1a2dff6b2bb42d89c785f673530c9d905d3eabca14a54202d5e8f0b55cf6240
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-007
+      quote: 最终必须提供可测试的在线访问链接
+      statement: 最终必须提供可测试的在线访问链接
+      disposition: SRC
+      src_id: SRC-007
+      requirement_ids:
+      - NFR-005
+    - id: ATOM-042
+      quote: 和实际可用功能
+      statement: 最终必须提供实际可用功能
+      disposition: SRC
+      src_id: SRC-021
+      requirement_ids:
+      - FR-002
+      - FR-004
+    - id: ATOM-043
+      quote: ，不能只有概念验证。
+      statement: 交付不得停留在概念验证
+      disposition: SRC
+      src_id: SRC-022
+      requirement_ids:
+      - NFR-001
+      - NFR-005
+  S001-U0010:
+    content_sha256: 405bc2f62d0843cde4a49902f6c79fd129812df1d3faaa88b2b85cf32f2882f7
+    status: NO_REQUIREMENT
+    reason: 章节标题
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S001-U0011:
+    content_sha256: fe326835c4ad4fa11fe0a5752903199265476788570931da4de53d58cb677775
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-008
+      quote: 完成度：功能完整性、稳定性与基本工程质量。
+      statement: 以功能完整性稳定性和工程质量评估完成度
+      disposition: SRC
+      src_id: SRC-008
+      requirement_ids:
+      - NFR-001
+  S001-U0012:
+    content_sha256: 73012f250b36eec483c16b6ff2b67997ee9fa67ff3a1e70de4c6ffddaeace5be
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-009
+      quote: 工程思维：任务拆解、技术选型、复杂度控制与取舍能力。
+      statement: 以任务拆解技术选型复杂度控制和取舍评估工程思维
+      disposition: SRC
+      src_id: SRC-009
+      requirement_ids:
+      - NFR-002
+  S001-U0013:
+    content_sha256: 2a0c06fb722f872f5db4afaef97cbb66eaa53705da42d4ef6909eceb84f7611d
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-010
+      quote: 用户体验：交互是否清晰、流程是否顺畅、是否可用。
+      statement: 以交互清晰流程顺畅和可用性评估用户体验
+      disposition: SRC
+      src_id: SRC-010
+      requirement_ids:
+      - NFR-003
+  S001-U0014:
+    content_sha256: 2c908399a742da62bb05d0d984cd9125d52c555d38bfa5e33086f876c6efc183
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-011
+      quote: 创新性：是否有亮点设计、独特视角或可扩展潜力。
+      statement: 以亮点独特视角和扩展潜力评估创新性
+      disposition: SRC
+      src_id: SRC-011
+      requirement_ids:
+      - NFR-004
+  S001-U0015:
+    content_sha256: f375335706204fe795b2917e0f09055dbf2aa37d5fe1723159469b03bf183a08
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-012
+      quote: 可交付性：文档清晰度、可运行程度、整体完成质量。
+      statement: 以文档可运行程度和整体质量评估可交付性
+      disposition: SRC
+      src_id: SRC-012
+      requirement_ids:
+      - NFR-005
+  S002-U0001:
+    content_sha256: de9eff3642f3be035a94368e2cc9f6eedcc899575103d922f28513cfb6535f65
+    status: NO_REQUIREMENT
+    reason: 文档标题
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S002-U0002:
+    content_sha256: 6ea9b6bf450a232126aae86d78c7338220e2842a0c7cbf30fbdae24aa9dcec60
+    status: NO_REQUIREMENT
+    reason: 采集日期元数据
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S002-U0003:
+    content_sha256: 874fba22c36ca3f1e20ca7c883e36a12b85b91406bd21c7b46483aec112b4b96
+    status: NO_REQUIREMENT
+    reason: 章节标题
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S002-U0004:
+    content_sha256: 4f314bf38e459f32ee0c58ed4be6adfa70e408883034ee4063fac824f711d0d6
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-013
+      quote: '`https://support.mgx.dev/en`：入口当前被本机安全页拦截，无法直接浏览。'
+      statement: 原帮助入口当前无法直接浏览
+      disposition: FACT
+      evidence_id: EV-002
+  S002-U0005:
+    content_sha256: d38c41ba4f2da26251779209fe086cbef4fdd8a38355731be69a48befdd635cb
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-014
+      quote: '`https://atomshelpcenter.pre.mgx.dev/en`：官方帮助中心公开可索引副本。'
+      statement: 存在官方帮助中心公开可索引副本
+      disposition: FACT
+      evidence_id: EV-002
+  S002-U0006:
+    content_sha256: 8240e926f15f17d1a1beefb7686c63a503919f9dd78e7ea3568134ea7d82a2a6
+    status: NO_REQUIREMENT
+    reason: 来源链接
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S002-U0007:
+    content_sha256: b7400768cac1f55bb53cc90019f9d6d1d90e6bc0e9314fea470883f08439e0a4
+    status: NO_REQUIREMENT
+    reason: 来源链接
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S002-U0008:
+    content_sha256: 6da51cef4421443eb64fcc9d63192deeace67747ca0804a73208f5c7daaf29b1
+    status: NO_REQUIREMENT
+    reason: 来源链接
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S002-U0009:
+    content_sha256: dda82de8f479f3326fae3205be834886e3f4b2a164717f406cc52f47cf2df8a0
+    status: NO_REQUIREMENT
+    reason: 来源链接
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S002-U0010:
+    content_sha256: be64f28a4ef2eb6b001b8d54e3045a204bf20a4bbb01ddc9d1e354b2a29aca95
+    status: NO_REQUIREMENT
+    reason: 章节标题
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S002-U0011:
+    content_sha256: 867ea40db59c5c8a47aebbe787801d73fca1fb353379a084b60652c138a2ce46
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-015
+      quote: MGX 已更名为 Atoms，产品建立在 MetaGPT 多智能体协作理念上。
+      statement: MGX 已更名且采用多智能体协作理念
+      disposition: FACT
+      evidence_id: EV-002
+  S002-U0012:
+    content_sha256: b616857fe3d7265dd358af67d5b430dd1a5d7fb7cdb30623675669b566e8cd9a
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-016
+      quote: 用户用自然语言描述目标，Agent 负责分析、规划、开发、数据处理和持续改进。
+      statement: 自然语言目标驱动多角色 Agent 完成软件工作
+      disposition: FACT
+      evidence_id: EV-002
+  S002-U0013:
+    content_sha256: b3108172e9ced49e5b2c0a431cf394e9a4b272c56177ba55459fe47e79aff178
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-017
+      quote: 官方列出 Team Leader、Product Manager、Architect、Engineer、Data Analyst、Deep Researcher、SEO Specialist 七类角色。
+      statement: 官方定义七类专业 Agent 角色
+      disposition: FACT
+      evidence_id: EV-002
+  S002-U0014:
+    content_sha256: 42c5a49089c39c66253b683ccd10be6f05dc49605f152b7af8abdab9b2f1994e
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-018
+      quote: 官方建议复杂项目先构建 MVP，再逐模块迭代。
+      statement: 官方推荐先 MVP 后增量迭代
+      disposition: FACT
+      evidence_id: EV-002
+  S002-U0015:
+    content_sha256: d537ffaaaa3db89d5fbefb30b9455fadf4f7df3c909df42034551d9e8194022d
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-019
+      quote: Atoms 工作区包含对话、应用生成和预览；
+      statement: Atoms 工作区包含对话生成和预览
+      disposition: FACT
+      evidence_id: EV-002
+  S002-U0016:
+    content_sha256: cdb7ee20fe0e5feaf26e3d1576aa867eb27dab765bca01d5e9578af14a0179cc
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-020
+      quote: Publish 生成稳定公开链接，Share 用于导出或分享。
+      statement: Atoms 支持公开发布和分享导出
+      disposition: FACT
+      evidence_id: EV-002
+  S002-U0017:
+    content_sha256: f8bba973a53be7259ee70b929fb7cb3a44a3d3c5758e2af1720dde128b0127cd
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-021
+      quote: 外部后端连接用于让数据跨刷新和会话保留；
+      statement: 后端连接用于跨刷新和会话持久化
+      disposition: FACT
+      evidence_id: EV-002
+  S002-U0018:
+    content_sha256: 2c009f3aa851d85960fc2824ca10e814e0bb4423dd6a67c7e11ab19501c16b4d
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-022
+      quote: 官方文档将“刷新后仍存在”作为持久化验证方式。
+      statement: 刷新恢复是持久化验收方式
+      disposition: FACT
+      evidence_id: EV-002
+  S002-U0019:
+    content_sha256: 6b972eba09422c2d4877b78301d264484667634757442435208432bafa415c12
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-023
+      quote: GitHub 被定义为长期代码保存和版本协作能力，Atoms 工作区负责持续生成与修改。
+      statement: Atoms 区分活跃工作区与长期版本保存
+      disposition: FACT
+      evidence_id: EV-002
+  S002-U0020:
+    content_sha256: 5485a2a4ccf669609e1d7491de9246393e0fec1930b91920aeef18c1febbd663
+    status: NO_REQUIREMENT
+    reason: 设计启发章节标题
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S002-U0021:
+    content_sha256: 97b1e97186048cb018204d799d079e7613506a1bed407f155ea42097f7d72753
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-024
+      quote: Demo 应让 Agent 的分工与进度可见，而不是仅显示统一加载动画。
+      statement: 设计启发不作为权威需求输入
+      disposition: OUT
+      reason: 由官方事实推导的本期设计选择，追踪至 DEC-008
+  S002-U0022:
+    content_sha256: b59cf207e6604162f66b7bcffe0db0909a7f1093d9fd168b619c7d6a38646d71
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-025
+      quote: 应把聊天、Agent 进度和应用预览放在同一工作区，减少上下文切换。
+      statement: 设计启发不作为权威需求输入
+      disposition: OUT
+      reason: 由官方事实推导的本期设计选择，追踪至 DEC-008
+  S002-U0023:
+    content_sha256: 1a1a1ab4ccc93acc8a37f1c16c5ec26c6fff4737867017363021f0f9dbe80e48
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-026
+      quote: 应支持对生成结果继续提出修改，并保留版本历史。
+      statement: 设计启发不作为权威需求输入
+      disposition: OUT
+      reason: 用户挑战只要求至少一项延展能力，具体选型追踪至 DEC-008
+  S003-U0001:
+    content_sha256: 5c49e70f9b8a9eeba1fe37b10396117c4f652429a2de4f7c1e8cb2737f62f6bd
+    status: NO_REQUIREMENT
+    reason: 文档标题
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S003-U0002:
+    content_sha256: e388892770361c05a09e3d33d381c055a6c23b4d35b8dea7a075cafa8d49481c
+    status: NO_REQUIREMENT
+    reason: 采集日期元数据
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S003-U0003:
+    content_sha256: 81ca1bc1bfd92383fa65b5e57998cbae498198cd0a0de976da90055886706d84
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-027
+      quote: 仓库已由 Sites Starter 初始化，目前只有加载骨架，没有 Atoms Demo 业务功能。
+      statement: 当前项目只有空骨架
+      disposition: FACT
+      evidence_id: EV-003
+  S003-U0004:
+    content_sha256: 8f9a576225deb3ecb914cd192ef8de23d4f01fe8520f93403c9ac610bce48a0f
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-028
+      quote: Starter 支持 React、Vinext、Cloudflare Worker 和 D1 逻辑绑定。
+      statement: Starter 提供目标技术栈和 D1 能力
+      disposition: FACT
+      evidence_id: EV-003
+  S003-U0005:
+    content_sha256: 5965503aadc04b828e2eb2293eb46bead79de1e45c5101a5507c6ad663155da3
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-029
+      quote: '`.openai/hosting.json` 是在线托管与 D1 资源声明的事实源。'
+      statement: hosting 配置是托管和 D1 绑定事实源
+      disposition: FACT
+      evidence_id: EV-003
+  S004-U0001:
+    content_sha256: adf01cfa8d159f3a6bf1712badbceb239b28363a41f5a15e528a5852cc2381c1
+    status: NO_REQUIREMENT
+    reason: 文档标题
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S004-U0002:
+    content_sha256: 39753a34a43216c08ddd5aef51cff5ecba46b5b4e2ba857d4d710395499a46d3
+    status: NO_REQUIREMENT
+    reason: 体验日期元数据
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S004-U0003:
+    content_sha256: ca11141b1a8acaed3d8862b28dd4c58699e4bf33597370fe9f1be88740aa1942
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-031
+      quote: 范围为无需账号即可访问的公开首页和登录入口。
+      statement: 体验范围仅覆盖公开首页和登录入口
+      disposition: FACT
+      evidence_id: EV-004
+  S004-U0004:
+    content_sha256: 3f34037c0afb8b9ecfda7b8fba6c714692f149eaa5d68d5c6838a8640a250cc6
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-032
+      quote: 首页第一屏以一句话输入框作为主入口，并提供 SaaS、电子商务、内部工具、个人项目等模板分类。
+      statement: Atoms 公开首屏采用一句话输入和模板分类
+      disposition: FACT
+      evidence_id: EV-004
+  S004-U0005:
+    content_sha256: 8a514ed0a4d3b0e4ae562ebdca963f0899844a9e5524ca1ae8bbbe206e1c83ad
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-033
+      quote: 首页强调八个具名 Agent 的专业分工，并把用户定位为决策者、Agent 定位为研究、规划、构建、测试和增长的执行团队。
+      statement: Atoms 公开页面强调具名 Agent 分工和用户决策者角色
+      disposition: FACT
+      evidence_id: EV-004
+  S004-U0006:
+    content_sha256: bbd00213473a7925bae511f9a52494b53b3f5a39b466b6a0a67d4babbf5885f4
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-034
+      quote: 产品价值表达从“生成代码”扩展到“把想法变成可销售产品”，同时强调真实应用、后端、发布和增长。
+      statement: Atoms 价值主张覆盖真实应用后端发布和增长
+      disposition: FACT
+      evidence_id: EV-004
+  S004-U0007:
+    content_sha256: 5826837f14d1022171b9e4961f98f9da810d519d7f854e6c5c476f226e695c10
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-035
+      quote: 登录入口支持 Google 或邮箱，未输入邮箱时继续按钮保持禁用。
+      statement: Atoms 登录入口具有第三方和邮箱方式及禁用状态
+      disposition: FACT
+      evidence_id: EV-004
+  S004-U0008:
+    content_sha256: 7c10d63bf5654d3def9eec7645ead3ac3a50e9760d416e0de613a4c568498db9
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-036
+      quote: 未使用个人账号继续登录，因此工作区内部行为仍以官方帮助资料为准。
+      statement: 实际体验未覆盖登录后工作区
+      disposition: FACT
+      evidence_id: EV-004
+  S004-U0009:
+    content_sha256: 6a7e553c202cf55217bf0aafaac92ac25c186190f4154c83322e1fba9faf8d38
+    status: NO_REQUIREMENT
+    reason: 设计辅助章节标题
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S004-U0010:
+    content_sha256: fdfb685bdd6a1171109b17c94a718fe8242062f00c33e43c9807f7e486bd5163
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-037
+      quote: Demo 第一屏应直接让用户输入想法，而不是先解释技术架构。
+      statement: 设计辅助推断
+      disposition: OUT
+      reason: 公开产品体验启发的设计选择，追踪至 DEC-008
+  S004-U0011:
+    content_sha256: 6337d4dc492916ea9792046e3d5ecdce22916f785d4425e1c615302efb43e850
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-038
+      quote: 模板示例可以降低空白输入压力，但生成后应快速把视觉焦点交给可操作的应用预览。
+      statement: 设计辅助推断
+      disposition: OUT
+      reason: 公开产品体验启发的设计选择，追踪至 DEC-008
+  S004-U0012:
+    content_sha256: 1c18c6c7e9db556b9af2e385165206823cf0737722d62ab08e36af2110900474
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-039
+      quote: Agent 角色应有明确职责和阶段产出，避免只有头像装饰。
+      statement: 设计辅助推断
+      disposition: OUT
+      reason: 公开产品体验启发的设计选择，追踪至 DEC-008
+  S005-U0001:
+    content_sha256: 59ea2b69ab0b87555d9f64b9986fbbebc29c39a8b12eb6286e8ddbc8235dea5a
+    status: NO_REQUIREMENT
+    reason: 文档标题
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S005-U0002:
+    content_sha256: e0e5e19c73a5813a0b9439bcd73245b7bc3f4b090cd29de763d58018fab0b4c9
+    status: NO_REQUIREMENT
+    reason: 原始证据快照元数据，不是独立需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S005-U0003:
+    content_sha256: 77fb701dc5d89e3366c5fa56bed03c0410379ee6b5292d0adf51c61b2bc6d820
+    status: NO_REQUIREMENT
+    reason: 原始证据快照内容，用于复核已索引事实，不作为新增需求
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S005-U0004:
+    content_sha256: 2789c27c5669c0ac51a3904a4b921a6c613fdc79fc234399892ea5c03004dc76
+    status: NO_REQUIREMENT
+    reason: 原始证据快照内容，用于复核已索引事实，不作为新增需求
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S005-U0005:
+    content_sha256: d11b24e9a9d54c06d57348fcc595851125529e483563f5187f6b21786ac08f47
+    status: NO_REQUIREMENT
+    reason: 原始证据快照内容，用于复核已索引事实，不作为新增需求
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S005-U0006:
+    content_sha256: c187082045b3ea4ccaab00e2904d4478bfb8192a39cbf162cce20da53da6ac21
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-058
+      quote: '```text
+
+        # Communicating with Agents
+
+
+        The Atoms team consists of seven specialized agents, each with specific talents:
+
+
+        * Mike (Team Leader): Distributes tasks and coordinates the team.
+
+        * Emma (Product Manager): Manages product requirement analysis and market research.
+
+        * Bob (Architect): Designs system architecture and technical solutions.
+
+        * Alex (Engineer): Focuses on application development, rapid bug fixes, and feature implementation.
+
+        * David (Data Analyst): Handles data processing, machine learning, web scraping, and data-driven Q&A tasks.
+
+        * Iris (Deep Researcher): Collects, analyzes, and summarizes information for work, study, or decision making.
+
+        * Sarah (SEO Specialist): Generate multilingual SEO content to drive traffic.
+
+
+        For complex tasks: Start with a Minimum Viable Product (MVP). Then, improve each module step by step.
+
+        ```'
+      statement: 官方原文定义七类 Agent 角色并建议复杂任务先做 MVP 再迭代
+      disposition: FACT
+      evidence_id: EV-002
+  S005-U0007:
+    content_sha256: 7be857311d5833d8c43a586b2cadc00eb7921682ed7ba1f7554720fc23308901
+    status: NO_REQUIREMENT
+    reason: 原始证据快照内容，用于复核已索引事实，不作为新增需求
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S005-U0008:
+    content_sha256: fb851433510dac4596c9a09ca624a2b715ea31ce707873a52482ba2a62fd03e3
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-059
+      quote: '```text
+
+        With Supabase, you can easily configure a backend for your websites—no development experience needed.
+
+
+        You can connect with Supabase to solve the problem that your Atoms team only stores in the browser''s memory, which can be lost upon refresh or closure. By integrating Atoms with Supabase, you can transform your website into a fully functional application with persistent storage and advanced features.
+
+
+        Test the Functionality in Atoms
+
+        * Create sample data in your app, such as adding a few "trip records" through the UI.
+
+        * Save the data and refresh the page. The data will be synced to the Supabase database.
+
+        * Log in to Supabase and verify whether the newly added data exists in the database.
+
+        ```'
+      statement: 官方原文说明后端持久化用于跨刷新保留数据并给出刷新验证步骤
+      disposition: FACT
+      evidence_id: EV-002
+  S005-U0009:
+    content_sha256: 5a7ba3dd4e7d899240d99efdab6e3c7e32b47d6c1e1879f745a02355e89c7535
+    status: NO_REQUIREMENT
+    reason: 原始证据快照内容，用于复核已索引事实，不作为新增需求
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S005-U0010:
+    content_sha256: e74e859e8683f86b053fe4071f62defa96aac337e94be1b586c23469d10dc2b0
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-060
+      quote: '```text
+
+        MGX is now rebranded to Atoms. It was once MetaGPTX, built on MetaGPT and pioneers multi-agent natural language programming. It simulates software development by breaking complex tasks into stages, and supports various LLMs and revolutionizes code generation through natural language.
+
+        ```'
+      statement: 官方原文说明 MGX 更名为 Atoms 并以多智能体分阶段模拟软件开发
+      disposition: FACT
+      evidence_id: EV-002
+  S005-U0011:
+    content_sha256: 9a82a4117eb670cf667cbb3fac795b802fa17720142ae3b24e034224a4c7bebe
+    status: NO_REQUIREMENT
+    reason: 原始证据快照内容，用于复核已索引事实，不作为新增需求
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S005-U0012:
+    content_sha256: b6f210edc67f496b732c403b0f2239a942b3ea88aef91dbab87d43443cee25af
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-061
+      quote: '```text
+
+        What can I build with Atoms?
+
+        You can build websites, landing pages, portfolios, web apps, dashboards, calculators, reports, and business tools with AI-assisted building.
+
+
+        Do I need coding experience to use Atoms?
+
+        No. Describe what you need and share feedback with AI agents; they help plan, build, edit, and improve the project.
+
+
+        How do Atoms agents help with my project?
+
+        Atoms agents can break down tasks, analyze requirements, write code, manage data, research information, and help turn an idea into a working product.
+
+
+        How do I publish or share my project?
+
+        Use Publish to create a stable public link or connect a custom domain. Use Share to export files, manage permissions, or copy a shareable link.
+
+        ```'
+      statement: 官方原文说明自然语言协作、可构建产品类型及 Publish 和 Share 能力
+      disposition: FACT
+      evidence_id: EV-002
+  S006-U0001:
+    content_sha256: 7383b56093dd59e37a869ab7d0b5918153f8ad28679bfb4cbdb46e31a093bc74
+    status: NO_REQUIREMENT
+    reason: 文档标题
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S006-U0002:
+    content_sha256: 5692e4667fe8b0c4cdb43e3c2aff6e98b93fd00b7ab16e1e29211d5aacd5bb75
+    status: NO_REQUIREMENT
+    reason: 原始证据快照内容，用于复核已索引事实，不作为新增需求
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S006-U0003:
+    content_sha256: a209731dd4bece701eccc8633a5e31f2024f9e06f452fd84fa14579609854114
+    status: NO_REQUIREMENT
+    reason: 原始证据快照内容，用于复核已索引事实，不作为新增需求
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S006-U0004:
+    content_sha256: 239d79fe04f01ddf524e001e25cbe4b86262175ec4b3aed4dbb7fda780a026af
+    status: NO_REQUIREMENT
+    reason: 原始证据快照内容，用于复核已索引事实，不作为新增需求
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S006-U0005:
+    content_sha256: 1328ea41ad81f5d78c9b60fe547a3ed170bf5711dda615c11b39fa75f20aaf4b
+    status: NO_REQUIREMENT
+    reason: 原始证据快照内容，用于复核已索引事实，不作为新增需求
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S006-U0006:
+    content_sha256: 3f90fd2241459b95f7e97b685d3d8157fab61949608b1cd75df667dd57ab6f4c
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-062
+      quote: '```text
+
+        定价  社区  资源  登录  注册
+
+        Mike - AI 团队领导 Agent
+
+        Adrian - AI 广告专家 Agent
+
+        Sarah - AI SEO 专家 Agent
+
+        Emma - AI 产品经理 Agent
+
+        Bob - AI 架构师 Agent
+
+        Alex - AI 工程师 Agent
+
+        David - AI 数据分析师 Agent
+
+        Iris - AI 深度研究员 Agent
+
+
+        # 把想法变成可销售的产品
+
+        AI 员工用于验证想法、构建产品并获取客户。几分钟内完成。无需编码。
+
+        开始
+
+
+        ## 从模板开始
+
+        SaaS 应用  电子商务  内部工具  个人项目
+
+
+        ## 你的 AI Team，帮助你更快构建并赢得客户
+
+        一个完整的 AI 团队，帮助你以更低成本更快发布。你做决策，智能体负责研究、规划、构建、测试和增长。
+
+
+        Emma
+
+        Product Manager 将你的想法转化为明确的规格和范围，以便构建保持简单且可用。
+
+        Mike
+
+        Team Leader 端到端运行计划，协调 agents，并请求你的批准，这样你在保持知情的同时也能快速行动。
+
+        Alex
+
+        Engineer 通过连接前端、后端、集成和部署，构建一个可投入生产的全栈应用。
+
+
+        ### 真实应用，不只是演示
+
+        构建一个可发布、可增长并可扩展的真实产品。所有刚需功能内置，包括用户登录、数据存储和 Stripe 支付。
+
+
+        可视化编辑器
+
+        精准实现你的设计。一个可视化编辑器，可快速调整布局和组件。
+
+
+        Atoms云
+
+        Atoms Cloud 为你的应用提供全栈后端，包括用户登录、数据库、集成和可扩展的托管。
+
+
+        ## 常见问题
+
+        Atoms 是一个由 AI 驱动的开发平台，可将你的想法变成可运行的产品。它运行多智能体工作流，由一支 AI 团队组成，例如产品经理、工程师和数据科学家，他们协同工作，从零开始规划、构建、测试并发布你的应用。
+
+
+        [Input: 告知 Atoms 团队你的需求] 开始
+
+        ```'
+      statement: 公开首页原文展示直接输入、模板、八个具名 Agent、真实应用和全栈后端价值表达
+      disposition: FACT
+      evidence_id: EV-004
+  S006-U0007:
+    content_sha256: 332438752be63aca6a4381ef9741ab2044d447c66c1fe088d344ea58b807bcb5
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-063
+      quote: 登录页实际观察：Google 与邮箱为可选登录入口；
+      statement: 登录页提供 Google 与邮箱入口
+      disposition: FACT
+      evidence_id: EV-004
+  S006-U0008:
+    content_sha256: 917df1dae61805e1f35bb69c9f679605072d1c9873cf5168e681ea534ca77a9f
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-064
+      quote: 邮箱为空时继续按钮禁用。
+      statement: 邮箱空值时继续按钮禁用
+      disposition: FACT
+      evidence_id: EV-004
+  S006-U0009:
+    content_sha256: 4924bd6af8d6fa884d530eea6ee736e301dd57a026fb95a384ef9d3304fefe55
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-065
+      quote: 本次未输入个人账号，也未提交外部表单。
+      statement: 产品体验未使用账号或提交外部表单
+      disposition: FACT
+      evidence_id: EV-004
+  S007-U0001:
+    content_sha256: 8963e902b1258943a1587e38bed1a634a4d88d971970dda11537e56572730c2e
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-056
+      quote: 'null'
+      statement: 当前 D1 绑定为空
+      disposition: FACT
+      evidence_id: EV-003
+  S007-U0002:
+    content_sha256: 94943e082faa99b4ba09abff377491eba101acfe3b33d09d9f56f100f05cf977
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-057
+      quote: 'null'
+      statement: 当前 R2 绑定为空
+      disposition: FACT
+      evidence_id: EV-003
+  S011-U0001:
+    content_sha256: c24dcf9bbdcd50bfb134acd2818ba100208bef2bdcb4fcf1de15ca9cf75ad62b
+    status: NO_REQUIREMENT
+    reason: 文档标题
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S011-U0002:
+    content_sha256: c9d12eb695d6d6fb84c24dd38a65d9f9d1bbd17d3297b1f5c5d012373b888429
+    status: NO_REQUIREMENT
+    reason: 原始证据快照内容，用于复核已索引事实，不作为新增需求
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S011-U0003:
+    content_sha256: 3cc4952e9e8a3008b90a76850f9d61744f7b52339012eaefcf1a86b710466747
+    status: NO_REQUIREMENT
+    reason: 原始证据快照内容，用于复核已索引事实，不作为新增需求
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S011-U0004:
+    content_sha256: f2f419c2d67fec4e136e5a440cd745ea5c4728f6f4595f4bf84357ed030691c2
+    status: NO_REQUIREMENT
+    reason: 原始证据快照内容，用于复核已索引事实，不作为新增需求
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S011-U0005:
+    content_sha256: 23eb73f70eee7463b09db075b549ae8ca02aa7129494f226264705425bdff6b9
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-066
+      quote: "```tsx\nimport type { Metadata } from \"next\";\nimport { SkeletonPreview } from \"./_sites-preview/SkeletonPreview\";\n\nexport const metadata: Metadata = {\n  title: \"Your site is taking shape\",\n  description:\n    \"Your first version will appear here automatically when it’s ready.\",\n  other: {\n    \"codex-preview\": \"development\",\n  },\n};\n\nexport default function Home() {\n  return <SkeletonPreview />;\n}\n```"
+      statement: 开发前页面仅渲染 Starter 骨架
+      disposition: FACT
+      evidence_id: EV-003
+  S011-U0006:
+    content_sha256: 7046b38cde179cdd42bf6cc1650d9db4302f5843e3a5dfb72708b606a78678a3
+    status: NO_REQUIREMENT
+    reason: 原始证据快照内容，用于复核已索引事实，不作为新增需求
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S011-U0007:
+    content_sha256: 15cb7e85b66b523cc66893096c8fb02c7068c4490b566924bac4fde92a3439a1
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-067
+      quote: '```ts
+
+        // Intentionally empty by default.
+
+        // Add Drizzle tables here when the site actually needs a database.
+
+        // See examples/d1/db/schema.ts for an opt-in example.
+
+        export {};
+
+        ```'
+      statement: 开发前 D1 schema 为空
+      disposition: FACT
+      evidence_id: EV-003
+  S011-U0008:
+    content_sha256: e9e23a7e6e5af462d2b790fc693ef8537f3dc48e39611548a5b7b41def58c0cb
+    status: NO_REQUIREMENT
+    reason: 原始证据快照内容，用于复核已索引事实，不作为新增需求
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S011-U0009:
+    content_sha256: d2e2b0dcf86eb885b72e74d8155dc03bec4856eac8cdc75b3c592c29ff54ea41
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-068
+      quote: "```json\n{\n  \"d1\": null,\n  \"r2\": null\n}\n```"
+      statement: 开发前 hosting 配置未启用 D1 或 R2
+      disposition: FACT
+      evidence_id: EV-003
+  S011-U0010:
+    content_sha256: 5510df730c639821f37e4e72e01a7d34e2b57db70f2a2f0d4fc41039ed2d5e5b
+    status: NO_REQUIREMENT
+    reason: 原始证据快照内容，用于复核已索引事实，不作为新增需求
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S011-U0011:
+    content_sha256: 906dfd7e3791b6d43b663dd7754dbe027f161bbea41366bfecec1b95e778f6b5
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-069
+      quote: "```json\n{\n  \"engines\": { \"node\": \">=22.13.0\" },\n  \"dependencies\": {\n    \"drizzle-orm\": \"0.45.2\",\n    \"react\": \"19.2.6\",\n    \"react-dom\": \"19.2.6\"\n  },\n  \"devDependencies\": {\n    \"typescript\": \"5.9.3\",\n    \"vinext\": \"1.0.0-beta.2\",\n    \"vite\": \"8.0.13\",\n    \"wrangler\": \"4.92.0\"\n  }\n}\n```"
+      statement: 开发前依赖基线为 React 19、Vinext、Drizzle、Vite 与 Wrangler
+      disposition: FACT
+      evidence_id: EV-003
+  S012-U0001:
+    content_sha256: b8b405989432139c922835f50eb506952409adbe88d719b3132343abea44a56d
+    status: NO_REQUIREMENT
+    reason: 文档标题
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S012-U0002:
+    content_sha256: 4812f91a823ca68806d0010bd9aec8c1e6f3147c6c9ab0533efb3a3f44024d70
+    status: NO_REQUIREMENT
+    reason: 原始证据快照内容，用于复核已索引事实，不作为新增需求
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S012-U0003:
+    content_sha256: 5e32a01e86fdb4d01f66af9d9e0214954a0168431a877991ad5c0d28bab52e8a
+    status: NO_REQUIREMENT
+    reason: 原始证据快照内容，用于复核已索引事实，不作为新增需求
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S012-U0004:
+    content_sha256: 2230afe64c5745ff8fe2b553f125055ac2d64a28613aa7f18f50c32c5ca9df52
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-070
+      quote: '```text
+
+        Use D1 for persistent structured state that needs to survive page reloads or sessions, especially when it represents product data rather than transient UI state.
+
+
+        Use browser storage only for device-local, non-authoritative UI preferences such as dismissed banners, theme choice, or temporary draft state. Do not use localStorage, sessionStorage, or in-memory state as the source of truth for user data that the product is expected to remember.
+
+
+        Set the needed logical bindings in .openai/hosting.json: use d1, usually DB, when D1 is required; use r2 when R2 is required; leave unused bindings null.
+
+
+        For D1-backed state: put schema definitions in db/schema.ts; keep D1 access behind a small helper; use prepared statements on the raw D1 binding for application queries and runtime initialization.
+
+        ```'
+      statement: Sites 平台要求持久产品数据使用 D1 并通过 schema 与参数化语句访问
+      disposition: FACT
+      evidence_id: EV-005
+  S012-U0005:
+    content_sha256: 9bce43650b70e8099ff758c0ea76cb4c1fdfddb15c3d4a30e8645f4b778ae250
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: ''
+    ignored: []
+    atoms:
+    - id: ATOM-071
+      quote: '```text
+
+        Signed-in visitors receive both oai-authenticated-user-id and oai-authenticated-user-email. Private Sites require every visitor to sign in; public Sites may also have anonymous visitors, for whom neither header is present.
+
+
+        The user ID is stable for the same user on the same Site and different across Sites.
+
+
+        Keep authorization decisions in server-side code for every site.
+
+
+        Do not add SIWC just because a site is public or published. Add it only when the requested product has a concrete sign-in-gated surface.
+
+        ```'
+      statement: Sites 公共站允许匿名访客且所有授权决定必须在服务端完成
+      disposition: FACT
+      evidence_id: EV-005
+review:
+  status: CONFIRMED
+  by: source_review
+  at: '2026-08-09T16:21:26+08:00'
+  basis_hash: 79de34fac3b9e2f4c2fe8d6b0edaab888fa5862b61c02468705db14993d6a1e6
+  report_sha256: 7530964680a0f2cba05c9ac6e3340d31ebb8e1023767f1786f37599c4b04e491

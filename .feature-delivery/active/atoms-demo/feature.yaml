@@ -1,0 +1,102 @@
+schema_version: 2
+feature:
+  slug: atoms-demo
+  title: Atoms AI App Builder Demo
+  risk: high
+  delivery_mode: full
+  status: ACCEPTANCE_FROZEN
+  owner_repository: atoms-demo
+  participating_repositories:
+  - atoms-demo
+  created_at: '2026-08-09T15:50:06+08:00'
+  updated_at: '2026-08-09T16:39:34+08:00'
+artifacts:
+  context: .feature-delivery/active/atoms-demo/_context.md
+  progress: .feature-delivery/active/atoms-demo/progress.md
+  facts: .feature-delivery/active/atoms-demo/facts.md
+  scope: .feature-delivery/active/atoms-demo/scope.md
+  open_questions: .feature-delivery/active/atoms-demo/open-questions.md
+  source_register: .feature-delivery/active/atoms-demo/source/register.yaml
+  source_units: .feature-delivery/active/atoms-demo/source/units.jsonl
+  source_coverage: .feature-delivery/active/atoms-demo/source/coverage.yaml
+  source_review: .feature-delivery/active/atoms-demo/source/review.md
+  prd: .feature-delivery/active/atoms-demo/reference/prd.md
+  reference_inventory: .feature-delivery/active/atoms-demo/reference/dependencies.md
+  technical_design: .feature-delivery/active/atoms-demo/design/technical-design.md
+  implementation_plan: .feature-delivery/active/atoms-demo/implementation-plan.md
+  cross_repo_contracts: []
+  traceability: .feature-delivery/active/atoms-demo/traceability.md
+  vibetest: .vibetest/atoms-demo
+  freeze_record: .feature-delivery/active/atoms-demo/freeze.md
+  change_log: .feature-delivery/active/atoms-demo/change-log.md
+  agent_work_packet: .feature-delivery/active/atoms-demo/agent-work-packet.md
+  release_record: .feature-delivery/active/atoms-demo/release.md
+dependencies:
+  upstream: []
+  downstream: []
+  external: []
+freeze:
+  scope:
+    status: FROZEN
+    at: '2026-08-09T16:21:33+08:00'
+    by: codex
+    artifacts:
+      .feature-delivery/active/atoms-demo/facts.md: 7781a617e8d0b9963e0b6adae0ad722232c321dc048f5e6874407c85a0bac66b
+      .feature-delivery/active/atoms-demo/scope.md: e1005c9dafb788e8bec8b0cd3704a5702df0f2af4635db1bee15c06970efa5a1
+      .feature-delivery/active/atoms-demo/open-questions.md: d6dca385665d8225c9502b92782dfc5ae32ac2a450159c9f0ddb2d3dfa813d52
+      .feature-delivery/active/atoms-demo/reference/prd.md: 5b7d44cf91196d31f52088461f987740c50d35d9aa123bec98b2618abb26e7b0
+      .feature-delivery/active/atoms-demo/traceability.md: a4d889f104f0c94b07a9ae9f1296f4762dc9e703985657fd249a71448d38ccba
+      .feature-delivery/active/atoms-demo/source/register.yaml: 1637056cf72f337aba37504008fba74835625e866142fc036a25c8e013ecc31b
+      .feature-delivery/active/atoms-demo/source/units.jsonl: 2029571d4dcef2fc1a424f873d7ee9913a025de6805b812bb441f88cb15b9f0f
+      .feature-delivery/active/atoms-demo/source/coverage.yaml: a4a8ff125b915a84e23380a7933d91cfcb2f3f8c097746cafbbd9c2839c28344
+      .feature-delivery/active/atoms-demo/source/review.md: 7530964680a0f2cba05c9ac6e3340d31ebb8e1023767f1786f37599c4b04e491
+  design:
+    status: FROZEN
+    at: '2026-08-09T16:34:47+08:00'
+    by: codex
+    artifacts:
+      .feature-delivery/active/atoms-demo/facts.md: 7781a617e8d0b9963e0b6adae0ad722232c321dc048f5e6874407c85a0bac66b
+      .feature-delivery/active/atoms-demo/scope.md: e1005c9dafb788e8bec8b0cd3704a5702df0f2af4635db1bee15c06970efa5a1
+      .feature-delivery/active/atoms-demo/open-questions.md: d6dca385665d8225c9502b92782dfc5ae32ac2a450159c9f0ddb2d3dfa813d52
+      .feature-delivery/active/atoms-demo/reference/prd.md: 5b7d44cf91196d31f52088461f987740c50d35d9aa123bec98b2618abb26e7b0
+      .feature-delivery/active/atoms-demo/traceability.md: a4d889f104f0c94b07a9ae9f1296f4762dc9e703985657fd249a71448d38ccba
+      .feature-delivery/active/atoms-demo/source/register.yaml: 1637056cf72f337aba37504008fba74835625e866142fc036a25c8e013ecc31b
+      .feature-delivery/active/atoms-demo/source/units.jsonl: 2029571d4dcef2fc1a424f873d7ee9913a025de6805b812bb441f88cb15b9f0f
+      .feature-delivery/active/atoms-demo/source/coverage.yaml: a4a8ff125b915a84e23380a7933d91cfcb2f3f8c097746cafbbd9c2839c28344
+      .feature-delivery/active/atoms-demo/source/review.md: 7530964680a0f2cba05c9ac6e3340d31ebb8e1023767f1786f37599c4b04e491
+      .feature-delivery/active/atoms-demo/design/technical-design.md: a308190bda62b6bd0d4d7b62bc8d87ec246110ac54a250c9f45bd1426d504a70
+      .feature-delivery/active/atoms-demo/implementation-plan.md: c4073989c90990875510ed664a717102c47b59c0acd444dc30bcb44838ad13ee
+  acceptance:
+    status: FROZEN
+    at: '2026-08-09T16:39:34+08:00'
+    by: codex
+    artifacts:
+      .feature-delivery/active/atoms-demo/facts.md: 7781a617e8d0b9963e0b6adae0ad722232c321dc048f5e6874407c85a0bac66b
+      .feature-delivery/active/atoms-demo/scope.md: e1005c9dafb788e8bec8b0cd3704a5702df0f2af4635db1bee15c06970efa5a1
+      .feature-delivery/active/atoms-demo/open-questions.md: d6dca385665d8225c9502b92782dfc5ae32ac2a450159c9f0ddb2d3dfa813d52
+      .feature-delivery/active/atoms-demo/reference/prd.md: 5b7d44cf91196d31f52088461f987740c50d35d9aa123bec98b2618abb26e7b0
+      .feature-delivery/active/atoms-demo/traceability.md: a4d889f104f0c94b07a9ae9f1296f4762dc9e703985657fd249a71448d38ccba
+      .feature-delivery/active/atoms-demo/source/register.yaml: 1637056cf72f337aba37504008fba74835625e866142fc036a25c8e013ecc31b
+      .feature-delivery/active/atoms-demo/source/units.jsonl: 2029571d4dcef2fc1a424f873d7ee9913a025de6805b812bb441f88cb15b9f0f
+      .feature-delivery/active/atoms-demo/source/coverage.yaml: a4a8ff125b915a84e23380a7933d91cfcb2f3f8c097746cafbbd9c2839c28344
+      .feature-delivery/active/atoms-demo/source/review.md: 7530964680a0f2cba05c9ac6e3340d31ebb8e1023767f1786f37599c4b04e491
+      .feature-delivery/active/atoms-demo/design/technical-design.md: a308190bda62b6bd0d4d7b62bc8d87ec246110ac54a250c9f45bd1426d504a70
+      .feature-delivery/active/atoms-demo/implementation-plan.md: c4073989c90990875510ed664a717102c47b59c0acd444dc30bcb44838ad13ee
+      .vibetest/atoms-demo/rules.md: b939a0f6e963ab03bf2359ffd7011d79c64693a730f78fc64bcdbfe3a19a4ff1
+      .vibetest/atoms-demo/cases.md: 51d299feb071ab0ce81ed20c72d901ebd90464e799647836292e319cd35d62e2
+      .vibetest/atoms-demo/evidence.md: dd115852dc9a0130a9cc7bd420dc1fdaf4af9c983e0f757979ce2e9345f9ccaa
+      .vibetest/atoms-demo/gaps.md: 0e43876a67ec7798292a9eb253890968ccb68ab3a43186e8e291038d6fe9d051
+      .feature-delivery/active/atoms-demo/agent-work-packet.md: ec47dd4b1f63b8a172ff9d9f2756ee92a9ca4ff2b01452a3cfb0fed300969a50
+baseline:
+  status: UNSET
+  commit: null
+  at: null
+verification:
+  status: NOT_RUN
+  evidence: []
+  open_gaps: []
+release:
+  status: NOT_STARTED
+  deployment: null
+  rollback: null
+  at: null
