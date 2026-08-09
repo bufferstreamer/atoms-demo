@@ -67,7 +67,7 @@ function assertAppSpec(value: unknown) {
   for (const stat of candidate.stats ?? []) if (stat.delta && /^(null|undefined)$/i.test(stat.delta.trim())) delete stat.delta;
   for (const filter of candidate.filters ?? []) {
     if (filter.options.length && !filter.options.includes(filter.defaultValue)) filter.defaultValue = filter.options[0];
-    if (filter.allValue !== undefined && !filter.options.includes(filter.allValue)) delete filter.allValue;
+    if (filter.allValue !== undefined && !filter.options.includes(filter.allValue)) filter.allValue = filter.defaultValue;
   }
   for (const [cardIndex, card] of (candidate.cards ?? []).entries()) {
     card.filterValues = card.filterValues ?? {};
