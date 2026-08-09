@@ -182,6 +182,7 @@ export async function generateAppWithAI(
           messages: [{ role: "system", content: systemPrompt(previous) }, { role: "user", content: prompt }],
           max_completion_tokens: 2200,
           temperature: 0.35,
+          reasoning_effort: "low",
           response_format: { type: "json_schema", json_schema: { name: "atomize_app", strict: true, schema: responseSchema } },
         }),
         timeoutAfter(timeoutMs),
