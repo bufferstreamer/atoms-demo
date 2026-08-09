@@ -211,3 +211,35 @@ DESIGN-005 规定 55~65 秒用于 fallback/completion，且“到 `apiDeadline` 
 - 一致性确认：R18、VT-017、VT-018 已统一到 DESIGN-005 的 staged `52s model / 62s persistence / 65s API` 与 `7/9/7/22/7s` 阶段上限，不再把 CHG-006 的单调用 55 秒参数声明为当前生产默认。
 - 回归边界：CHG-006 的非法输出、对象/字符串适配、fallback、completion/event/failure 原子性、迟到守卫以及限流/容量/幂等零调用仍作为行为回归保留；历史 artifact 不能证明 CHG-007 四阶段在线成功。
 - 最终边界：CHG-007 设计与验收基线现已一致，可以重新冻结；实现、运行用例和 GAP-006 线上证据仍需后续完成。
+
+# CHG-008 中间阶段 JSON Mode 兼容独立设计复核
+
+- 日期：2026-08-09
+- Reviewer：`codex-independent-chg008-reviewer`
+- 结论：`REJECTED`
+
+## 已确认
+
+- Cloudflare 官方 JSON Mode 文档明确支持 `json_object`/`json_schema`，并说明模型不保证满足请求 JSON Schema，极端情况下返回 `JSON Mode couldn't be met`；两次 Product strict-schema `MODEL_ERROR` 与该兼容风险一致。
+- DESIGN-005 §11.5 仅把 Product/Architecture/Design 的平台生成格式切为 `json_object`；system message 携带对应 `STAGE_SCHEMAS[role]` 的完整 canonical 序列化对象，Engineering/AppSpec 继续使用严格 `json_schema`。
+- canonical schema、exact-key、类型/枚举/长度/唯一性/数组上限、12 KiB、下游零调用、D1 artifact、52/62/65 秒预算以及 owner/API/UI 协议均未被放宽；`json_object` 不被当作信任边界，设计安全方向成立。
+
+## 阻塞项
+
+### CHG8-DREV-001 — 冻结后影响登记未覆盖完整修改链且无 traceability 行
+
+CHG-008 的 change-log 只登记 FR-002/003/004、NFR-001/002/003/004 和 VT-017/018/021/023，但同一四阶段 pipeline 也承接 FR-006 的基于当前 AppSpec 继续修改，并由 VT-019 验证合法修改/非法输出不覆盖历史版本；CHG-007 原追踪还包含 NFR-005/007 与相关回归。当前 `traceability.md` 没有 CHG-008 行，无法证明兼容切换对修改、版本和数据/创新性约束的回归责任。应补全实际受影响 FR/NFR，至少关联 DESIGN-005、TASK-007、VT-017/018/019/021/023 及必要 VT-024/业务回归，并在 traceability 登记 `CHANGE_PENDING_FREEZE`。
+
+## 结论边界
+
+在 CHG8-DREV-001 关闭前，CHG-008 设计变更不能重新冻结。本结论不评价业务代码，也不代表中间阶段已在线成功。
+
+# CHG-008 中间阶段 JSON Mode 兼容独立设计复核（第二轮）
+
+- 日期：2026-08-09
+- Reviewer：`codex-independent-chg008-reviewer`
+- 结论：`CONFIRMED`
+- 关闭项：`CHG8-DREV-001`
+- 影响闭环：change-log 已覆盖 FR-002/003/004/006、NFR-001/002/003/004/005/007、TASK-007、VT-002/003/005/016~021/023/024 与 GAP-006；traceability 已新增 CHG-008 `CHANGE_PENDING_FREEZE` 行，并把 DESIGN-005 §11.5、VT-019 修改链和必要回归纳入。
+- 设计边界：Product/Architecture/Design 的 `json_object` 仅为平台兼容层，canonical `STAGE_SCHEMAS` 与服务端 exact-key/type/enum/length/unique/12 KiB 校验仍是唯一准入边界；Engineering/AppSpec 保持 `json_schema`，预算、D1、API、UI、owner、版本与迟到协议不变。
+- 声明边界：CHG-008 设计基线可以重新冻结；本结论不代表业务代码或线上四阶段证据已完成。

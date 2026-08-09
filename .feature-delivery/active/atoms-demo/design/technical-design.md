@@ -370,3 +370,9 @@ Engineering 第一次响应通过结构解析后还必须检查 AppSpec 语义�
 `run_steps` 以可重复迁移新增 nullable `source TEXT`、`model TEXT`、`duration_ms INTEGER`、`attempt_no INTEGER`、`artifact_json TEXT`、`error_code TEXT`；`runs` 新增 nullable `runner_claimed_at TEXT`。初始化先读 `PRAGMA table_info`，对缺失列逐条执行 `ALTER TABLE ADD COLUMN`；若并发初始化产生 duplicate-column 错误，必须立即重读对应 `PRAGMA table_info`，只有目标列已存在时才把该错误视为成功，其他错误一律抛出。所有列处理后再完整回读并断言七个目标列齐全，schema promise 失败时清空以允许重试。旧 run/step 可保持 null 且必须可读。
 
 API 的 `AgentStep` 增加可选 `source/model/durationMs/attemptNo/artifact/errorCode`；只对项目 owner 返回。前端默认只展示安全摘要、来源、阶段耗时和修复标识，不展示完整 artifact；artifact 用于验收和后续扩展。旧项目缺少这些字段时仍按旧摘要正常展示。
+
+### 11.5 Workers AI 中间阶段兼容模式（CHG-008）
+
+两次线上 Product 严格 schema 调用均被平台在约 0.9 秒拒绝。为遵循 Cloudflare 官方“schema 可能无法满足并返回 JSON Mode couldn't be met”的事实，Product/Architecture/Design 使用 `response_format:{type:"json_object"}`，并把对应 `STAGE_SCHEMAS[role]` 完整序列化后置于 system prompt；Engineering 继续使用 `response_format:{type:"json_schema",json_schema:STAGE_SCHEMAS.engineering}`，最终 AppSpec 约束不变。
+
+服务端 canonical schema、exact-key/类型/枚举/长度/数组上限与唯一性、12 KiB 限制和 D1 artifact 契约不变。前三阶段收到 null/数组/primitive、额外/缺失字段、非法枚举、越界或重复数组、超长/控制字符、不可序列化或超限对象仍拒绝且不启动下游。`json_object` 只是平台生成兼容层，不是验证边界；平台的 `JSON Mode couldn't be met` 只映射为 `JSON_MODE_UNMET` 枚举，不保存上游原文。

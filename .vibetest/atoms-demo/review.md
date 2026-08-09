@@ -212,3 +212,40 @@ CHG-007 的 traceability/TASK-007 明确要求回归 VT-016~020，但 R18 仍写
 - 当前预算：R18 明确要求 52 秒总模型、62 秒持久化和 65 秒 execute API；VT-017 按同一线上 run 验证四阶段各自 `<7/<9/<7/<22s`、总模型 `<52s`、completion `<62s`、API `<65s`；VT-018 固定生产 deadline 与 `7/9/7/22/7s` 上限，并明确不存在单次默认 `55000ms`。
 - 回归保留：VT-018 继续覆盖 CHG-006 已验证的对象/字符串响应、非法/超限输出、安全 fallback、原子回滚、迟到写入以及拒绝路径零 AI 调用，但 CHG-006 artifact 仅为历史证据，不能通过当前 VT-017、VT-021~024 或关闭 GAP-006。
 - 最终边界：首轮与后续全部设计/验收阻塞均已关闭，CHG-007 验收基线可以重新冻结；所有 case 仍为 pending，只有固定 CHG-007 artifact 和 GAP-006 条件完成后才能声明真实四阶段 Agent 已上线。
+
+# CHG-008 中间阶段 JSON Mode 兼容验收基线独立复核
+
+- 日期：2026-08-09
+- Reviewer：`codex-independent-chg008-reviewer`
+- 结论：`REJECTED`
+
+## 已确认
+
+- VT-018 已区分前三阶段 `json_object + system canonical schema` 与 Engineering `json_schema + APP_SPEC_SCHEMA`，并覆盖平台 JSON Mode 拒绝到 `JSON_MODE_UNMET`、不泄露原文和安全 fallback。
+- VT-021 已要求直接导入生产 `STAGE_SCHEMAS`，逐阶段断言 system message 只含对应完整 canonical schema，并保留非法、重复、超限 artifact 下游 counter=0 的负向矩阵；schema 唯一性与服务端准入边界可执行。
+- 既有预算、D1 原子性、迟到保护、限流/容量/busy/幂等零调用和真实四阶段 D1/UI 证据要求未被删除。
+
+## 阻塞项
+
+### CHG8-AREV-001 — 当前线上门禁仍可由 CHG-008 前 artifact 关闭
+
+VT-017 仍写“部署 CHG-007”，VT-021 仍写入既有 `chg007-multi-agent-2026-08-09.md`，GAP-006 也只排除 CHG-006/旧 version/event，没有要求部署 CHG-008 后前三阶段实际使用 `json_object`、system canonical schema 与 Engineering `json_schema` 的同次证据。应把同一 artifact 的关闭条件升级为 CHG-008 commit/Worker version，记录四阶段实际 response-format、canonical schema hash/identity、requestId/runId/step/event/version/current 与 52/62/65 阈值；明确 `e40dafa6`、`06eddb22` 及任何 pre-CHG-008 artifact 不能通过 VT-017/021 或关闭 GAP-006。
+
+### CHG8-AREV-002 — 修改版本回归未接入本次兼容切换
+
+前三阶段模式同时用于初次生成和继续修改，但 CHG-008 验收映射未包含 VT-019。应在 fake runner 下以当前 AppSpec 执行一次合法修改和一次中间阶段/Engineering 非法输出，证明 canonical prompt 与服务端校验在修改链同样生效，合法结果保留 parent/base，非法结果不新增 version/event、不移动 current；线上 artifact 至少记录一次本期要求的复杂交互生成，历史单阶段或 CHG-007 strict-schema 结果不能替代。
+
+## 结论边界
+
+在 CHG8-AREV-001/002 关闭前，CHG-008 验收基线不可重新冻结；相关 case 继续保持 pending，不得声明兼容模式已在线接通。
+
+# CHG-008 中间阶段 JSON Mode 兼容验收基线独立复核（第二轮）
+
+- 日期：2026-08-09
+- Reviewer：`codex-independent-chg008-reviewer`
+- 结论：`CONFIRMED`
+- 关闭项：`CHG8-AREV-001`、`CHG8-AREV-002`
+- 线上证据：VT-017/GAP-006 只接受部署 CHG-008 后同一 commit/Worker version 的固定 artifact，必须记录三次 `json_object`、一次 `json_schema`、四个 canonical schema SHA-256、生产构建 SHA、同一 requestId/runId 的 step/event/version/current 与预算结果；明确排除 `e40dafa6`、`06eddb22`、pre-CHG-008 artifact 和旧 event。
+- 修改链：VT-019 已先以 CHG-008 兼容格式生成初版，再携带 current AppSpec 执行 previous-version 修改；spy 固定前三阶段格式/schema 与 Engineering AppSpec context，合法路径验证 parent，非法路径验证历史 JSON、version/event/current 不被污染，并回归筛选/表单/toggle。
+- 安全回归：VT-018/021 继续验证 canonical schema 唯一性、服务端严格二次校验、非法/重复/超限 artifact 下游零调用、枚举失败码、不泄露原文、fallback 与原子/迟到边界。
+- 最终边界：CHG-008 验收基线可以重新冻结；所有 case 仍为 pending，只有固定 artifact 完整且 GAP-006 关闭后才能声明兼容模式和真实四阶段 Agent 已上线。
