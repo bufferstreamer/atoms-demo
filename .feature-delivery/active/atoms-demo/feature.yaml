@@ -9,7 +9,7 @@ feature:
   participating_repositories:
   - atoms-demo
   created_at: '2026-08-09T15:50:06+08:00'
-  updated_at: '2026-08-10T01:06:55+08:00'
+  updated_at: '2026-08-10T01:07:17+08:00'
 artifacts:
   context: .feature-delivery/active/atoms-demo/_context.md
   progress: .feature-delivery/active/atoms-demo/progress.md
@@ -88,9 +88,9 @@ freeze:
     at: '2026-08-10T01:06:55+08:00'
     by: codex
 baseline:
-  status: SUPERSEDED
-  commit: 2c08238f43a712d40b35d9c5384876f9f503b604
-  at: '2026-08-09T23:54:16+08:00'
+  status: FROZEN
+  commit: 867775c4a7a293af1122416b50dac4c0c1060862
+  at: '2026-08-10T01:07:17+08:00'
 verification:
   status: PENDING
   evidence:
