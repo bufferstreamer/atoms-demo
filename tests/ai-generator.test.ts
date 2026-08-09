@@ -61,6 +61,37 @@ test("rejects conflicting product capabilities before downstream calls", async (
   assert.equal(result.generation.failureCode, "INVALID_PRODUCT_ARTIFACT");
 });
 
+test("rejects a product with no allowed action before engineering schema derivation", async () => {
+  let calls = 0;
+  const runner: AiRunner = { run: async () => { calls++; return { response: { ...product, requiredCapabilities: [], forbiddenCapabilities: ["filter", "form", "toggle", "toast"] } }; } };
+  const result = await generateAppWithAgents("做一个无交互看板", undefined, runner);
+  assert.equal(calls, 1);
+  assert.equal(result.generation.source, "deterministic");
+  assert.equal(result.generation.failureCode, "INVALID_PRODUCT_ARTIFACT");
+});
+
+test("forbidden components are rejected by the server even without a working action", async () => {
+  for (const forbidden of ["form", "filter"] as const) {
+    const forbiddenProduct = { ...product, requiredCapabilities: [], forbiddenCapabilities: [forbidden] };
+    const forbiddenSpec = {
+      ...engineering,
+      spec: {
+        ...engineering.spec,
+        filters: forbidden === "filter" ? engineering.spec.filters : [],
+        cards: forbidden === "filter" ? engineering.spec.cards : engineering.spec.cards.map((card) => ({ id: card.id, title: card.title, description: card.description, tag: card.tag })),
+        ...(forbidden === "form" ? { form: { id: "entry-form", title: "新增观测", fields: [{ id: "entry-name", label: "名称", placeholder: "请输入", required: true }], submitLabel: "提交" } } : {}),
+        actions: [{ id: "notice", label: "提示", kind: "show_toast", message: "完成" }],
+      },
+    };
+    const values = [forbiddenProduct, architecture, design, forbiddenSpec, forbiddenSpec]; let calls = 0;
+    const runner: AiRunner = { run: async () => ({ response: values[calls++] }) };
+    const result = await generateAppWithAgents(`禁止 ${forbidden}`, undefined, runner);
+    assert.equal(calls, 5);
+    assert.equal(result.generation.source, "deterministic");
+    assert.equal(result.generation.failureCode, "FORBIDDEN_CAPABILITY");
+  }
+});
+
 test("audits bounded AppSpec normalization and completes required actions", async () => {
   const requiredProduct = { ...product, requiredCapabilities: ["filter", "form", "stats"], forbiddenCapabilities: ["toggle", "external_script"] };
   const normalizedEngineering = {

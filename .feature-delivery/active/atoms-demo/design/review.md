@@ -303,3 +303,38 @@ Engineering artifact 仍只有 `{summary,repaired}`，线上 D1 无法区分模�
 ## 冻结条件
 
 CHG-009 需以新的确切 commit/Worker 重新登记并验证：Product 能力集合可满足性预检；required filter 的非 all option、卡片分布与实际收窄不变量；规范化与补齐对 repair/source/attempt 的唯一语义；持久化的 normalization 版本/代码、completed capabilities、base/derived schema SHA。完成前维持 `CHANGE_PENDING_FREEZE`，设计不可 CONFIRMED。
+
+# CHG-009 最终实现独立设计复核（第二轮）
+
+- 日期：2026-08-10
+- Reviewer：`codex-independent-chg009-reviewer`
+- Production code SHA：`0085c134042f68ca7b2ac1a57d08f6d7e4b3b3fe`
+- Worker：`8d3e1c98-888a-4072-bd06-788860cd59bf`
+- 结论：`REJECTED`
+
+## 已关闭
+
+- `CHG9-DREV-001`：DESIGN-005 §11.3/11.6 已登记允许规范化白名单、repair/fallback 边界、`workers_ai/SUCCESS` 下的显式 normalized UI/审计语义，公共 `validateAppSpec` 仍保持严格。
+- `CHG9-DREV-003`：实现将 required filter 定义为非 all action 且可见卡片数 `>0 && <cards.length`；不可收窄时进入 repair/fallback。线上 artifact 与浏览器证据均有真实子集变化。
+- `CHG9-DREV-004`：Engineering artifact 已持久化 `normalizationVersion/codes/completedCapabilities/baseAppSpecSchemaSha/derivedEngineeringSchemaSha`。本地按生产对象重算 base=`bf11ff...bca8`、derived=`152d11...d708`，与固定 artifact 一致。
+- `CHG9-DREV-002` 的 required/forbidden 同能力交集部分已关闭：Product 解析后立即以 `INVALID_PRODUCT_ARTIFACT/CAPABILITY_CONFLICT` 收敛，下游 AI 为零。
+
+## 剩余阻塞
+
+### CHG9-DREV2-001 — forbidden capability 未被服务端按结构边界二次执行
+
+`checkCapabilities` 对 required 与 forbidden 共用 `abilityPresent`。该函数为了 required filter 的“真实可用”语义要求 set_filter 必须实际收窄，form 则要求 form 与 add_item 同时存在；因此 forbidden `filter` 可携带无效/不收窄的 set_filter 或 filter 组件，forbidden `form` 可携带 form 但不含 add_item，仍被判定为“能力不存在”。本轮直接使用生产 `generateAppWithAgents` 注入 Product `forbiddenCapabilities:["form"]` 与带 form、仅 show_toast 的 Engineering 响应，结果为 `calls=4, source=workers_ai, hasForm=true, failure=null`。这违反 §11.3“所有 forbidden 映射必须为假”、§11.6 派生 schema 删除 form/filter 的安全边界，也说明服务端二次校验仍依赖平台遵守动态 schema。
+
+应将 forbidden 结构存在性与 required 可操作性拆成两个谓词：forbidden form 只要存在 form 或 add_item 即拒绝；forbidden filter 只要存在 filters 或 set_filter 即拒绝；toggle/toast/stats 同样按其明确结构拒绝。服务端必须对最终对象执行派生约束等价校验，不能只依赖 Workers AI `json_schema`。
+
+### CHG9-DREV2-002 — 全部 action 能力 forbidden 时派生 schema 无解
+
+对 `forbiddenCapabilities=[filter,form,toggle,toast]` 调用生产 `engineeringSchemaFor`，实测得到 `actions.minItems=1` 且 `actions.items.oneOf.length=0`。该 Product 没有 required/forbidden 交集，却产生不可满足 schema，并会被笼统降级而非在 Product 后以明确可满足性错误停止。应在 Product 校验中拒绝该组合，或给 AppSpec 定义合法的无 action 形态；同时增加下游 AI=0 的固定用例。
+
+### CHG9-DREV2-003 — 技术设计仍保留冲突的 Engineering artifact 旧契约
+
+DESIGN-005 §11.1 在新增完整 engineeringArtifact schema 前仍写“Engineering artifact 固定为 `{summary,repaired}`”，与紧随其后的八字段 required schema、当前实现和 D1 证据冲突。应删除旧句或改为完整权威字段引用，避免冻结后出现两个持久化契约。
+
+## 结论边界
+
+新 commit/Worker 已实质关闭上一轮四项中的三项及冲突交集子项，但 `CHG9-DREV2-001~003` 未关闭，CHG-009 仍不可重新冻结为 CONFIRMED。本轮未修改业务代码。

@@ -7,7 +7,7 @@
 | GAP-003 | ACCEPTED_RISK | ACCEPTED | 匿名访问者可清除 Cookie 重置 owner 级额度 | D1 全局分钟桶与全站 5000 项目硬上限保护容量；不承诺企业级身份防滥用 |
 | GAP-004 | IMPLEMENTATION | CLOSED | CHG-006 已部署并证明 JSON Schema/对象响应路径的 Llama 在线成功 | 同一部署、requestId/runId、55/65 秒预算、D1 与浏览器证据见 `artifacts/chg006-online-model-2026-08-09.md` |
 | GAP-005 | ACCEPTED_RISK | ACCEPTED | Workers AI 免费日额度耗尽时生成会降级为规则引擎 | UI 明示生成来源；D1 审计区分成功与降级；不影响已有项目和版本读取 |
-| GAP-006 | IMPLEMENTATION | OPEN | CHG-009 新增规范化审计元数据后须取得与最终 commit/Worker 一致的线上证据 | 关闭条件：固定 artifact 更新最终 commit/Worker；同 run 四阶段 workers_ai/SUCCESS；Engineering artifact 明示 normalized/codes；复杂筛选/表单浏览器交互与刷新通过；修改 parent 版本可读；pre-audit Worker `812bd26c` 不单独关闭 |
+| GAP-006 | IMPLEMENTATION | OPEN | CHG-009 forbidden 结构二次校验与无 action 可满足性修复已实现，等待新 commit/Worker 的最终复验 | 旧 `0085c134` / `8d3e1c98` 只保留主链证据；关闭须含新负向测试、新 Worker 同 run 模型/D1/浏览器/版本证据 |
 
 ## 完成声明边界
 

@@ -2,7 +2,7 @@
 
 ## 环境
 
-- Branch/commit：`main` / `86d348f4298444feb7c2081010442f4844b76bd0`
+- Branch/production code commit：`main` / `0085c134042f68ca7b2ac1a57d08f6d7e4b3b3fe`
 - Environment：localhost / Cloudflare production
 - Date：2026-08-09
 - Data used：验收用示例项目
@@ -19,6 +19,8 @@
 | VT-017/021 / R15 | 最终 Worker `812bd26c` 固定 requestId API + D1 step/event/version 回查 | 同 run 四阶段均 workers_ai；event SUCCESS 5255ms；HTTP 5.822057s | PASS | 真实四 Agent、独立产物、时延预算与原子持久化 | 不保证任意提示词均成功 |
 | VT-019/023 | 最终 Worker 复杂筛选+表单初版、修改与历史版本回查 | 初版合法；修改创建 parent v2；模型非法 JSON 时透明 fallback | PASS | 能力遵循、关系规范化、版本不可变与失败透明 | 本次最终 Worker 修改 run 不是 AI SUCCESS |
 | VT-020/022 | 应用内浏览器 BUILDING→终态、表单提交、reload | 观察 BUILDING/disabled；成功 run 显示 AI · LLAMA；新增卡片可见；刷新恢复项目/版本/来源 | PASS | 真实等待体验、页面交互、服务端持久化恢复 | 表单临时卡片不跨刷新 |
+| VT-017/021/023 / CHG-009 | Worker `8d3e1c98` 固定 requestId API、D1、动态 schema 与浏览器复验 | 同 run 四阶段 workers_ai；event SUCCESS 5217ms；API 5.900679s；normalized/codes/base+derived SHA 齐全 | PASS | 最终审计实现、真实收窄 filter、form、规范化来源与原子持久化 | 不保证任意模型输出均合法 |
+| VT-019 / CHG-009 | 同项目 previous-version 修改与 D1 历史回查 | v2 parent=v1；blue→coral；上游非法时透明 `FALLBACK/INVALID_ARCHITECTURE_ARTIFACT` | PASS | 修改可用、历史不可变、失败来源透明 | 该次修改不是 workers_ai SUCCESS |
 
 ## 汇总
 

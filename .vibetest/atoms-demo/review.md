@@ -318,3 +318,36 @@ GAP-006/VT-017 当前只排除 pre-CHG-008；应进一步规定任何 pre-CHG-00
 ## 最终结论
 
 `CHG9-AREV-001~004` 及上述两项增量门禁尚未关闭，当前 GAP-006 的 CLOSED 与 `PASS_WITH_ACCEPTED_RISKS` 不成立；验收结论维持 `REJECTED`。本复核未修改业务代码。
+
+# CHG-009 最终实现独立验收复核（第二轮）
+
+- 日期：2026-08-10
+- Reviewer：`codex-independent-chg009-reviewer`
+- Production code SHA：`0085c134042f68ca7b2ac1a57d08f6d7e4b3b3fe`
+- Worker：`8d3e1c98-888a-4072-bd06-788860cd59bf`
+- 结论：`REJECTED`
+
+## 已确认
+
+- 本轮独立执行 `pnpm test`，production build 成功且 12/12 通过；包含 Product 同能力冲突仅一次 AI、规范化不修改原对象、真实收窄 required filter、审计字段与 repair/fallback 回归。
+- 固定 artifact 已换成新 commit/Worker，排除 `86d348f/812bd26c`；同 run `b9485271...` 四阶段均 `workers_ai/SUCCESS`，event 5217ms、API 5.900679s，D1 Engineering artifact 含 normalization version/codes/completed capabilities/base+derived SHA。
+- 本地按 production schema 重算的 base/derived SHA 与 artifact 完全一致；浏览器 run `31bdd0a1...` 提供筛选子集、表单、toast、刷新恢复，修改链提供 v2 parent=v1、历史不变与 fallback 来源透明。由此关闭上一轮 `CHG9-AREV-002` 的主要规范化审计边界、`CHG9-AREV-004` 的线上字段缺口和 `CHG9-AREV-005` 的旧证据隔离。
+
+## 剩余阻塞
+
+### CHG9-AREV2-003 — forbidden/可满足性负向矩阵仍缺且已复现失败
+
+现有 12 项自动化只覆盖 required/forbidden 同能力交集，没有覆盖以下两条旧 blocker：
+
+- Product forbidden form，Engineering 返回 form 但没有 add_item：生产函数实测仍返回 `workers_ai/SUCCESS` 并保留 form，而不是 repair/fallback。
+- Product 同时 forbidden filter/form/toggle/toast：生产派生 schema 实测为 `actions.minItems=1`、`oneOf=[]`，不是 Product 阶段明确拒绝且下游 AI=0。
+
+还应补 forbidden filter 组件/不收窄 set_filter、required/forbidden 各能力单项、actions 满 8、required toggle/toast 补齐及 forbidden 不补齐的表驱动断言，并回查最终 version/event/current 不写非法 AppSpec。现有 `VT-023` 的文字矩阵比实际测试覆盖更宽，不能据 case 描述直接记 PASS。
+
+### CHG9-AREV2-004 — GAP-006 尚不可关闭
+
+固定线上 happy-path、D1 审计、真实浏览器和版本链的最小身份/主链证据已经满足；但 GAP-006 当前声称“CHG-009 最终审计实现”已闭环，而上述 forbidden 安全边界可在 production 函数中复现失败。应先修复并以新 commit/Worker 重跑负向矩阵及固定 artifact，再关闭 GAP-006。`0085c134/8d3e1c98` 可作为本轮主链成功证据保留，但不能单独证明最终安全门禁。
+
+## 最终结论
+
+此前大部分 AREV 阻塞已经关闭，但 `CHG9-AREV2-003/004` 仍为门禁级问题；当前 GAP-006 的 CLOSED 和总体完成声明应撤回，验收结论为 `REJECTED`。本轮未修改业务代码。
