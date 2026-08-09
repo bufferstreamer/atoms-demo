@@ -126,35 +126,6 @@ function extractText(raw: unknown) {
   throw new ModelOutputError("EMPTY_RESPONSE");
 }
 
-const appSpecSchema = {
-  type: "object",
-  additionalProperties: false,
-  required: ["schemaVersion", "kind", "title", "subtitle", "theme", "stats", "filters", "cards", "actions"],
-  properties: {
-    schemaVersion: { const: 1 },
-    kind: { enum: ["dashboard", "tracker", "landing"] },
-    title: { type: "string", minLength: 1, maxLength: 60 },
-    subtitle: { type: "string", maxLength: 140 },
-    theme: { type: "object", additionalProperties: false, required: ["accent", "density"], properties: { accent: { enum: ["violet", "coral", "mint", "blue"] }, density: { enum: ["comfortable", "compact"] } } },
-    stats: { type: "array", maxItems: 4, items: { type: "object", additionalProperties: false, required: ["id", "label", "value"], properties: { id: { type: "string" }, label: { type: "string" }, value: { type: "string" }, delta: { type: "string" } } } },
-    filters: { type: "array", maxItems: 2, items: { type: "object", additionalProperties: false, required: ["id", "label", "options", "defaultValue"], properties: { id: { type: "string" }, label: { type: "string" }, options: { type: "array", minItems: 1, maxItems: 6, items: { type: "string" } }, defaultValue: { type: "string" }, allValue: { type: "string" } } } },
-    cards: { type: "array", minItems: 1, maxItems: 12, items: { type: "object", additionalProperties: false, required: ["id", "title", "description", "tag"], properties: { id: { type: "string" }, title: { type: "string" }, description: { type: "string" }, tag: { type: "string" }, filterValues: { type: "object", additionalProperties: { type: "string" } }, done: { type: "boolean" } } } },
-    form: { type: "object", additionalProperties: false, required: ["id", "title", "fields", "submitLabel"], properties: { id: { type: "string" }, title: { type: "string" }, fields: { type: "array", minItems: 1, maxItems: 4, items: { type: "object", additionalProperties: false, required: ["id", "label", "placeholder", "required"], properties: { id: { type: "string" }, label: { type: "string" }, placeholder: { type: "string" }, required: { type: "boolean" } } } }, submitLabel: { type: "string" } } },
-    actions: { type: "array", minItems: 1, maxItems: 8, items: { type: "object" } },
-  },
-};
-
-const responseSchema = {
-  type: "object",
-  additionalProperties: false,
-  required: ["spec", "summary", "steps"],
-  properties: {
-    spec: appSpecSchema,
-    summary: { type: "string", minLength: 1, maxLength: 160 },
-    steps: { type: "array", minItems: 4, maxItems: 4, items: { type: "object", additionalProperties: false, required: ["role", "summary"], properties: { role: { enum: ROLES }, summary: { type: "string", minLength: 1, maxLength: 180 } } } },
-  },
-};
-
 function systemPrompt(previous?: AppSpec) {
   return `你是 Atomize 的应用生成团队。把用户需求转成安全的 AppSpec v1 JSON。只输出符合 schema 的 JSON，不输出 Markdown。四个 steps 必须依次是 product、architecture、design、engineering，每个摘要说明本角色实际做出的决定。应用必须有真实可操作的筛选、卡片状态、表单或 toast，文案使用用户语言。不要输出 HTML、CSS、JavaScript 或 URL。${previous ? `这是当前版本，返回完整修改版并保留未要求改变的能力：${JSON.stringify(previous)}` : ""}`;
 }
@@ -188,7 +159,7 @@ export async function generateAppWithAI(
           max_completion_tokens: 2200,
           temperature: 0.35,
           reasoning_effort: "low",
-          response_format: { type: "json_schema", json_schema: { name: "atomize_app", strict: true, schema: responseSchema } },
+          response_format: { type: "json_object" },
         }), timeoutMs);
       const text = extractText(raw);
       if (new TextEncoder().encode(text).byteLength > MAX_RESPONSE_BYTES) throw new ModelOutputError("RESPONSE_TOO_LARGE");
