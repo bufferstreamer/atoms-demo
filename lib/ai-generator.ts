@@ -64,9 +64,17 @@ function assertAppSpec(value: unknown) {
   const code = "INVALID_APP_SPEC"; const spec = record(value, code);
   exact(spec, ["schemaVersion", "kind", "title", "subtitle", "theme", "stats", "filters", "cards", "actions", ...(spec.form === undefined ? [] : ["form"])], code);
   const candidate = structuredClone(spec) as AppSpec;
+  for (const stat of candidate.stats ?? []) if (stat.delta && /^(null|undefined)$/i.test(stat.delta.trim())) delete stat.delta;
   for (const filter of candidate.filters ?? []) {
     if (filter.options.length && !filter.options.includes(filter.defaultValue)) filter.defaultValue = filter.options[0];
     if (filter.allValue !== undefined && !filter.options.includes(filter.allValue)) delete filter.allValue;
+  }
+  for (const [cardIndex, card] of (candidate.cards ?? []).entries()) {
+    card.filterValues = card.filterValues ?? {};
+    for (const filter of candidate.filters ?? []) {
+      const choices = filter.options.filter((option) => option !== filter.allValue);
+      if (!filter.options.includes(card.filterValues[filter.id])) card.filterValues[filter.id] = choices[cardIndex % choices.length] ?? filter.defaultValue;
+    }
   }
   for (const action of candidate.actions ?? []) {
     if (action.kind === "set_filter") {

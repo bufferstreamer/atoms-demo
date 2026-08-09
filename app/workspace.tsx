@@ -242,7 +242,7 @@ function AppPreview({ spec }: { spec: AppSpec }) {
   return <div className={`generated-app accent-${spec.theme.accent} density-${spec.theme.density}`}>
     <nav className="generated-nav"><span className="generated-logo"><i>✦</i>{spec.title.split(" ")[0]}</span><div><button>Overview</button><button>Insights</button><span className="mini-avatar">ZU</span></div></nav>
     <section className="generated-hero"><span className="generated-kicker">YOUR LIVE APP</span><h2>{spec.title}</h2><p>{spec.subtitle}</p></section>
-    {spec.stats.length > 0 && <div className="stats-grid">{spec.stats.map((stat) => <article key={stat.id}><span>{stat.label}</span><strong>{stat.value}</strong><small>{stat.delta ?? "实时概览"}</small></article>)}</div>}
+    {spec.stats.length > 0 && <div className="stats-grid">{spec.stats.map((stat) => <article key={stat.id}><span>{stat.label}</span><strong>{stat.value}</strong><small>{stat.delta && !/^(null|undefined)$/i.test(stat.delta.trim()) ? stat.delta : "实时概览"}</small></article>)}</div>}
     {spec.filters.length > 0 && <div className="filters">{spec.filters.map((filter) => <label key={filter.id}>{filter.label}<select value={filters[filter.id]} onChange={(event) => setFilters((current) => ({ ...current, [filter.id]: event.target.value }))}>{filter.options.map((option) => <option key={option}>{option}</option>)}</select></label>)}</div>}
     <div className={`generated-content ${spec.form ? "with-form" : ""}`}>
       <div className="cards-grid">{cards.map((card) => {
