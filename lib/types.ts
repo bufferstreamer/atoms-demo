@@ -63,6 +63,7 @@ export type ProjectSnapshot = {
   title: string;
   prompt: string;
   status: string;
+  errorCode: string | null;
   currentVersionId: string | null;
   createdAt: string;
   updatedAt: string;

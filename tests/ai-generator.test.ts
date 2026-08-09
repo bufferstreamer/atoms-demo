@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { generateAppWithAI, WORKERS_AI_MODEL, type AiRunner } from "../lib/ai-generator";
+import { DEFAULT_MODEL_TIMEOUT_MS, generateAppWithAI, WORKERS_AI_MODEL, type AiRunner } from "../lib/ai-generator";
 
 const modelEnvelope = {
   spec: {
@@ -59,6 +59,7 @@ test("invalid, oversized and extra-field model responses fall back safely", asyn
 });
 
 test("missing binding, thrown errors and timeout do not expose raw errors", async () => {
+  assert.equal(DEFAULT_MODEL_TIMEOUT_MS, 55_000);
   const unavailable = await generateAppWithAI("做一个旅行计划看板", undefined, undefined);
   assert.equal(unavailable.generation.failureCode, "AI_UNAVAILABLE");
 

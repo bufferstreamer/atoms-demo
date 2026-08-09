@@ -138,17 +138,19 @@ export async function getProject(ownerKey: string, projectId: string): Promise<P
   await recoverStaleRuns();
   const project = await queryFirst("SELECT * FROM projects WHERE id=? AND owner_key=?", projectId, ownerKey);
   if (!project) throw new InputError("NOT_FOUND", "这个项目不存在，或不属于当前工作区。", 404);
-  const [messages, versions, stepRows, generation] = await Promise.all([
+  const [messages, versions, stepRows, generation, latestRun] = await Promise.all([
     queryAll("SELECT * FROM messages WHERE project_id=? ORDER BY created_at ASC", projectId),
     queryAll("SELECT * FROM versions WHERE project_id=? ORDER BY version_no DESC", projectId),
     queryAll("SELECT rs.* FROM run_steps rs JOIN runs r ON r.id=rs.run_id WHERE r.project_id=? ORDER BY r.created_at DESC, rs.ordinal ASC LIMIT 4", projectId),
     queryFirst("SELECT ge.* FROM generation_events ge JOIN runs r ON r.id=ge.run_id WHERE r.project_id=? ORDER BY ge.created_at DESC LIMIT 1", projectId),
+    queryFirst("SELECT status,error_code FROM runs WHERE project_id=? ORDER BY created_at DESC LIMIT 1", projectId),
   ]);
   return {
     id: String(project.id),
     title: String(project.title),
     prompt: String(project.prompt),
     status: String(project.status),
+    errorCode: latestRun?.error_code ? String(latestRun.error_code) : null,
     currentVersionId: project.current_version_id ? String(project.current_version_id) : null,
     createdAt: String(project.created_at),
     updatedAt: String(project.updated_at),

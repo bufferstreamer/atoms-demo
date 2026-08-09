@@ -30,26 +30,50 @@ export function Workspace() {
   const [device, setDevice] = useState<"desktop" | "mobile">("desktop");
 
   const activeProject = workspace.projects.find((project) => project.id === workspace.activeProjectId) ?? null;
-  const activeUpdatedAt = activeProject?.updatedAt;
+  const isBuilding = building || activeProject?.status === "BUILDING";
 
   useEffect(() => {
     api<WorkspaceSnapshot>("/api/workspace")
-      .then(setWorkspace)
+      .then((snapshot) => {
+        setWorkspace(snapshot);
+        const active = snapshot.projects.find((project) => project.id === snapshot.activeProjectId);
+        if (active?.status === "BUILDING") setPrompt(active.messages.filter((item) => item.role === "user").at(-1)?.content ?? active.prompt);
+      })
       .catch((cause) => setError(cause instanceof Error ? cause.message : "加载失败"))
       .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
-    if (!building || !activeUpdatedAt) return;
-    const timers = [0, 1, 2, 3].map((step) => window.setTimeout(() => setVisibleSteps(step + 1), 220 + step * 360));
-    const done = window.setTimeout(() => setBuilding(false), 1780);
-    return () => { timers.forEach(window.clearTimeout); window.clearTimeout(done); };
-  }, [activeUpdatedAt, building]);
+    if (activeProject?.status !== "BUILDING") return;
+    let cancelled = false;
+    let timer = 0;
+    const poll = async () => {
+      try {
+        const project = await api<ProjectSnapshot>(`/api/projects/${activeProject.id}`);
+        if (cancelled) return;
+        setWorkspace((current) => ({ ...current, projects: current.projects.map((item) => item.id === project.id ? project : item) }));
+        if (project.status === "READY") {
+          setPrompt("");
+          setVisibleSteps(4);
+          return;
+        }
+        if (project.status === "FAILED") {
+          setError(project.errorCode === "RUN_TIMEOUT" ? "生成任务超时，请重新提交。" : "生成没有完成，请重新提交。");
+          return;
+        }
+      } catch (cause) {
+        if (!cancelled) setError(cause instanceof Error ? cause.message : "恢复生成状态失败");
+      }
+      if (!cancelled) timer = window.setTimeout(poll, 1500);
+    };
+    timer = window.setTimeout(poll, 1500);
+    return () => { cancelled = true; window.clearTimeout(timer); };
+  }, [activeProject?.id, activeProject?.status]);
 
   async function submit(event: FormEvent) {
     event.preventDefault();
     const value = prompt.trim();
-    if (!value || building) return;
+    if (!value || isBuilding) return;
     setError("");
     setVisibleSteps(0);
     setBuilding(true);
@@ -67,7 +91,9 @@ export function Workspace() {
         projects: [project, ...current.projects.filter((item) => item.id !== project.id)],
         activeProjectId: project.id,
       }));
-      setPrompt("");
+      if (project.status === "READY") setPrompt("");
+      setVisibleSteps(project.status === "READY" ? 4 : 0);
+      setBuilding(false);
     } catch (cause) {
       setBuilding(false);
       setError(cause instanceof Error ? cause.message : "生成失败，请重试");
@@ -132,10 +158,10 @@ export function Workspace() {
             <div className="thread">
               <div className="user-message"><span>你</span><p>{activeProject.messages.filter((item) => item.role === "user").at(-1)?.content}</p></div>
               <div className="run-card">
-                <div className="run-head"><span className="spark">✦</span><div><strong>{building ? "Agent 团队正在构建" : "构建完成"}</strong><small>{building ? "正在回放已保存的执行步骤" : activeProject.generation?.source === "workers_ai" ? `真实模型生成 · ${activeProject.generation.durationMs}ms` : "规则引擎安全降级 · 结果已保存"}</small></div><em>{building ? `${Math.min(visibleSteps, 4)}/4` : activeProject.generation?.source === "workers_ai" ? "AI · GLM" : "FALLBACK"}</em></div>
+                <div className="run-head"><span className="spark">✦</span><div><strong>{isBuilding ? "Agent 团队正在构建" : activeProject.status === "FAILED" ? "构建未完成" : "构建完成"}</strong><small>{isBuilding ? "真实模型正在生成，刷新后也会继续恢复" : activeProject.status === "FAILED" ? `错误：${activeProject.errorCode ?? "GENERATION_FAILED"}` : activeProject.generation?.source === "workers_ai" ? `真实模型生成 · ${activeProject.generation.durationMs}ms` : `规则引擎安全降级 · ${activeProject.generation?.failureCode ?? "AI_UNAVAILABLE"}`}</small></div><em>{isBuilding ? "BUILDING" : activeProject.status === "FAILED" ? "FAILED" : activeProject.generation?.source === "workers_ai" ? "AI · GLM" : "FALLBACK"}</em></div>
                 <div className="agent-steps">
                   {activeProject.steps.map((step, index) => {
-                    const shown = index < visibleSteps;
+                    const shown = !isBuilding && index < visibleSteps && step.status === "COMPLETED";
                     return <div key={`${step.role}-${index}`} className={`agent-step ${shown ? "done" : "waiting"}`}>
                       <span className={`agent-avatar ${step.role}`}>{roleInitials[step.role]}</span>
                       <div><strong>{step.name}</strong><p>{shown ? step.summary : "等待上一阶段完成…"}</p></div>
@@ -144,7 +170,7 @@ export function Workspace() {
                   })}
                 </div>
               </div>
-              {!building && <div className="assistant-note"><span>✦</span><p>{activeProject.messages.filter((item) => item.role === "assistant").at(-1)?.content}<br /><small>{activeProject.generation?.source === "workers_ai" ? "本版本由 Cloudflare Workers AI 生成并通过 AppSpec 安全校验。" : "模型不可用时已使用规则引擎安全降级。"} 可以继续提出任意具体修改。</small></p></div>}
+              {!isBuilding && activeProject.status === "READY" && <div className="assistant-note"><span>✦</span><p>{activeProject.messages.filter((item) => item.role === "assistant").at(-1)?.content}<br /><small>{activeProject.generation?.source === "workers_ai" ? "本版本由 Cloudflare Workers AI 生成并通过 AppSpec 安全校验。" : `模型未完成（${activeProject.generation?.failureCode ?? "AI_UNAVAILABLE"}），已使用规则引擎安全降级。`} 可以继续提出任意具体修改。</small></p></div>}
             </div>
           )}
         </div>
@@ -153,7 +179,7 @@ export function Workspace() {
           {error && <div className="error-banner"><span>!</span>{error}<button onClick={() => setError("")}>×</button></div>}
           <form className="composer" onSubmit={submit}>
             <textarea value={prompt} onChange={(event) => setPrompt(event.target.value)} maxLength={800} placeholder={activeProject ? "继续修改这个应用，例如：换成暖色并增加统计卡…" : "告诉 Agent 团队你想构建什么…"} />
-            <div className="composer-actions"><span>{prompt.length}/800</span><button disabled={!prompt.trim() || building}>{building ? "构建中" : activeProject ? "继续迭代 ↗" : "开始构建 ↗"}</button></div>
+            <div className="composer-actions"><span>{prompt.length}/800</span><button disabled={!prompt.trim() || isBuilding}>{isBuilding ? "构建中" : activeProject ? "继续迭代 ↗" : "开始构建 ↗"}</button></div>
           </form>
         </div>
       </section>

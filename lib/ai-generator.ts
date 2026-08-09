@@ -3,7 +3,7 @@ import type { AgentStep, AppSpec } from "./types";
 
 export const WORKERS_AI_MODEL = "@cf/zai-org/glm-4.7-flash";
 const MAX_RESPONSE_BYTES = 48 * 1024;
-const DEFAULT_TIMEOUT_MS = 25_000;
+export const DEFAULT_MODEL_TIMEOUT_MS = 55_000;
 const ROLES = ["product", "architecture", "design", "engineering"] as const;
 const ROLE_NAMES: Record<(typeof ROLES)[number], string> = {
   product: "Emma · Product",
@@ -149,7 +149,7 @@ export async function generateAppWithAI(
   prompt: string,
   previous: AppSpec | undefined,
   runner: AiRunner | undefined,
-  timeoutMs = DEFAULT_TIMEOUT_MS,
+  timeoutMs = DEFAULT_MODEL_TIMEOUT_MS,
 ): Promise<GeneratedApp> {
   const started = Date.now();
   if (runner) {
