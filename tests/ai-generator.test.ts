@@ -30,7 +30,10 @@ test("uses the real model envelope and exposes auditable generation metadata", a
   let calledModel = "";
   const runner: AiRunner = { run: async (model, input) => {
     calledModel = model;
-    assert.equal((input.max_completion_tokens as number), 2200);
+    assert.equal(input.max_tokens, 2200);
+    assert.deepEqual(input.response_format, { type: "json_object" });
+    assert.equal("max_completion_tokens" in input, false);
+    assert.equal("reasoning_effort" in input, false);
     return { choices: [{ message: { content: JSON.stringify(modelEnvelope) } }] };
   } };
   const result = await generateAppWithAI("做一个萤火虫观测协作台", undefined, runner);
@@ -66,6 +69,12 @@ test("missing binding, thrown errors and timeout do not expose raw errors", asyn
   const failed = await generateAppWithAI("做一个旅行计划看板", undefined, { run: async () => { throw new Error("secret upstream response"); } });
   assert.equal(failed.generation.failureCode, "MODEL_ERROR");
   assert.ok(!JSON.stringify(failed.generation).includes("secret"));
+
+  const jsonModeRejected = await generateAppWithAI("做一个旅行计划看板", undefined, { run: async () => { throw new Error("JSON Mode couldn't be met"); } });
+  assert.equal(jsonModeRejected.generation.source, "deterministic");
+  assert.equal(jsonModeRejected.generation.outcome, "FALLBACK");
+  assert.equal(jsonModeRejected.generation.failureCode, "MODEL_ERROR");
+  assert.ok(!JSON.stringify(jsonModeRejected.generation).includes("couldn't be met"));
 
   const timedOut = await generateAppWithAI("做一个旅行计划看板", undefined, { run: () => new Promise(() => undefined) }, 2);
   assert.equal(timedOut.generation.failureCode, "MODEL_TIMEOUT");

@@ -1,7 +1,7 @@
 import { generateAppSpec, validateAppSpec } from "./generator";
 import type { AgentStep, AppSpec } from "./types";
 
-export const WORKERS_AI_MODEL = "@cf/zai-org/glm-4.7-flash";
+export const WORKERS_AI_MODEL = "@cf/meta/llama-3.1-8b-instruct-fast";
 const MAX_RESPONSE_BYTES = 48 * 1024;
 export const DEFAULT_MODEL_TIMEOUT_MS = 55_000;
 const ROLES = ["product", "architecture", "design", "engineering"] as const;
@@ -156,9 +156,8 @@ export async function generateAppWithAI(
     try {
       const raw = await withTimeout(runner.run(WORKERS_AI_MODEL, {
           messages: [{ role: "system", content: systemPrompt(previous) }, { role: "user", content: prompt }],
-          max_completion_tokens: 2200,
+          max_tokens: 2200,
           temperature: 0.35,
-          reasoning_effort: "low",
           response_format: { type: "json_object" },
         }), timeoutMs);
       const text = extractText(raw);
