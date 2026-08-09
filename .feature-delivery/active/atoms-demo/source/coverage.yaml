@@ -961,29 +961,19 @@ units:
       disposition: FACT
       evidence_id: EV-004
   S007-U0001:
-    content_sha256: 8963e902b1258943a1587e38bed1a634a4d88d971970dda11537e56572730c2e
-    status: ATOMIZED
-    reason: ''
-    coverage_assertion: ''
+    content_sha256: 9940efd150c7125517f10626aa2f93d9aa2c91239f601d3216e48d7a358e3650
+    status: NO_REQUIREMENT
+    reason: 初始 D1 绑定为空仅用于证明仓库起始状态；目标绑定由 Sites 能力来源和技术设计约束。
+    coverage_assertion: 已保留基线事实，不把初始空值误写成目标需求。
     ignored: []
-    atoms:
-    - id: ATOM-056
-      quote: 'null'
-      statement: 当前 D1 绑定为空
-      disposition: FACT
-      evidence_id: EV-003
+    atoms: []
   S007-U0002:
-    content_sha256: 94943e082faa99b4ba09abff377491eba101acfe3b33d09d9f56f100f05cf977
-    status: ATOMIZED
-    reason: ''
-    coverage_assertion: ''
+    content_sha256: c8a48666640f2a2dff7edc6a169e38bb53474ecbaa147bd3bffdcae35d12c709
+    status: NO_REQUIREMENT
+    reason: 初始 R2 绑定为空仅用于证明仓库起始状态，本需求也不使用 R2。
+    coverage_assertion: 已保留基线事实且不引入额外存储范围。
     ignored: []
-    atoms:
-    - id: ATOM-057
-      quote: 'null'
-      statement: 当前 R2 绑定为空
-      disposition: FACT
-      evidence_id: EV-003
+    atoms: []
   S011-U0001:
     content_sha256: c24dcf9bbdcd50bfb134acd2818ba100208bef2bdcb4fcf1de15ca9cf75ad62b
     status: NO_REQUIREMENT
@@ -1164,7 +1154,7 @@ units:
       evidence_id: EV-005
 review:
   status: CONFIRMED
-  by: source_review
-  at: '2026-08-09T16:21:26+08:00'
-  basis_hash: 79de34fac3b9e2f4c2fe8d6b0edaab888fa5862b61c02468705db14993d6a1e6
-  report_sha256: 7530964680a0f2cba05c9ac6e3340d31ebb8e1023767f1786f37599c4b04e491
+  by: codex-independent-source-reviewer-chg001
+  at: '2026-08-09T17:02:27+08:00'
+  basis_hash: a73d304af83ba585c4b283ae731c8880cf0d6d975e4dd34f73db33a2df779a93
+  report_sha256: 9308ae6cb0b121d18210462da8f3ce9d5d39aae4e5f592909035a2f31d8fde6f

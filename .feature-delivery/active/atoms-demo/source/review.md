@@ -1,48 +1,23 @@
-# Atoms AI App Builder Demo - 来源覆盖独立复核（第四轮）
+# CHG-001 独立来源复核（复审）
 
-## 复核范围
+- Reviewer ID: `codex-independent-source-reviewer-chg001`
+- Source set hash: `6e34165c709387641dff3c0b50ce2d25210ca67bad35bac20a87bb46717e2964`
+- S007 snapshot hash: `d532abb65cf9ae20634b464d954cb4a08a0de9f3cd3cdf7f9c3ec8948826d947`
 
-- 当前 `source/register.yaml`、`source/units.jsonl`、`source/coverage.yaml`。
-- S005/S006/S011/S012 原始快照及 `facts.md`、`traceability.md` 闭环。
-- 第三轮 F-201 至 F-203 的修复结果。
+## 复核结论依据
 
-## 复核结果
+- S007 已指向不可变快照 `reference/initial-hosting-config.json`，登记路径、哈希、两个来源单元及 coverage 条目一致。
+- S007 的两个 `null` 单元均为 `NO_REQUIREMENT`，仅表达初始状态，不再被解释为目标部署状态或产品要求。
+- `facts.md` 的 EV-003 仅引用 `raw-code-config-snapshot.md` 与 `initial-hosting-config.json` 等冻结原始材料，并明确实时 hosting 配置及 D1 绑定须由部署 evidence 验证。
+- `source/register.yaml` 的 code、downstream、data_and_state facet 已分别区分初始声明、平台能力与实时部署证据，未再以冻结来源声称当前线上绑定状态。
+- `reference/prd.md` 与 `traceability.md` 的产品范围、D1 持久化、在线交付及验证闭环未因 CHG-001 发生冲突或缺失；实时部署状态仍保留为实施/发布阶段证据责任。
 
-### 1. 来源全集与结构覆盖
+## 阻塞项
 
-- 来源全集已由用户确认；当前登记 9 个来源、94 个结构单元，register 数量、units 与 coverage 一致。
-- 原始官方帮助、公开 UI、代码/配置和 Sites 平台规则均保存为本地可重复读取快照；登记哈希未见漂移。
-- 标题、采集说明、来源 URL 和代码块路径标签被标为 `NO_REQUIREMENT`，理由与其元数据性质一致；实质正文和代码未再被静默忽略。
-
-### 2. Quote 完整性与分类
-
-- S005、S006、S011、S012 共 14 个实质单元已 `ATOMIZED` 为 FACT：S005 4 个、S006 4 个、S011 4 个、S012 2 个。
-- 逐单元比较 `units.jsonl.content` 与 atom `quote`，14/14 均为完整逐字覆盖，无截断、改写或未解释剩余片段。
-- 官方/产品/仓库/平台事实分别关联 EV-002、EV-004、EV-003、EV-005；设计启发仍保持 `OUT`，没有重新混入 SRC。
-
-### 3. FACT → EV → raw 闭环
-
-- FACT-002~004 与 EV-002 首要指向 S005 `raw-official-help-snapshot.md`。
-- FACT-005 与 EV-004 首要指向 S006 `raw-atoms-public-ui.md`。
-- 仓库基线由 S011 与 S007 关联 EV-003；代码、空 schema、空 D1/R2 与依赖基线均有逐字 quote。
-- FACT-006 与 EV-005 首要指向 S012 `raw-sites-platform-capabilities.md`。旧 observations 仅作为索引，不再替代 raw 证据。
-
-### 4. 安全 facet 闭环
-
-- `security_and_permissions` 已标为 `COVERED` 并关联 S001、S012。
-- S012-U0005 / ATOM-071 明确覆盖“公共站允许匿名访客”“匿名访客无身份头”“所有授权决定必须在服务端执行”“公开站不自动增加登录”，并关联 EV-005。
-- FACT-006、DEC-006、DEC-009 和 traceability 的安全决策表分别承接事实、owner 隔离、输入/容量保护与 VT-007/010/011 验证，事实与设计选择边界清楚。
-
-### 5. SRC 与需求追踪
-
-- 设计启发单元 S002-U0021~U0023、S004-U0010~U0012 均保持 `OUT` 并指向 DEC-008。
-- coverage 与 traceability 的 13 个 FR/NFR 映射集合一致；SRC-001、SRC-006、SRC-020 等上一轮语义错配已修正。
-- PRD 新增的失败保护、体验选择和安全容量约束分别由 DEC-007、DEC-008、DEC-009 追踪，不再伪装成用户原始硬需求。
-
-## Findings
-
-未发现阻止来源范围冻结的新问题。
+无。CHG1-SREV-001、CHG1-SREV-002 均已关闭。
 
 ## 结论
 
-`CONFIRMED` — 第四轮复核确认 F-201 至 F-203 已全部修复。当前来源全集、结构单元、quote 覆盖、FACT→EV→raw、安全 facet 及 SRC→FR/NFR/DEC 语义链满足高风险来源门禁要求。此结论仅确认来源覆盖，不代表设计、实现、预发或发布已完成。
+**CONFIRMED**
+
+CHG-001 后的来源登记、原子单元、coverage、事实证据与 PRD/追踪关系保持完整且语义一致，高风险来源门禁继续满足。本结论只确认冻结来源集合与映射质量，不代表实时 Sites/D1 部署状态已被验证。

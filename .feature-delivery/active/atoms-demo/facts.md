@@ -46,6 +46,6 @@
 | --- | --- | --- | --- | --- |
 | EV-001 | 用户需求快照 | `reference/user-challenge.md` | 本期目标与验收要求 | 不证明实现状态 |
 | EV-002 | 官方帮助原文快照 | `reference/raw-official-help-snapshot.md`（索引：`official-help-observations.md`） | MGX/Atoms 产品角色、持久化验证与发布分享 | 原入口受安全页限制，使用官方公开副本 |
-| EV-003 | 仓库原始基线 | `reference/raw-code-config-snapshot.md`、`.openai/hosting.json`（索引：`current-project-observations.md`） | 空骨架、技术栈与空 D1/R2 配置 | 不证明线上托管已可用 |
+| EV-003 | 仓库原始基线 | `reference/raw-code-config-snapshot.md`、`reference/initial-hosting-config.json`（索引：`current-project-observations.md`） | 开发前空骨架、技术栈与初始空 D1/R2 配置 | 不证明当前部署配置或线上托管已可用；实时 `.openai/hosting.json` 由部署证据验证 |
 | EV-004 | 公开产品页面原文与体验 | `reference/raw-atoms-public-ui.md`（索引：`product-experience-observations.md`） | 首屏、模板、Agent 表达和登录入口 | 未进入登录后的工作区 |
 | EV-005 | Sites 平台能力 | `reference/raw-sites-platform-capabilities.md` | D1 持久化、身份头、匿名边界和服务端授权责任 | 不证明线上资源已创建 |

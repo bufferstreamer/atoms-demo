@@ -1,9 +1,9 @@
 schema_version: 1
 confirmation:
   status: CONFIRMED
-  by: user
-  at: '2026-08-09T16:16:53+08:00'
-  source_set_hash: dac95f0c723431914d17e417dae11e9a0cca54b64d62c9e91fb67b4d7d408fe7
+  by: codex
+  at: '2026-08-09T17:01:00+08:00'
+  source_set_hash: 6e34165c709387641dff3c0b50ce2d25210ca67bad35bac20a87bb46717e2964
 facets:
   product_requirements:
     status: COVERED
@@ -30,7 +30,7 @@ facets:
     source_ids:
     - S007
     - S011
-    reason: Starter 与 hosting 配置已核对
+    reason: Starter 与初始 hosting 声明已核对；实时部署配置不属于冻结来源
   upstream_contracts:
     status: NOT_APPLICABLE
     source_ids: []
@@ -41,7 +41,7 @@ facets:
     - S007
     - S011
     - S012
-    reason: 仅依赖 Sites D1 与 Hosting 声明及平台能力快照
+    reason: 依赖初始 Hosting 声明和 Sites 平台能力快照；实时绑定由部署 evidence 验证
   data_and_state:
     status: COVERED
     source_ids:
@@ -50,7 +50,7 @@ facets:
     - S007
     - S011
     - S012
-    reason: 持久化要求、官方验证方式、当前 D1 配置和平台能力已核对
+    reason: 持久化要求、官方验证方式、初始 D1 配置快照和平台能力已核对；实时绑定由部署 evidence 验证
   security_and_permissions:
     status: COVERED
     source_ids:
@@ -79,7 +79,7 @@ sources:
   status: INGESTED
   sha256: cf273f06ed22336085d9afa9aee0f917ac469ce8fab69c1cf91c792d0cfedd79
   unit_count: 15
-  ingested_at: '2026-08-09T16:15:12+08:00'
+  ingested_at: '2026-08-09T16:58:37+08:00'
 - id: S002
   title: MGX Atoms Official Help Observations
   kind: markdown
@@ -90,7 +90,7 @@ sources:
   status: INGESTED
   sha256: 12d37c44035566ca604b126632033d1bc4b0126043f9a776658985053e4fb25b
   unit_count: 23
-  ingested_at: '2026-08-09T16:15:12+08:00'
+  ingested_at: '2026-08-09T16:58:37+08:00'
 - id: S003
   title: Current Project Observations
   kind: markdown
@@ -101,7 +101,7 @@ sources:
   status: INGESTED
   sha256: e8b5a49c9369cb5501cc9da8083ebeb33576229a5c6067f2cd7f42e5efb9840c
   unit_count: 5
-  ingested_at: '2026-08-09T16:15:12+08:00'
+  ingested_at: '2026-08-09T16:58:37+08:00'
 - id: S004
   title: Atoms Public Product Experience
   kind: markdown
@@ -112,7 +112,7 @@ sources:
   status: INGESTED
   sha256: 7f70a2c3947e9f086a626ebc17e4ee212ee3bee0f73d7ed60fe8f09aba6c44cb
   unit_count: 12
-  ingested_at: '2026-08-09T16:15:12+08:00'
+  ingested_at: '2026-08-09T16:58:37+08:00'
 - id: S005
   title: Raw Official Help Snapshot
   kind: markdown
@@ -123,7 +123,7 @@ sources:
   status: INGESTED
   sha256: 2e364bfdb85d13d5d84e0bef06226414425d8cf261e3abc7de696f4b5da4a231
   unit_count: 12
-  ingested_at: '2026-08-09T16:15:12+08:00'
+  ingested_at: '2026-08-09T16:58:37+08:00'
 - id: S006
   title: Raw Atoms Public UI Snapshot
   kind: markdown
@@ -134,18 +134,18 @@ sources:
   status: INGESTED
   sha256: 46ebc0013c340ef9cc353588d0c0feece0580602c7beb2309b090f4e278045c6
   unit_count: 9
-  ingested_at: '2026-08-09T16:15:12+08:00'
+  ingested_at: '2026-08-09T16:58:37+08:00'
 - id: S007
-  title: Sites Hosting Configuration
+  title: Initial Sites Hosting Configuration Snapshot
   kind: json
-  path: .openai/hosting.json
+  path: .feature-delivery/active/atoms-demo/reference/initial-hosting-config.json
   authority: repository
   required: true
   version: null
   status: INGESTED
   sha256: d532abb65cf9ae20634b464d954cb4a08a0de9f3cd3cdf7f9c3ec8948826d947
   unit_count: 2
-  ingested_at: '2026-08-09T16:15:12+08:00'
+  ingested_at: '2026-08-09T16:58:37+08:00'
 - id: S011
   title: Raw Code and Configuration Snapshot
   kind: markdown
@@ -156,7 +156,7 @@ sources:
   status: INGESTED
   sha256: c29827368c9f69fe20fefe3396ff2a7e3a1c501b87406621f2370e7cfcb6c55d
   unit_count: 11
-  ingested_at: '2026-08-09T16:15:12+08:00'
+  ingested_at: '2026-08-09T16:58:37+08:00'
 - id: S012
   title: Raw Sites Platform Capability Snapshot
   kind: markdown
@@ -167,4 +167,4 @@ sources:
   status: INGESTED
   sha256: bf6bec85ca58520055c12eb4586987d58fc81a50eea2e86816064b70f58f84f7
   unit_count: 5
-  ingested_at: '2026-08-09T16:15:12+08:00'
+  ingested_at: '2026-08-09T16:58:37+08:00'
