@@ -1,0 +1,107 @@
+schema_version: 2
+feature:
+  slug: atoms-demo
+  title: Atoms AI App Builder Demo
+  risk: high
+  delivery_mode: full
+  status: ARCHIVED
+  owner_repository: atoms-demo
+  participating_repositories:
+  - atoms-demo
+  created_at: '2026-08-09T15:50:06+08:00'
+  updated_at: '2026-08-10T01:08:10+08:00'
+artifacts:
+  context: .feature-delivery/archive/atoms-demo/_context.md
+  progress: .feature-delivery/archive/atoms-demo/progress.md
+  facts: .feature-delivery/archive/atoms-demo/facts.md
+  scope: .feature-delivery/archive/atoms-demo/scope.md
+  open_questions: .feature-delivery/archive/atoms-demo/open-questions.md
+  source_register: .feature-delivery/archive/atoms-demo/source/register.yaml
+  source_units: .feature-delivery/archive/atoms-demo/source/units.jsonl
+  source_coverage: .feature-delivery/archive/atoms-demo/source/coverage.yaml
+  source_review: .feature-delivery/archive/atoms-demo/source/review.md
+  prd: .feature-delivery/archive/atoms-demo/reference/prd.md
+  reference_inventory: .feature-delivery/archive/atoms-demo/reference/dependencies.md
+  technical_design: .feature-delivery/archive/atoms-demo/design/technical-design.md
+  implementation_plan: .feature-delivery/archive/atoms-demo/implementation-plan.md
+  cross_repo_contracts: []
+  traceability: .feature-delivery/archive/atoms-demo/traceability.md
+  vibetest: .vibetest/atoms-demo
+  freeze_record: .feature-delivery/archive/atoms-demo/freeze.md
+  change_log: .feature-delivery/archive/atoms-demo/change-log.md
+  agent_work_packet: .feature-delivery/archive/atoms-demo/agent-work-packet.md
+  release_record: .feature-delivery/archive/atoms-demo/release.md
+dependencies:
+  upstream: []
+  downstream: []
+  external: []
+freeze:
+  scope:
+    status: FROZEN
+    artifacts:
+      .feature-delivery/archive/atoms-demo/facts.md: dfc0bfba99bc83b6c0ade6da4fa913258dcf334186eae188edaad7f29edcc00d
+      .feature-delivery/archive/atoms-demo/scope.md: e1005c9dafb788e8bec8b0cd3704a5702df0f2af4635db1bee15c06970efa5a1
+      .feature-delivery/archive/atoms-demo/open-questions.md: d6dca385665d8225c9502b92782dfc5ae32ac2a450159c9f0ddb2d3dfa813d52
+      .feature-delivery/archive/atoms-demo/reference/prd.md: 5b7d44cf91196d31f52088461f987740c50d35d9aa123bec98b2618abb26e7b0
+      .feature-delivery/archive/atoms-demo/traceability.md: 59be292319e3739d38ef465b3530182040308d529151fd01a0f21a80f00584ba
+      .feature-delivery/archive/atoms-demo/source/register.yaml: 2add64b2e30745b9a9a4b05305e93a47bcf342f04672abe5c9438d8c54b95fa0
+      .feature-delivery/archive/atoms-demo/source/units.jsonl: 7d06581503d40f30f8d685be435fe003b421f2c5b20e7feff33a701ee5e1ca49
+      .feature-delivery/archive/atoms-demo/source/coverage.yaml: 2617e8be2c138f711221ed9555c57e8a64f22a7af777b2f5877c919b2897ad8d
+      .feature-delivery/archive/atoms-demo/source/review.md: 9308ae6cb0b121d18210462da8f3ce9d5d39aae4e5f592909035a2f31d8fde6f
+    at: '2026-08-10T01:06:48+08:00'
+    by: codex
+  design:
+    status: FROZEN
+    artifacts:
+      .feature-delivery/archive/atoms-demo/facts.md: dfc0bfba99bc83b6c0ade6da4fa913258dcf334186eae188edaad7f29edcc00d
+      .feature-delivery/archive/atoms-demo/scope.md: e1005c9dafb788e8bec8b0cd3704a5702df0f2af4635db1bee15c06970efa5a1
+      .feature-delivery/archive/atoms-demo/open-questions.md: d6dca385665d8225c9502b92782dfc5ae32ac2a450159c9f0ddb2d3dfa813d52
+      .feature-delivery/archive/atoms-demo/reference/prd.md: 5b7d44cf91196d31f52088461f987740c50d35d9aa123bec98b2618abb26e7b0
+      .feature-delivery/archive/atoms-demo/traceability.md: 59be292319e3739d38ef465b3530182040308d529151fd01a0f21a80f00584ba
+      .feature-delivery/archive/atoms-demo/source/register.yaml: 2add64b2e30745b9a9a4b05305e93a47bcf342f04672abe5c9438d8c54b95fa0
+      .feature-delivery/archive/atoms-demo/source/units.jsonl: 7d06581503d40f30f8d685be435fe003b421f2c5b20e7feff33a701ee5e1ca49
+      .feature-delivery/archive/atoms-demo/source/coverage.yaml: 2617e8be2c138f711221ed9555c57e8a64f22a7af777b2f5877c919b2897ad8d
+      .feature-delivery/archive/atoms-demo/source/review.md: 9308ae6cb0b121d18210462da8f3ce9d5d39aae4e5f592909035a2f31d8fde6f
+      .feature-delivery/archive/atoms-demo/design/technical-design.md: 7dbab72c712271a055b6a562e2e0871d1e6f64fd90d09e580cd0f6faabc3f9bb
+      .feature-delivery/archive/atoms-demo/implementation-plan.md: 7906e9825edfb7da4cd591e8f0a93269773fca716010e8b1130c1c0602682f8c
+    at: '2026-08-10T01:06:52+08:00'
+    by: codex
+  acceptance:
+    status: FROZEN
+    artifacts:
+      .feature-delivery/archive/atoms-demo/facts.md: dfc0bfba99bc83b6c0ade6da4fa913258dcf334186eae188edaad7f29edcc00d
+      .feature-delivery/archive/atoms-demo/scope.md: e1005c9dafb788e8bec8b0cd3704a5702df0f2af4635db1bee15c06970efa5a1
+      .feature-delivery/archive/atoms-demo/open-questions.md: d6dca385665d8225c9502b92782dfc5ae32ac2a450159c9f0ddb2d3dfa813d52
+      .feature-delivery/archive/atoms-demo/reference/prd.md: 5b7d44cf91196d31f52088461f987740c50d35d9aa123bec98b2618abb26e7b0
+      .feature-delivery/archive/atoms-demo/traceability.md: 59be292319e3739d38ef465b3530182040308d529151fd01a0f21a80f00584ba
+      .feature-delivery/archive/atoms-demo/source/register.yaml: 2add64b2e30745b9a9a4b05305e93a47bcf342f04672abe5c9438d8c54b95fa0
+      .feature-delivery/archive/atoms-demo/source/units.jsonl: 7d06581503d40f30f8d685be435fe003b421f2c5b20e7feff33a701ee5e1ca49
+      .feature-delivery/archive/atoms-demo/source/coverage.yaml: 2617e8be2c138f711221ed9555c57e8a64f22a7af777b2f5877c919b2897ad8d
+      .feature-delivery/archive/atoms-demo/source/review.md: 9308ae6cb0b121d18210462da8f3ce9d5d39aae4e5f592909035a2f31d8fde6f
+      .feature-delivery/archive/atoms-demo/design/technical-design.md: 7dbab72c712271a055b6a562e2e0871d1e6f64fd90d09e580cd0f6faabc3f9bb
+      .feature-delivery/archive/atoms-demo/implementation-plan.md: 7906e9825edfb7da4cd591e8f0a93269773fca716010e8b1130c1c0602682f8c
+      .vibetest/atoms-demo/rules.md: d66115b0ef4389b75ace9c6b8ea5cd159c3671f053b63e610baed44d6f9a1b5d
+      .vibetest/atoms-demo/cases.md: 736029a4f172b17d2cf5c62392977feb71f57c13dbe60262eebaa9535e703cc0
+      .vibetest/atoms-demo/evidence.md: 13a0c94a4cd73469d7704f88640bf4c3ce83c0840f05e6b0ca3884b1836b9929
+      .vibetest/atoms-demo/gaps.md: 699d452fa73aad3917f4eaa1df0345200d7590094ca449ac73099290a2cfa693
+      .feature-delivery/archive/atoms-demo/agent-work-packet.md: ec47dd4b1f63b8a172ff9d9f2756ee92a9ca4ff2b01452a3cfb0fed300969a50
+    at: '2026-08-10T01:06:55+08:00'
+    by: codex
+baseline:
+  status: FROZEN
+  commit: 867775c4a7a293af1122416b50dac4c0c1060862
+  at: '2026-08-10T01:07:17+08:00'
+verification:
+  status: PASS
+  evidence:
+  - .vibetest/atoms-demo/evidence.md
+  - .vibetest/atoms-demo/artifacts/chg007-multi-agent-2026-08-09.md
+  open_gaps:
+  - GAP-003
+  - GAP-005
+  at: '2026-08-10T01:07:37+08:00'
+release:
+  status: RELEASED
+  deployment: cloudflare:atomize-ai-builder-demo@a3a2348b-f185-4020-8869-9f3e79f5f75f
+  rollback: cloudflare:atomize-ai-builder-demo@8d3e1c98-888a-4072-bd06-788860cd59bf
+  at: '2026-08-10T01:07:52+08:00'
