@@ -27,7 +27,10 @@ test("runs four real model stages in order and passes validated artifacts downst
   const result = await generateAppWithAgents("做一个萤火虫观测协作台", undefined, runner, { onStage: async (event) => { progress.push(event); } });
   assert.equal(inputs.length, 4);
   assert.deepEqual(inputs.slice(0, 3).map((item) => item.response_format), [{ type: "json_object" }, { type: "json_object" }, { type: "json_object" }]);
-  assert.deepEqual(inputs[3].response_format, { type: "json_schema", json_schema: STAGE_SCHEMAS.engineering });
+  const engineeringFormat = inputs[3].response_format as { type: string; json_schema: { properties: { spec: { properties: { filters: { minItems?: number } } } } } };
+  assert.equal(engineeringFormat.type, "json_schema");
+  assert.equal(engineeringFormat.json_schema.properties.spec.properties.filters.minItems, 1);
+  assert.ok(!("minItems" in STAGE_SCHEMAS.engineering.properties.spec.properties.filters));
   assert.match(JSON.stringify(inputs[0].messages), new RegExp(STAGE_SCHEMAS.product.required[0]));
   assert.equal(STAGE_SCHEMAS.engineering.properties.spec, APP_SPEC_SCHEMA);
   assert.doesNotMatch(JSON.stringify(STAGE_SCHEMAS.engineering), /\$ref/);

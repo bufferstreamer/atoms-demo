@@ -90,6 +90,22 @@ function abilityPresent(spec: AppSpec, ability: string) {
 }
 function checkCapabilities(spec: AppSpec, product: ReturnType<typeof parseProduct>) { for (const ability of product.requiredCapabilities) if (!abilityPresent(spec, ability)) throw new ModelOutputError("MISSING_REQUIRED_CAPABILITY", ability); for (const ability of product.forbiddenCapabilities) if (ability !== "external_script" && abilityPresent(spec, ability)) throw new ModelOutputError("FORBIDDEN_CAPABILITY", ability); }
 
+type MutableSchema = { properties?: Record<string, MutableSchema>; required?: string[]; items?: MutableSchema; oneOf?: MutableSchema[]; const?: string; minItems?: number; maxItems?: number };
+function engineeringSchemaFor(product: ReturnType<typeof parseProduct>) {
+  const schema = structuredClone(STAGE_SCHEMAS.engineering) as unknown as MutableSchema;
+  const spec = schema.properties!.spec;
+  if (product.requiredCapabilities.includes("form") && !spec.required!.includes("form")) spec.required!.push("form");
+  if (product.requiredCapabilities.includes("filter")) spec.properties!.filters.minItems = 1;
+  if (product.requiredCapabilities.includes("stats")) spec.properties!.stats.minItems = 1;
+  if (product.forbiddenCapabilities.includes("form")) delete spec.properties!.form;
+  if (product.forbiddenCapabilities.includes("filter")) spec.properties!.filters.maxItems = 0;
+  if (product.forbiddenCapabilities.includes("stats")) spec.properties!.stats.maxItems = 0;
+  const forbiddenActions = new Set(product.forbiddenCapabilities.map((capability) => ({ filter: "set_filter", form: "add_item", toggle: "toggle_item", toast: "show_toast" }[capability])).filter(Boolean));
+  const actionItems = spec.properties!.actions.items!;
+  if (forbiddenActions.size) actionItems.oneOf = actionItems.oneOf!.filter((branch) => !forbiddenActions.has(branch.properties!.kind.const));
+  return schema;
+}
+
 function stageSystem(role: StageRole, context: string, schema: unknown) {
   const common = "只输出符合 JSON Schema 的 JSON，不要 Markdown、HTML、CSS、JavaScript、URL 或额外字段。使用用户的语言。";
   const contract = `\n以下是约束定义，仅用于约束。必须输出满足它的数据实例，绝对禁止返回 $schema/type/properties/required/additionalProperties 等 Schema 定义字段:${JSON.stringify(schema)}`;
@@ -122,9 +138,10 @@ export async function generateAppWithAgents(prompt: string, previous: AppSpec | 
     const productResult = await call("product", STAGE_SCHEMAS.product, 420, (value) => parseProduct(value)); const product = productResult.parsed as ReturnType<typeof parseProduct>; artifacts.product = product; await progress({ role: "product", status: "COMPLETED", summary: product.summary, artifact: product, source: "workers_ai", model: WORKERS_AI_MODEL, durationMs: productResult.durationMs, attemptNo: 1 }); steps.push({ role: "product", name: ROLE_NAMES.product, summary: product.summary, status: "COMPLETED", source: "workers_ai", model: WORKERS_AI_MODEL, durationMs: productResult.durationMs, attemptNo: 1, artifact: product });
     const architectureResult = await call("architecture", STAGE_SCHEMAS.architecture, 520, (value) => parseArchitecture(value)); const architecture = architectureResult.parsed as ReturnType<typeof parseArchitecture>; artifacts.architecture = architecture; await progress({ role: "architecture", status: "COMPLETED", summary: architecture.summary, artifact: architecture, source: "workers_ai", model: WORKERS_AI_MODEL, durationMs: architectureResult.durationMs, attemptNo: 1 }); steps.push({ role: "architecture", name: ROLE_NAMES.architecture, summary: architecture.summary, status: "COMPLETED", source: "workers_ai", model: WORKERS_AI_MODEL, durationMs: architectureResult.durationMs, attemptNo: 1, artifact: architecture });
     const designResult = await call("design", STAGE_SCHEMAS.design, 420, (value) => parseDesign(value)); const design = designResult.parsed as ReturnType<typeof parseDesign>; artifacts.design = design; await progress({ role: "design", status: "COMPLETED", summary: design.summary, artifact: design, source: "workers_ai", model: WORKERS_AI_MODEL, durationMs: designResult.durationMs, attemptNo: 1 }); steps.push({ role: "design", name: ROLE_NAMES.design, summary: design.summary, status: "COMPLETED", source: "workers_ai", model: WORKERS_AI_MODEL, durationMs: designResult.durationMs, attemptNo: 1, artifact: design });
+    const engineeringSchema = engineeringSchemaFor(product);
     let engineering: ReturnType<typeof parseEngineering>; let engineeringDuration = 0; let repaired = false;
-    try { const result = await call("engineering", STAGE_SCHEMAS.engineering, 2200, (value) => parseEngineering(value)); engineering = result.parsed as ReturnType<typeof parseEngineering>; engineeringDuration += result.durationMs; checkCapabilities(engineering.spec, product); }
-    catch (firstError) { const code = errorCode(firstError); if (!["INVALID_ENGINEERING_ARTIFACT", "INVALID_APP_SPEC", "MISSING_REQUIRED_CAPABILITY", "FORBIDDEN_CAPABILITY"].includes(code)) throw firstError; const reason = `${code}${firstError instanceof ModelOutputError && firstError.path ? `:${firstError.path}` : ""}`; const result = await call("engineering", STAGE_SCHEMAS.engineering, 2200, (value) => parseEngineering(value), 2, reason); engineering = result.parsed as ReturnType<typeof parseEngineering>; engineeringDuration += result.durationMs; checkCapabilities(engineering.spec, product); repaired = true; }
+    try { const result = await call("engineering", engineeringSchema, 2200, (value) => parseEngineering(value)); engineering = result.parsed as ReturnType<typeof parseEngineering>; engineeringDuration += result.durationMs; checkCapabilities(engineering.spec, product); }
+    catch (firstError) { const code = errorCode(firstError); if (!["INVALID_ENGINEERING_ARTIFACT", "INVALID_APP_SPEC", "MISSING_REQUIRED_CAPABILITY", "FORBIDDEN_CAPABILITY"].includes(code)) throw firstError; const reason = `${code}${firstError instanceof ModelOutputError && firstError.path ? `:${firstError.path}` : ""}`; const result = await call("engineering", engineeringSchema, 2200, (value) => parseEngineering(value), 2, reason); engineering = result.parsed as ReturnType<typeof parseEngineering>; engineeringDuration += result.durationMs; checkCapabilities(engineering.spec, product); repaired = true; }
     const engineeringArtifact = { summary: engineering.summary, repaired }; await progress({ role: "engineering", status: "COMPLETED", summary: engineering.summary, artifact: engineeringArtifact, source: "workers_ai", model: WORKERS_AI_MODEL, durationMs: engineeringDuration, attemptNo: repaired ? 2 : 1 }); steps.push({ role: "engineering", name: ROLE_NAMES.engineering, summary: engineering.summary, status: "COMPLETED", source: "workers_ai", model: WORKERS_AI_MODEL, durationMs: engineeringDuration, attemptNo: repaired ? 2 : 1, artifact: engineeringArtifact });
     return { spec: engineering.spec, summary: engineering.summary, steps, generation: { source: "workers_ai", model: WORKERS_AI_MODEL, outcome: "SUCCESS", failureCode: null, durationMs: now() - started } };
   } catch (error) { return fallback(errorCode(error)); }
