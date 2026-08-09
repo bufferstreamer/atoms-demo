@@ -102,6 +102,21 @@ function abilityPresent(spec: AppSpec, ability: string) {
 }
 function checkCapabilities(spec: AppSpec, product: ReturnType<typeof parseProduct>) { for (const ability of product.requiredCapabilities) if (!abilityPresent(spec, ability)) throw new ModelOutputError("MISSING_REQUIRED_CAPABILITY", ability); for (const ability of product.forbiddenCapabilities) if (ability !== "external_script" && abilityPresent(spec, ability)) throw new ModelOutputError("FORBIDDEN_CAPABILITY", ability); }
 
+function completeRequiredCapabilities(input: AppSpec, product: ReturnType<typeof parseProduct>) {
+  const spec = structuredClone(input);
+  const ids = new Set([...spec.stats, ...spec.filters, ...spec.cards, ...spec.actions, ...(spec.form ? [spec.form, ...spec.form.fields] : [])].map((item) => item.id));
+  const actionId = (base: string) => { let id = base; let suffix = 2; while (ids.has(id)) id = `${base}-${suffix++}`; ids.add(id); return id; };
+  const add = (action: AppSpec["actions"][number]) => { if (spec.actions.length < 8) spec.actions.push(action); };
+  if (product.requiredCapabilities.includes("filter") && !abilityPresent(spec, "filter") && spec.filters[0]) {
+    const filter = spec.filters[0]; add({ id: actionId("agent-filter"), label: `筛选${filter.label}`, kind: "set_filter", targetId: filter.id, value: filter.defaultValue });
+  }
+  if (product.requiredCapabilities.includes("form") && !abilityPresent(spec, "form") && spec.form) add({ id: actionId("agent-submit"), label: spec.form.submitLabel, kind: "add_item", targetId: spec.form.id });
+  if (product.requiredCapabilities.includes("toggle") && !abilityPresent(spec, "toggle") && spec.cards[0]) add({ id: actionId("agent-toggle"), label: "切换状态", kind: "toggle_item", targetId: spec.cards[0].id });
+  if (product.requiredCapabilities.includes("toast") && !abilityPresent(spec, "toast")) add({ id: actionId("agent-toast"), label: "查看提示", kind: "show_toast", message: "操作已完成。" });
+  validateAppSpec(spec);
+  return spec;
+}
+
 type MutableSchema = { properties?: Record<string, MutableSchema>; required?: string[]; items?: MutableSchema; oneOf?: MutableSchema[]; const?: string; minItems?: number; maxItems?: number };
 function engineeringSchemaFor(product: ReturnType<typeof parseProduct>) {
   const schema = structuredClone(STAGE_SCHEMAS.engineering) as unknown as MutableSchema;
@@ -152,8 +167,8 @@ export async function generateAppWithAgents(prompt: string, previous: AppSpec | 
     const designResult = await call("design", STAGE_SCHEMAS.design, 420, (value) => parseDesign(value)); const design = designResult.parsed as ReturnType<typeof parseDesign>; artifacts.design = design; await progress({ role: "design", status: "COMPLETED", summary: design.summary, artifact: design, source: "workers_ai", model: WORKERS_AI_MODEL, durationMs: designResult.durationMs, attemptNo: 1 }); steps.push({ role: "design", name: ROLE_NAMES.design, summary: design.summary, status: "COMPLETED", source: "workers_ai", model: WORKERS_AI_MODEL, durationMs: designResult.durationMs, attemptNo: 1, artifact: design });
     const engineeringSchema = engineeringSchemaFor(product);
     let engineering: ReturnType<typeof parseEngineering>; let engineeringDuration = 0; let repaired = false;
-    try { const result = await call("engineering", engineeringSchema, 2200, (value) => parseEngineering(value)); engineering = result.parsed as ReturnType<typeof parseEngineering>; engineeringDuration += result.durationMs; checkCapabilities(engineering.spec, product); }
-    catch (firstError) { const code = errorCode(firstError); if (!["INVALID_ENGINEERING_ARTIFACT", "INVALID_APP_SPEC", "MISSING_REQUIRED_CAPABILITY", "FORBIDDEN_CAPABILITY"].includes(code)) throw firstError; const reason = `${code}${firstError instanceof ModelOutputError && firstError.path ? `:${firstError.path}` : ""}`; const result = await call("engineering", engineeringSchema, 2200, (value) => parseEngineering(value), 2, reason); engineering = result.parsed as ReturnType<typeof parseEngineering>; engineeringDuration += result.durationMs; checkCapabilities(engineering.spec, product); repaired = true; }
+    try { const result = await call("engineering", engineeringSchema, 2200, (value) => parseEngineering(value)); engineering = result.parsed as ReturnType<typeof parseEngineering>; engineering.spec = completeRequiredCapabilities(engineering.spec, product); engineeringDuration += result.durationMs; checkCapabilities(engineering.spec, product); }
+    catch (firstError) { const code = errorCode(firstError); if (!["INVALID_ENGINEERING_ARTIFACT", "INVALID_APP_SPEC", "MISSING_REQUIRED_CAPABILITY", "FORBIDDEN_CAPABILITY"].includes(code)) throw firstError; const reason = `${code}${firstError instanceof ModelOutputError && firstError.path ? `:${firstError.path}` : ""}`; const result = await call("engineering", engineeringSchema, 2200, (value) => parseEngineering(value), 2, reason); engineering = result.parsed as ReturnType<typeof parseEngineering>; engineering.spec = completeRequiredCapabilities(engineering.spec, product); engineeringDuration += result.durationMs; checkCapabilities(engineering.spec, product); repaired = true; }
     const engineeringArtifact = { summary: engineering.summary, repaired }; await progress({ role: "engineering", status: "COMPLETED", summary: engineering.summary, artifact: engineeringArtifact, source: "workers_ai", model: WORKERS_AI_MODEL, durationMs: engineeringDuration, attemptNo: repaired ? 2 : 1 }); steps.push({ role: "engineering", name: ROLE_NAMES.engineering, summary: engineering.summary, status: "COMPLETED", source: "workers_ai", model: WORKERS_AI_MODEL, durationMs: engineeringDuration, attemptNo: repaired ? 2 : 1, artifact: engineeringArtifact });
     return { spec: engineering.spec, summary: engineering.summary, steps, generation: { source: "workers_ai", model: WORKERS_AI_MODEL, outcome: "SUCCESS", failureCode: null, durationMs: now() - started } };
   } catch (error) { return fallback(errorCode(error)); }
