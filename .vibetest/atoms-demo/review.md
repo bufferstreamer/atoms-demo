@@ -351,3 +351,32 @@ GAP-006/VT-017 当前只排除 pre-CHG-008；应进一步规定任何 pre-CHG-00
 ## 最终结论
 
 此前大部分 AREV 阻塞已经关闭，但 `CHG9-AREV2-003/004` 仍为门禁级问题；当前 GAP-006 的 CLOSED 和总体完成声明应撤回，验收结论为 `REJECTED`。本轮未修改业务代码。
+
+# CHG-009 最终实现独立验收复核（第三轮）
+
+- 日期：2026-08-10
+- Reviewer：`codex-independent-chg009-reviewer`
+- Production code SHA：`7ced0ada6fdd08e885db46243351a948d484305b`
+- Worker：`a3a2348b-f185-4020-8869-9f3e79f5f75f`
+- 结论：`CONFIRMED`
+
+## 阻塞关闭确认
+
+- `CHG9-AREV2-003` 已关闭：14 项自动化包含 required/forbidden 同能力冲突、四 action 全 forbidden 下游零调用、forbidden form/filter 缺工作动作仍由服务端拒绝、真实收窄 required filter、规范化不修改原对象及完整审计字段。独立执行同一套 production build + tests 为 14/14 PASS，并手工重放两项历史失败输入确认结果已反转。
+- `CHG9-AREV2-004` 已关闭：固定 artifact 锁定新 commit/Worker 并明确排除 `86d348f/812bd26c`、`0085c134/8d3e1c98`。同 run `daee9323...` 四阶段均为 `workers_ai/SUCCESS`，event 4499ms、API 5.166946s，run/step/event/version/current 与 normalization 审计完整。
+- 真实交互证据覆盖最终 Worker 的 BUILDING、输入保留、disabled、透明 fallback、筛选 `3→2→3` allValue 恢复、toast 与 reload；最终 Worker 对既有 workers_ai AppSpec 的筛选、form 新卡片和 toast 兼容通过，且旧 run 未被冒充为本次模型调用证据。
+- 修改链在最终 Worker 创建 v2、`parent=v1`、blue→coral，v1 历史 JSON 不变；上游非法 JSON 明确记录 `deterministic/FALLBACK/INVALID_JSON`，没有冒充 AI 成功。
+
+## GAP-006 结论
+
+GAP-006 的最小关闭条件现已满足：确切 production SHA/Worker/bindings/D1；本期负向安全回归；同 run 四阶段真实模型、时延与 D1 原子链；base/derived schema SHA 和规范化审计；最终 Worker 浏览器交互、刷新、来源；previous-version parent/历史不变；旧证据隔离。`gaps.md` 将 GAP-006 标为 `CLOSED` 与现有证据一致，可以关闭。
+
+## 最终结论
+
+此前 `CHG9-AREV-001~005`、`CHG9-AREV2-003/004` 均已关闭，CHG-009 验收结论为 `CONFIRMED`。仓内其他明确 pending case 与 GAP-003/005 accepted risk 保持原边界，不由本结论改写。本轮未修改业务代码。
+
+## 当前工作区最终态补充
+
+- 独立重跑当前工作区：production build PASS、16/16 tests PASS、lint PASS、TypeScript no-emit PASS。
+- 新增矩阵逐项覆盖 filter/form/toggle/stats/toast forbidden 结构拒绝；required toggle/toast 的唯一 ID 与 `completedCapabilities` 安全补齐；actions 已满 8 项时首次与 repair 均无法补齐，最终恰好五次模型调用后 `deterministic/FALLBACK/MISSING_REQUIRED_CAPABILITY`。
+- 固定 artifact/evidence 已同步 16/16，production SHA/Worker、线上 run、D1、浏览器和版本证据未漂移。该扩充关闭了第二轮建议的完整负向矩阵，GAP-006 维持 `CLOSED` 合理，最终结论仍为 `CONFIRMED`。

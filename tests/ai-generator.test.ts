@@ -70,17 +70,20 @@ test("rejects a product with no allowed action before engineering schema derivat
   assert.equal(result.generation.failureCode, "INVALID_PRODUCT_ARTIFACT");
 });
 
-test("forbidden components are rejected by the server even without a working action", async () => {
-  for (const forbidden of ["form", "filter"] as const) {
+test("every forbidden capability is rejected by the server from its structure", async () => {
+  for (const forbidden of ["form", "filter", "toggle", "stats", "toast"] as const) {
     const forbiddenProduct = { ...product, requiredCapabilities: [], forbiddenCapabilities: [forbidden] };
+    const baseCards = forbidden === "filter" ? engineering.spec.cards : engineering.spec.cards.map((card) => ({ id: card.id, title: card.title, description: card.description, tag: card.tag }));
+    const baseActions = forbidden === "filter" || forbidden === "form" || forbidden === "stats" ? [{ id: "notice", label: "提示", kind: "show_toast", message: "完成" }] : engineering.spec.actions;
     const forbiddenSpec = {
       ...engineering,
       spec: {
         ...engineering.spec,
+        stats: forbidden === "stats" ? [{ id: "total", label: "总数", value: "2" }] : [],
         filters: forbidden === "filter" ? engineering.spec.filters : [],
-        cards: forbidden === "filter" ? engineering.spec.cards : engineering.spec.cards.map((card) => ({ id: card.id, title: card.title, description: card.description, tag: card.tag })),
+        cards: baseCards,
         ...(forbidden === "form" ? { form: { id: "entry-form", title: "新增观测", fields: [{ id: "entry-name", label: "名称", placeholder: "请输入", required: true }], submitLabel: "提交" } } : {}),
-        actions: [{ id: "notice", label: "提示", kind: "show_toast", message: "完成" }],
+        actions: forbidden === "toggle" ? [{ id: "toggle", label: "切换", kind: "toggle_item", targetId: "site-a" }] : forbidden === "toast" ? [{ id: "notice", label: "提示", kind: "show_toast", message: "完成" }] : baseActions,
       },
     };
     const values = [forbiddenProduct, architecture, design, forbiddenSpec, forbiddenSpec]; let calls = 0;
@@ -90,6 +93,31 @@ test("forbidden components are rejected by the server even without a working act
     assert.equal(result.generation.source, "deterministic");
     assert.equal(result.generation.failureCode, "FORBIDDEN_CAPABILITY");
   }
+});
+
+test("safely completes required toggle and toast capabilities", async () => {
+  for (const required of ["toggle", "toast"] as const) {
+    const requiredProduct = { ...product, requiredCapabilities: [required], forbiddenCapabilities: ["external_script"] };
+    const incomplete = { ...engineering, spec: { ...engineering.spec, filters: [], cards: engineering.spec.cards.map((card) => ({ id: card.id, title: card.title, description: card.description, tag: card.tag })), actions: required === "toast" ? [{ id: "toggle", label: "切换", kind: "toggle_item", targetId: "site-a" }] : [{ id: "notice", label: "已有动作", kind: "show_toast", message: "完成" }] } };
+    const values = [requiredProduct, architecture, design, incomplete]; let calls = 0;
+    const runner: AiRunner = { run: async () => ({ response: values[calls++] }) };
+    const result = await generateAppWithAgents(`必须支持 ${required}`, undefined, runner);
+    assert.equal(calls, 4);
+    assert.equal(result.generation.source, "workers_ai");
+    assert.deepEqual(result.steps[3].artifact?.completedCapabilities, [required]);
+  }
+});
+
+test("falls back when the action limit prevents required capability completion", async () => {
+  const requiredProduct = { ...product, requiredCapabilities: ["toggle"], forbiddenCapabilities: ["external_script"] };
+  const fullActions = Array.from({ length: 8 }, (_, index) => ({ id: `notice-${index}`, label: `提示 ${index}`, kind: "show_toast", message: "完成" }));
+  const full = { ...engineering, spec: { ...engineering.spec, filters: [], cards: engineering.spec.cards.map((card) => ({ id: card.id, title: card.title, description: card.description, tag: card.tag })), actions: fullActions } };
+  const values = [requiredProduct, architecture, design, full, full]; let calls = 0;
+  const runner: AiRunner = { run: async () => ({ response: values[calls++] }) };
+  const result = await generateAppWithAgents("必须支持切换", undefined, runner);
+  assert.equal(calls, 5);
+  assert.equal(result.generation.source, "deterministic");
+  assert.equal(result.generation.failureCode, "MISSING_REQUIRED_CAPABILITY");
 });
 
 test("audits bounded AppSpec normalization and completes required actions", async () => {

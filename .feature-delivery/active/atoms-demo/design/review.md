@@ -338,3 +338,32 @@ DESIGN-005 §11.1 在新增完整 engineeringArtifact schema 前仍写“Enginee
 ## 结论边界
 
 新 commit/Worker 已实质关闭上一轮四项中的三项及冲突交集子项，但 `CHG9-DREV2-001~003` 未关闭，CHG-009 仍不可重新冻结为 CONFIRMED。本轮未修改业务代码。
+
+# CHG-009 最终实现独立设计复核（第三轮）
+
+- 日期：2026-08-10
+- Reviewer：`codex-independent-chg009-reviewer`
+- Production code SHA：`7ced0ada6fdd08e885db46243351a948d484305b`
+- Worker：`a3a2348b-f185-4020-8869-9f3e79f5f75f`
+- 结论：`CONFIRMED`
+
+## 阻塞关闭确认
+
+- `CHG9-DREV2-001` 已关闭：required 继续使用真实可操作谓词，forbidden 改用独立 `forbiddenStructurePresent`。filter/form 的组件或对应动作任一存在即拒绝，toggle/stats/toast 同样按结构拒绝，不再依赖平台动态 schema。独立重放上一轮 forbidden form 输入得到 `calls=5, source=deterministic, hasForm=false, failure=FORBIDDEN_CAPABILITY`。
+- `CHG9-DREV2-002` 已关闭：Product 同时禁止 filter/form/toggle/toast 时在 Product 解析阶段触发 `INVALID_PRODUCT_ARTIFACT/NO_ALLOWED_ACTION`；独立重放确认 AI 仅调用一次，未进入无解 Engineering schema。
+- `CHG9-DREV2-003` 已关闭：DESIGN-005 §11.1 已明确 Engineering artifact 使用完整八字段安全审计契约，并明确旧 `{summary,repaired}` 形态已废止，与 §11.3/11.6、production 实现和 D1 artifact 一致。
+- 前两轮已关闭项保持成立：规范化白名单、repair/fallback/source/attempt 语义、真实收窄 filter、原对象不变、服务端计算的 normalization/version/codes/completed capabilities 与 base/derived schema SHA 均未回退。
+
+## 独立验证
+
+- `pnpm test` 完成 production build，14/14 通过；`pnpm run lint` 与 `pnpm exec tsc --noEmit` 均通过。
+- 按 production `APP_SPEC_SCHEMA` 和 required filter/form 派生对象重算 SHA，仍为 base `bf11ff9e...bca8`、derived `152d110b...d708`，与最终线上 artifact 完全一致。
+- 设计已明确动态 schema 是平台生成约束，服务端 forbidden 结构校验是独立安全边界；全 action 禁止的不可满足组合在调用 Engineering 前停止，边界完整且可实现。
+
+## 最终结论
+
+此前 `CHG9-DREV-001~004`、`CHG9-DREV2-001~003` 均已关闭。CHG-009 设计变更可以重新冻结；本结论不扩大到 CHG-009 之外仍标 pending/accepted-risk 的项目。本轮未修改业务代码。
+
+## 当前工作区最终态补充
+
+在不改变 production code SHA `7ced0ada...` 与 Worker `a3a2348b...` 的前提下，验收测试进一步扩充为五类 forbidden 逐项结构拒绝、required toggle/toast 安全补齐、actions=8 无法补齐时恰好一次 repair 后 `FALLBACK/MISSING_REQUIRED_CAPABILITY`。该补充与现有设计一致，没有引入新的设计冲突，`CONFIRMED` 结论保持不变。
