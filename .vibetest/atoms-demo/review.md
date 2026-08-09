@@ -77,3 +77,39 @@ GAP-004 仍写“CHG-003 尚未实现”且没有锁定 CHG-005 的 Llama 模型
 - 参数契约：VT-018 已通过 fake binding/spy 固定精确模型 ID、`max_tokens: 2200`、`response_format: { type: "json_object" }`，并断言不存在 `max_completion_tokens`、`reasoning_effort` 等遗留参数；JSON Mode 平台拒绝映射为 `MODEL_ERROR` 并透明 fallback。
 - 线上门禁：GAP-004 已锁定 CHG-005，只接受同一部署、同一 requestId/runId 的 Llama `workers_ai/SUCCESS`、模型 `<55s`、API `<65s` 与 `artifacts/chg005-online-model-2026-08-09.md`；GLM 或历史 event 无效。
 - 声明边界：CHG-005 验收基线可以重新冻结；VT-016~020 与相关回归继续保持 pending，在线证据完成前不得声明真实模型已接通。
+
+# CHG-006 JSON Schema 与对象响应适配验收基线独立复核
+
+- 日期：2026-08-09
+- Reviewer：`codex-independent-chg006-reviewer`
+- 结论：`REJECTED`
+
+## 已确认
+
+- VT-018 已要求 spy 固定 Llama 模型、`max_tokens:2200`、`response_format.type=json_schema`，检查 required、数组上限、action 分支与 `additionalProperties:false`，并证明同一合法 envelope 以字符串或对象返回时结果一致。
+- 原有 JSON Mode 拒绝、55/65 秒预算、48 KiB、枚举失败码、fallback 校验、completion/failure 原子性、迟到结果、限流/容量/幂等零调用等断言仍保留，未运行用例继续为 pending。
+
+## 阻塞项
+
+### CHG6-AREV-001 — 对象响应的新攻击面缺少负向用例
+
+VT-018 只覆盖合法对象与合法字符串等价，未明确覆盖对象分支的 `null`、数组、数字/布尔值、不可安全序列化对象、序列化后超过 48 KiB、顶层或嵌套额外字段和非法 AppSpec。应以表驱动方式固定这些输入的失败码/fallback、无原始响应日志、无非法 version/event/current 写入，并证明对象路径同样经过 48 KiB、exact-keys 和 `validateAppSpec`，不能因跳过字符串解析而绕过边界。
+
+### CHG6-AREV-002 — 最高风险线上门禁仍可被 CHG-006 前证据关闭
+
+GAP-004 和 VT-017 仍只锁定 CHG-005 与 `artifacts/chg005-online-model-2026-08-09.md`。CHG-006 改变了实际请求 schema 与响应解析器，旧 artifact 即使存在也不能证明新路径成功。应把 GAP-004/VT-017 的关闭条件更新为部署 CHG-006 后的同一 commit、Worker version、bindings、requestId/runId 与 Llama `workers_ai/SUCCESS`，并使用 CHG-006 专属 artifact（或在受控 artifact 中明确不可混淆的 CHG-006 版本段）；`adce530c` 或历史成功 event 不得关闭该门禁。
+
+## 结论边界
+
+在 CHG6-AREV-001/002 关闭前，CHG-006 验收基线不能重新冻结，且不得声明 JSON Schema/对象响应路径已在线接通。
+
+# CHG-006 JSON Schema 与对象响应适配验收基线独立复核（第二轮）
+
+- 日期：2026-08-09
+- Reviewer：`codex-independent-chg006-reviewer`
+- 结论：`CONFIRMED`
+- 关闭项：`CHG6-AREV-001`、`CHG6-AREV-002`
+- VT-018 已要求请求 schema 与 DESIGN-004 唯一对象逐字段一致，并以表驱动覆盖合法字符串/对象等价以及对象 `null`、数组、数字、布尔值、不可安全序列化、序列化后超 48 KiB、顶层/嵌套额外字段和非法 AppSpec；每例均验证精确失败边界、透明 fallback、无原始响应日志及无非法 version/event/current。
+- VT-017 与 GAP-004 已切换到 CHG-006 专属 `artifacts/chg006-online-model-2026-08-09.md`，要求同一部署 commit/Worker version/bindings 与同一 requestId/runId 的 Llama `workers_ai/SUCCESS`；明确排除 `adce530c`、CHG-005 artifact 和历史 event。
+- 原有 55/65 秒预算、D1 原子性、失败/迟到、幂等/限流/容量零调用及 VT-019/020 回归保持不变；所有未执行项继续为 pending。
+- 声明边界：CHG-006 验收基线可以重新冻结；GAP-004 关闭且形成真实在线证据前，不得声明 JSON Schema/对象响应路径已接通。

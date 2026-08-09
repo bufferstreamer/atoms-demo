@@ -94,3 +94,39 @@ CHG-005 的 change-log 影响栏没有 FR/NFR，traceability 只新增 NFR-003�
 - 复核依据：模型事实快照已使用 Cloudflare canonical Llama URL，并统一 CHG-003/005、GLM/Llama/Kimi 与 JSON Mode 口径；REF-009 同步索引完整。CHG-005 的 change-log 与 traceability 已覆盖 FR-002/003/004/006、NFR-001/002/003/004/005，关联 DESIGN-004、TASK-006、VT-016~020 及 VT-002/003/005 回归。
 - 设计边界：仅替换生产模型与模型专属参数；55/65 秒预算、严格 envelope/AppSpec 校验、两阶段 run reservation、D1 原子审计、attempt token、超时回收、UI 状态与透明 fallback 均保持不变。
 - 声明边界：CHG-005 设计变更可以重新冻结；本结论不代表业务代码已完成，也不代表 Llama 已在线成功生成。
+
+# CHG-006 JSON Schema 与对象响应适配独立设计复核
+
+- 日期：2026-08-09
+- Reviewer：`codex-independent-chg006-reviewer`
+- 结论：`REJECTED`
+
+## 已确认
+
+- Cloudflare 官方 JSON Mode 契约支持 `response_format.type=json_schema` 与有效 JSON Schema，示例响应中的 `response` 可为已解析对象；官方同时不保证模型绝对遵循 schema，因此保留 exact-keys、`validateAppSpec` 二次校验与透明 fallback 是必要且方向正确的。
+- CHG-006 已在 change-log 和 traceability 覆盖 FR-002/003/004/006、NFR-001/002/003/004/005，并关联 DESIGN-004、TASK-006、VT-017/018/019/020 及 VT-002/003/005 回归；55/65 秒预算、48 KiB、两阶段 D1 原子持久化、attempt token、超时回收与 UI 状态协议均未被放宽。
+
+## 阻塞项
+
+### CHG6-DREV-001 — 冻结设计没有可核验的完整 JSON Schema
+
+DESIGN-004 仍写作 `json_schema:<完整 envelope schema>`，后文只用自然语言概括字段、分支、数组上限和 `additionalProperties:false`，没有内联 schema，也没有引用受控且可哈希的 schema artifact。由此无法独立判断 required、嵌套对象、四类 action 分支、四步顺序及 AppSpec 全部约束是否真的可由同一份有效 schema 表达，TASK-006 和 VT-018 也没有唯一的预期对象可对照。应把完整 schema 固化在 DESIGN-004 或引用一个纳入冻结/哈希的唯一 schema 文件，并明确其 draft/Workers AI 兼容口径；服务端 validator 继续作为二次边界。
+
+### CHG6-DREV-002 — CHG-006 的事实快照适用范围未闭环
+
+`reference/workers-ai-model-facts-2026-08-09.md` 已新增 JSON Schema/对象响应事实，但文件仍声明“用于 CHG-003 与 CHG-005”，末尾也只写 `CHG-003/005`。应把 CHG-006 纳入快照适用范围，避免变更记录依赖一个按自身声明不覆盖该变更的事实源。
+
+## 结论边界
+
+在 CHG6-DREV-001/002 关闭前，CHG-006 不能重新冻结。本结论只审查设计与证据闭环，不评价业务代码实现，也不代表线上模型已经成功生成。
+
+# CHG-006 JSON Schema 与对象响应适配独立设计复核（第二轮）
+
+- 日期：2026-08-09
+- Reviewer：`codex-independent-chg006-reviewer`
+- 结论：`CONFIRMED`
+- 关闭项：`CHG6-DREV-001`、`CHG6-DREV-002`
+- Schema 契约：DESIGN-004 已内联唯一 `APP_SPEC_ENVELOPE_SCHEMA`，固定 JSON Schema 2020-12，并完整约束 envelope、AppSpec 字段、required、枚举、数组上限、四类 action 分支与四步 `prefixItems` 顺序；除 `filterValues` 明确为动态 string map 外对象均封闭，动态 key 与 filter id 的引用关系继续由 `validateAppSpec` 二次校验。
+- 对象响应边界：只接受字符串或非 null、非数组的普通 JSON object；对象安全序列化后与字符串统一进入 48 KiB、JSON 解析、exact-keys 和 AppSpec validator，失败保持枚举错误与透明 fallback，不放宽 D1 写入边界。
+- 事实与追踪：模型事实快照已明确覆盖 CHG-006；change-log、traceability、TASK-006 与 VT-017~020 的 FR/NFR 影响和回归关系一致。
+- 声明边界：CHG-006 设计基线可以重新冻结；本结论不代表业务代码已完成，也不代表线上 JSON Schema 路径已经成功。
