@@ -1,5 +1,5 @@
 import { env } from "cloudflare:workers";
-import { generateAppWithAI, type GenerationMeta } from "./ai-generator";
+import { generateAppWithAgents, type GenerationMeta, type StageProgress } from "./ai-generator";
 import { cleanPrompt, InputError } from "./generator";
 import type { AgentStep, AppSpec, ProjectSnapshot, VersionSnapshot, WorkspaceSnapshot } from "./types";
 
@@ -10,9 +10,9 @@ const SCHEMA_STATEMENTS = [
   `CREATE TABLE IF NOT EXISTS workspace_requests (owner_key TEXT NOT NULL, request_id TEXT NOT NULL, project_id TEXT NOT NULL, run_id TEXT NOT NULL, status TEXT NOT NULL, error_code TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, PRIMARY KEY(owner_key, request_id))`,
   `CREATE TABLE IF NOT EXISTS messages (id TEXT PRIMARY KEY, project_id TEXT NOT NULL, role TEXT NOT NULL, content TEXT NOT NULL, created_at TEXT NOT NULL)`,
   `CREATE INDEX IF NOT EXISTS messages_project_created_idx ON messages(project_id, created_at)`,
-  `CREATE TABLE IF NOT EXISTS runs (id TEXT PRIMARY KEY, project_id TEXT NOT NULL, request_id TEXT NOT NULL, base_version_id TEXT, attempt_token TEXT, status TEXT NOT NULL, error_code TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, UNIQUE(project_id, request_id))`,
+  `CREATE TABLE IF NOT EXISTS runs (id TEXT PRIMARY KEY, project_id TEXT NOT NULL, request_id TEXT NOT NULL, base_version_id TEXT, attempt_token TEXT, runner_claimed_at TEXT, status TEXT NOT NULL, error_code TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, UNIQUE(project_id, request_id))`,
   `CREATE UNIQUE INDEX IF NOT EXISTS runs_project_running_idx ON runs(project_id) WHERE status = 'RUNNING'`,
-  `CREATE TABLE IF NOT EXISTS run_steps (id TEXT PRIMARY KEY, run_id TEXT NOT NULL, ordinal INTEGER NOT NULL, role TEXT NOT NULL, name TEXT NOT NULL, status TEXT NOT NULL, summary TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, UNIQUE(run_id, ordinal))`,
+  `CREATE TABLE IF NOT EXISTS run_steps (id TEXT PRIMARY KEY, run_id TEXT NOT NULL, ordinal INTEGER NOT NULL, role TEXT NOT NULL, name TEXT NOT NULL, status TEXT NOT NULL, summary TEXT NOT NULL, source TEXT, model TEXT, duration_ms INTEGER, attempt_no INTEGER, artifact_json TEXT, error_code TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, UNIQUE(run_id, ordinal))`,
   `CREATE TABLE IF NOT EXISTS versions (id TEXT PRIMARY KEY, project_id TEXT NOT NULL, parent_version_id TEXT, version_no INTEGER NOT NULL, app_spec_json TEXT NOT NULL, change_summary TEXT NOT NULL, created_at TEXT NOT NULL, UNIQUE(project_id, version_no))`,
   `CREATE TABLE IF NOT EXISTS rate_limits (bucket_key TEXT NOT NULL, window_start TEXT NOT NULL, action TEXT NOT NULL, count INTEGER NOT NULL, PRIMARY KEY(bucket_key, window_start, action))`,
   `CREATE TABLE IF NOT EXISTS generation_events (run_id TEXT PRIMARY KEY, source TEXT NOT NULL, model TEXT NOT NULL, outcome TEXT NOT NULL, failure_code TEXT, duration_ms INTEGER NOT NULL, created_at TEXT NOT NULL)`,
@@ -29,12 +29,24 @@ function d1() {
 export function ensureSchema() {
   schemaPromise ??= (async () => {
     await d1().batch(SCHEMA_STATEMENTS.map((sql) => d1().prepare(sql)));
-    const columns = await queryAll("PRAGMA table_info(runs)");
-    if (!columns.some((column) => column.name === "attempt_token")) {
-      await d1().prepare("ALTER TABLE runs ADD COLUMN attempt_token TEXT").run();
-    }
-  })();
+    await ensureColumns("runs", { attempt_token: "TEXT", runner_claimed_at: "TEXT" });
+    await ensureColumns("run_steps", { source: "TEXT", model: "TEXT", duration_ms: "INTEGER", attempt_no: "INTEGER", artifact_json: "TEXT", error_code: "TEXT" });
+  })().catch((error) => { schemaPromise = null; throw error; });
   return schemaPromise;
+}
+
+async function ensureColumns(table: "runs" | "run_steps", columns: Record<string, string>) {
+  const present = new Set((await queryAll(`PRAGMA table_info(${table})`)).map((row) => String(row.name)));
+  for (const [name, type] of Object.entries(columns)) {
+    if (present.has(name)) continue;
+    try { await d1().prepare(`ALTER TABLE ${table} ADD COLUMN ${name} ${type}`).run(); }
+    catch (error) {
+      const afterRace = new Set((await queryAll(`PRAGMA table_info(${table})`)).map((row) => String(row.name)));
+      if (!afterRace.has(name)) throw error;
+    }
+  }
+  const final = new Set((await queryAll(`PRAGMA table_info(${table})`)).map((row) => String(row.name)));
+  for (const name of Object.keys(columns)) if (!final.has(name)) throw new Error(`Schema migration missing ${table}.${name}`);
 }
 
 function parseCookie(header: string | null, name: string) {
@@ -116,7 +128,7 @@ async function recoverStaleRuns() {
     await d1().batch([
       d1().prepare("UPDATE runs SET status='FAILED',error_code='RUN_TIMEOUT',attempt_token=NULL,updated_at=? WHERE id=? AND status='RUNNING' AND updated_at<?").bind(now, row.id, cutoff),
       d1().prepare("UPDATE workspace_requests SET status='FAILED',error_code='RUN_TIMEOUT',updated_at=? WHERE run_id=? AND status='RUNNING'").bind(now, row.id),
-      d1().prepare("UPDATE run_steps SET status='FAILED',summary='生成任务超时，请重新提交。',updated_at=? WHERE run_id=? AND status='PENDING'").bind(now, row.id),
+      d1().prepare("UPDATE run_steps SET status='FAILED',summary='生成任务超时，请重新提交。',error_code='RUN_TIMEOUT',updated_at=? WHERE run_id=? AND status IN ('PENDING','RUNNING')").bind(now, row.id),
       d1().prepare("UPDATE projects SET status=CASE WHEN current_version_id IS NULL THEN 'FAILED' ELSE 'READY' END,updated_at=? WHERE id=? AND status='BUILDING'").bind(now, row.project_id),
     ]);
   }
@@ -143,7 +155,7 @@ export async function getProject(ownerKey: string, projectId: string): Promise<P
     queryAll("SELECT * FROM versions WHERE project_id=? ORDER BY version_no DESC", projectId),
     queryAll("SELECT rs.* FROM run_steps rs JOIN runs r ON r.id=rs.run_id WHERE r.project_id=? ORDER BY r.created_at DESC, rs.ordinal ASC LIMIT 4", projectId),
     queryFirst("SELECT ge.* FROM generation_events ge JOIN runs r ON r.id=ge.run_id WHERE r.project_id=? ORDER BY ge.created_at DESC LIMIT 1", projectId),
-    queryFirst("SELECT status,error_code FROM runs WHERE project_id=? ORDER BY created_at DESC LIMIT 1", projectId),
+    queryFirst("SELECT id,request_id,status,error_code FROM runs WHERE project_id=? ORDER BY created_at DESC LIMIT 1", projectId),
   ]);
   return {
     id: String(project.id),
@@ -154,8 +166,10 @@ export async function getProject(ownerKey: string, projectId: string): Promise<P
     currentVersionId: project.current_version_id ? String(project.current_version_id) : null,
     createdAt: String(project.created_at),
     updatedAt: String(project.updated_at),
+    latestRunId: latestRun?.id ? String(latestRun.id) : null,
+    latestRequestId: latestRun?.request_id ? String(latestRun.request_id) : null,
     messages: messages.map((row: Row) => ({ id: String(row.id), role: String(row.role), content: String(row.content), createdAt: String(row.created_at) })),
-    steps: stepRows.map((row: Row) => ({ role: row.role, name: String(row.name), summary: String(row.summary), status: row.status })) as AgentStep[],
+    steps: stepRows.map((row: Row) => ({ role: row.role, name: String(row.name), summary: String(row.summary), status: row.status, source: row.source ? String(row.source) : null, model: row.model ? String(row.model) : null, durationMs: row.duration_ms === null || row.duration_ms === undefined ? null : Number(row.duration_ms), attemptNo: row.attempt_no === null || row.attempt_no === undefined ? null : Number(row.attempt_no), artifact: row.artifact_json ? JSON.parse(String(row.artifact_json)) : null, errorCode: row.error_code ? String(row.error_code) : null })) as AgentStep[],
     generation: generation ? {
       source: String(generation.source) as "workers_ai" | "deterministic",
       model: String(generation.model),
@@ -216,13 +230,6 @@ export async function createProject(ownerKey: string, input: { prompt?: unknown;
     throw error;
   }
 
-  try {
-    const output = await generateAppWithAI(prompt, undefined, env.AI);
-    await completeGeneration({ ownerKey, projectId, runId, requestId, attemptToken, baseVersionId: null, versionNo: 1, output, firstProject: true });
-  } catch (error) {
-    await failGeneration(projectId, runId, attemptToken, "GENERATION_FAILED", true);
-    throw error;
-  }
   return getProject(ownerKey, projectId);
 }
 
@@ -248,7 +255,7 @@ async function completeGeneration(input: {
     : [versionId, projectId, baseVersionId, versionNo, JSON.stringify(output.spec), output.summary, now, runId, attemptToken, projectId, baseVersionId];
   const statements = [
     d1().prepare(`INSERT INTO versions(id,project_id,parent_version_id,version_no,app_spec_json,change_summary,created_at) SELECT ?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM runs r JOIN projects p ON p.id=r.project_id WHERE r.id=? AND r.attempt_token=? AND r.status='RUNNING' AND p.id=? AND ${baseGuard})`).bind(...versionValues),
-    ...output.steps.map((step, index) => d1().prepare("UPDATE run_steps SET status='COMPLETED',summary=?,updated_at=? WHERE run_id=? AND ordinal=? AND EXISTS(SELECT 1 FROM versions WHERE id=? AND project_id=?)").bind(step.summary, now, runId, index, versionId, projectId)),
+    ...output.steps.map((step, index) => d1().prepare("UPDATE run_steps SET status='COMPLETED',summary=?,source=?,model=?,duration_ms=?,attempt_no=?,artifact_json=?,error_code=?,updated_at=? WHERE run_id=? AND ordinal=? AND EXISTS(SELECT 1 FROM versions WHERE id=? AND project_id=?)").bind(step.summary, step.source ?? output.generation.source, step.model ?? output.generation.model, step.durationMs ?? 0, step.attemptNo ?? 1, step.artifact ? JSON.stringify(step.artifact) : null, step.errorCode ?? null, now, runId, index, versionId, projectId)),
     d1().prepare("INSERT INTO messages(id,project_id,role,content,created_at) SELECT ?,?,?,?,? WHERE EXISTS(SELECT 1 FROM versions WHERE id=? AND project_id=?)").bind(crypto.randomUUID(), projectId, "assistant", output.summary, now, versionId, projectId),
     d1().prepare("UPDATE runs SET status='COMPLETED',error_code=NULL,updated_at=? WHERE id=? AND attempt_token=? AND status='RUNNING' AND EXISTS(SELECT 1 FROM versions WHERE id=? AND project_id=?)").bind(now, runId, attemptToken, versionId, projectId),
     d1().prepare("UPDATE projects SET title=?,current_version_id=?,status='READY',updated_at=? WHERE id=? AND owner_key=? AND EXISTS(SELECT 1 FROM runs WHERE id=? AND status='COMPLETED') AND EXISTS(SELECT 1 FROM versions WHERE id=? AND project_id=?)").bind(projectTitle(output.spec), versionId, now, projectId, ownerKey, runId, versionId, projectId),
@@ -292,7 +299,6 @@ export async function generateVersion(ownerKey: string, projectId: string, input
   if (running) throw new InputError("PROJECT_BUSY", "项目正在生成中，请稍后再试。", 409);
   const base = await queryFirst("SELECT * FROM versions WHERE id=? AND project_id=?", baseVersionId, projectId);
   if (!base) throw new InputError("NOT_FOUND", "基础版本不存在。", 404);
-  const max = await queryFirst("SELECT MAX(version_no) AS max_no FROM versions WHERE project_id=?", projectId);
   const now = new Date().toISOString();
   const runId = crypto.randomUUID();
   const attemptToken = crypto.randomUUID();
@@ -310,11 +316,43 @@ export async function generateVersion(ownerKey: string, projectId: string, input
     if (raced) return getProject(ownerKey, projectId);
     throw error;
   }
+  return getProject(ownerKey, projectId);
+}
+
+async function persistStage(runId: string, attemptToken: string, stage: StageProgress) {
+  const now = new Date().toISOString();
+  const ordinal = ["product", "architecture", "design", "engineering"].indexOf(stage.role);
+  const result = stage.status === "RUNNING"
+    ? await d1().prepare("UPDATE run_steps SET status='RUNNING',attempt_no=?,updated_at=? WHERE run_id=? AND ordinal=? AND status IN ('PENDING','RUNNING') AND EXISTS(SELECT 1 FROM runs WHERE id=? AND attempt_token=? AND status='RUNNING')").bind(stage.attemptNo ?? 1, now, runId, ordinal, runId, attemptToken).run()
+    : await d1().prepare("UPDATE run_steps SET status='COMPLETED',summary=?,source=?,model=?,duration_ms=?,attempt_no=?,artifact_json=?,error_code=?,updated_at=? WHERE run_id=? AND ordinal=? AND status IN ('PENDING','RUNNING','COMPLETED') AND EXISTS(SELECT 1 FROM runs WHERE id=? AND attempt_token=? AND status='RUNNING')").bind(stage.summary ?? "阶段完成", stage.source ?? null, stage.model ?? null, stage.durationMs ?? 0, stage.attemptNo ?? 1, stage.artifact ? JSON.stringify(stage.artifact) : null, stage.errorCode ?? null, now, runId, ordinal, runId, attemptToken).run();
+  if (result.meta.changes !== 1) throw new InputError("STALE_RUN", "生成任务已经失效。", 409);
+  await d1().prepare("UPDATE runs SET updated_at=? WHERE id=? AND attempt_token=? AND status='RUNNING'").bind(now, runId, attemptToken).run();
+}
+
+export async function executeGeneration(ownerKey: string, projectId: string, input: { requestId?: unknown }) {
+  await ensureSchema();
+  await recoverStaleRuns();
+  const requestId = typeof input.requestId === "string" ? input.requestId : "";
+  const run = await queryFirst("SELECT r.* FROM runs r JOIN projects p ON p.id=r.project_id WHERE r.project_id=? AND r.request_id=? AND p.owner_key=?", projectId, requestId, ownerKey);
+  if (!run) throw new InputError("NOT_FOUND", "这个生成任务不存在。", 404);
+  if (run.status === "COMPLETED") return getProject(ownerKey, projectId);
+  if (run.status === "FAILED") throw new InputError(String(run.error_code ?? "GENERATION_FAILED"), "上一次生成没有完成，请重新提交。", 409);
+  const claimedAt = new Date().toISOString();
+  const claim = await d1().prepare("UPDATE runs SET runner_claimed_at=?,updated_at=? WHERE id=? AND status='RUNNING' AND runner_claimed_at IS NULL AND attempt_token IS NOT NULL").bind(claimedAt, claimedAt, run.id).run();
+  if (claim.meta.changes !== 1) return getProject(ownerKey, projectId);
+
+  const attemptToken = String(run.attempt_token);
+  const baseVersionId = run.base_version_id ? String(run.base_version_id) : null;
+  const firstProject = baseVersionId === null;
+  const message = await queryFirst("SELECT content FROM messages WHERE project_id=? AND role='user' ORDER BY created_at DESC LIMIT 1", projectId);
+  const prompt = String(message?.content ?? "");
+  const base = baseVersionId ? await queryFirst("SELECT app_spec_json FROM versions WHERE id=? AND project_id=?", baseVersionId, projectId) : null;
+  const max = await queryFirst("SELECT MAX(version_no) AS max_no FROM versions WHERE project_id=?", projectId);
   try {
-    const output = await generateAppWithAI(prompt, JSON.parse(String(base.app_spec_json)) as AppSpec, env.AI);
-    await completeGeneration({ ownerKey, projectId, runId, requestId, attemptToken, baseVersionId, versionNo: Number(max?.max_no ?? 0) + 1, output, firstProject: false });
+    const output = await generateAppWithAgents(prompt, base ? JSON.parse(String(base.app_spec_json)) as AppSpec : undefined, env.AI, { onStage: (stage) => persistStage(String(run.id), attemptToken, stage) });
+    await completeGeneration({ ownerKey, projectId, runId: String(run.id), requestId, attemptToken, baseVersionId, versionNo: Number(max?.max_no ?? 0) + 1, output, firstProject });
   } catch (error) {
-    await failGeneration(projectId, runId, attemptToken, "GENERATION_FAILED", false);
+    await failGeneration(projectId, String(run.id), attemptToken, error instanceof InputError ? error.code : "GENERATION_FAILED", firstProject);
     throw error;
   }
   return getProject(ownerKey, projectId);
@@ -325,7 +363,7 @@ async function failGeneration(projectId: string, runId: string, attemptToken: st
   await d1().batch([
     d1().prepare("UPDATE runs SET status='FAILED',error_code=?,attempt_token=NULL,updated_at=? WHERE id=? AND attempt_token=? AND status='RUNNING'").bind(code, now, runId, attemptToken),
     ...(firstProject ? [d1().prepare("UPDATE workspace_requests SET status='FAILED',error_code=?,updated_at=? WHERE run_id=? AND status='RUNNING'").bind(code, now, runId)] : []),
-    d1().prepare("UPDATE run_steps SET status='FAILED',summary='生成失败，请重新提交。',updated_at=? WHERE run_id=? AND status='PENDING'").bind(now, runId),
+    d1().prepare("UPDATE run_steps SET status='FAILED',summary='生成失败，请重新提交。',error_code=?,updated_at=? WHERE run_id=? AND status IN ('PENDING','RUNNING')").bind(code, now, runId),
     d1().prepare("UPDATE projects SET status=CASE WHEN current_version_id IS NULL THEN 'FAILED' ELSE 'READY' END,updated_at=? WHERE id=? AND status='BUILDING'").bind(now, projectId),
   ]);
 }

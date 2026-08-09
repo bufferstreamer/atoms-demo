@@ -78,21 +78,27 @@ export function Workspace() {
     setVisibleSteps(0);
     setBuilding(true);
     try {
+      const requestId = crypto.randomUUID();
       const project = activeProject
         ? await api<ProjectSnapshot>(`/api/projects/${activeProject.id}/generate`, {
             method: "POST",
-            body: JSON.stringify({ prompt: value, requestId: crypto.randomUUID(), baseVersionId: activeProject.currentVersionId }),
+            body: JSON.stringify({ prompt: value, requestId, baseVersionId: activeProject.currentVersionId }),
           })
         : await api<ProjectSnapshot>("/api/projects", {
             method: "POST",
-            body: JSON.stringify({ prompt: value, requestId: crypto.randomUUID() }),
+            body: JSON.stringify({ prompt: value, requestId }),
           });
       setWorkspace((current) => ({
         projects: [project, ...current.projects.filter((item) => item.id !== project.id)],
         activeProjectId: project.id,
       }));
-      if (project.status === "READY") setPrompt("");
-      setVisibleSteps(project.status === "READY" ? 4 : 0);
+      const completed = await api<ProjectSnapshot>(`/api/projects/${project.id}/execute`, {
+        method: "POST",
+        body: JSON.stringify({ requestId }),
+      });
+      setWorkspace((current) => ({ projects: [completed, ...current.projects.filter((item) => item.id !== completed.id)], activeProjectId: completed.id }));
+      if (completed.status === "READY") setPrompt("");
+      setVisibleSteps(4);
       setBuilding(false);
     } catch (cause) {
       setBuilding(false);
@@ -161,11 +167,12 @@ export function Workspace() {
                 <div className="run-head"><span className="spark">✦</span><div><strong>{isBuilding ? "Agent 团队正在构建" : activeProject.status === "FAILED" ? "构建未完成" : "构建完成"}</strong><small>{isBuilding ? "真实模型正在生成，刷新后也会继续恢复" : activeProject.status === "FAILED" ? `错误：${activeProject.errorCode ?? "GENERATION_FAILED"}` : activeProject.generation?.source === "workers_ai" ? `真实模型生成 · ${activeProject.generation.durationMs}ms` : `规则引擎安全降级 · ${activeProject.generation?.failureCode ?? "AI_UNAVAILABLE"}`}</small></div><em>{isBuilding ? "BUILDING" : activeProject.status === "FAILED" ? "FAILED" : activeProject.generation?.source === "workers_ai" ? "AI · LLAMA" : "FALLBACK"}</em></div>
                 <div className="agent-steps">
                   {activeProject.steps.map((step, index) => {
-                    const shown = !isBuilding && index < visibleSteps && step.status === "COMPLETED";
+                    const shown = step.status === "COMPLETED" && (isBuilding || index < visibleSteps);
+                    const running = step.status === "RUNNING";
                     return <div key={`${step.role}-${index}`} className={`agent-step ${shown ? "done" : "waiting"}`}>
                       <span className={`agent-avatar ${step.role}`}>{roleInitials[step.role]}</span>
-                      <div><strong>{step.name}</strong><p>{shown ? step.summary : "等待上一阶段完成…"}</p></div>
-                      <span className="step-state">{shown ? "✓" : "···"}</span>
+                      <div><strong>{step.name}</strong><p>{shown ? `${step.summary}${step.durationMs != null ? ` · ${(step.durationMs / 1000).toFixed(1)}s` : ""}${step.attemptNo === 2 ? " · 已自动修复" : ""}` : running ? "正在调用模型并校验产物…" : "等待上一阶段完成…"}</p></div>
+                      <span className="step-state">{shown ? "✓" : running ? "↻" : "···"}</span>
                     </div>;
                   })}
                 </div>

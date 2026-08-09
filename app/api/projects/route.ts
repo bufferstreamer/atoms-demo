@@ -5,7 +5,7 @@ export async function POST(request: Request) {
   try {
     const payload = await request.json();
     const project = await createProject(owner.ownerKey, payload as { prompt?: unknown; requestId?: unknown });
-    return jsonResponse({ data: project, error: null }, 201, owner.setCookie);
+    return jsonResponse({ data: project, error: null }, 202, owner.setCookie);
   } catch (error) {
     return errorResponse(error, owner.setCookie);
   }

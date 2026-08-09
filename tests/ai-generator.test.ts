@@ -1,120 +1,67 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { APP_SPEC_ENVELOPE_SCHEMA, DEFAULT_MODEL_TIMEOUT_MS, generateAppWithAI, WORKERS_AI_MODEL, type AiRunner } from "../lib/ai-generator";
+import { APP_SPEC_SCHEMA, generateAppWithAgents, MODEL_DEADLINE_MS, STAGE_SCHEMAS, STAGE_TIMEOUTS_MS, WORKERS_AI_MODEL, type AiRunner, type StageProgress } from "../lib/ai-generator";
 
-const modelEnvelope = {
+const product = { summary: "为观测者规划地点和天气筛选。", audience: "自然观察爱好者", goal: "记录萤火虫观测", requiredCapabilities: ["filter"], forbiddenCapabilities: ["external_script"] };
+const architecture = { summary: "用筛选与卡片组织观测记录。", kind: "dashboard", components: ["filters", "cards", "actions"], interactionPlan: ["set_filter"], persistencePlan: "版本保存到 D1" };
+const design = { summary: "以夜间蓝色视觉突出观测信息。", visualDirection: "安静的夜间蓝色", layout: "dashboard-grid", interactionStates: ["default", "filtered"], accessibilityNotes: ["控件包含可读标签"] };
+const engineering = {
   spec: {
-    schemaVersion: 1,
-    kind: "dashboard",
-    title: "萤火虫观测协作台",
-    subtitle: "记录观测地点、天气与发现",
-    theme: { accent: "blue", density: "comfortable" },
-    stats: [{ id: "sightings", label: "本周发现", value: "18", delta: "+6" }],
+    schemaVersion: 1, kind: "dashboard", title: "萤火虫观测协作台", subtitle: "记录观测地点、天气与发现",
+    theme: { accent: "blue", density: "comfortable" }, stats: [],
     filters: [{ id: "weather", label: "天气", options: ["全部", "晴朗", "多云"], defaultValue: "全部", allValue: "全部" }],
-    cards: [
-      { id: "site-a", title: "溪谷入口", description: "20:30 开始观测", tag: "晴朗", filterValues: { weather: "晴朗" } },
-      { id: "site-b", title: "林间步道", description: "湿度较高", tag: "多云", filterValues: { weather: "多云" } },
-    ],
+    cards: [{ id: "site-a", title: "溪谷入口", description: "20:30 开始观测", tag: "晴朗", filterValues: { weather: "晴朗" } }, { id: "site-b", title: "林间步道", description: "湿度较高", tag: "多云", filterValues: { weather: "多云" } }],
     actions: [{ id: "sunny", label: "只看晴朗", kind: "set_filter", targetId: "weather", value: "晴朗" }],
-  },
-  summary: "创建了萤火虫观测协作台，并提供天气筛选。",
-  steps: [
-    { role: "product", summary: "将需求收敛为地点记录和天气筛选。" },
-    { role: "architecture", summary: "用 AppSpec 组织统计、筛选与观测卡片。" },
-    { role: "design", summary: "选择蓝色舒适布局突出夜间观测氛围。" },
-    { role: "engineering", summary: "实现天气筛选动作并校验引用关系。" },
-  ],
+  }, summary: "实现了可筛选的萤火虫观测协作台。",
 };
 
-test("uses the real model envelope and exposes auditable generation metadata", async () => {
-  let calledModel = "";
-  const runner: AiRunner = { run: async (model, input) => {
-    calledModel = model;
-    assert.equal(input.max_tokens, 2200);
-    assert.deepEqual(input.response_format, { type: "json_schema", json_schema: APP_SPEC_ENVELOPE_SCHEMA });
-    assert.equal(APP_SPEC_ENVELOPE_SCHEMA.additionalProperties, false);
-    assert.deepEqual(APP_SPEC_ENVELOPE_SCHEMA.required, ["spec", "summary", "steps"]);
-    assert.equal(APP_SPEC_ENVELOPE_SCHEMA.properties.steps.prefixItems.length, 4);
-    assert.equal(APP_SPEC_ENVELOPE_SCHEMA.properties.spec.properties.actions.items.oneOf.length, 4);
-    const messages = input.messages as Array<{ role: string; content: string }>;
-    assert.match(messages[0].content, /所有 id.*全局唯一/);
-    assert.match(messages[0].content, /set_filter\.targetId/);
-    assert.match(messages[0].content, /add_item\.targetId/);
-    assert.equal("max_completion_tokens" in input, false);
-    assert.equal("reasoning_effort" in input, false);
-    return { choices: [{ message: { content: JSON.stringify(modelEnvelope) } }] };
-  } };
-  const result = await generateAppWithAI("做一个萤火虫观测协作台", undefined, runner);
-  assert.equal(calledModel, WORKERS_AI_MODEL);
+function stagedRunner(overrides: Partial<Record<number, unknown>> = {}) {
+  const inputs: Array<Record<string, unknown>> = [];
+  const values = [product, architecture, design, engineering];
+  const runner: AiRunner = { run: async (model, input) => { assert.equal(model, WORKERS_AI_MODEL); const index = inputs.length; inputs.push(input); return { response: overrides[index] ?? values[index] }; } };
+  return { runner, inputs };
+}
+
+test("runs four real model stages in order and passes validated artifacts downstream", async () => {
+  const { runner, inputs } = stagedRunner(); const progress: StageProgress[] = [];
+  const result = await generateAppWithAgents("做一个萤火虫观测协作台", undefined, runner, { onStage: async (event) => { progress.push(event); } });
+  assert.equal(inputs.length, 4);
+  assert.deepEqual(inputs.map((item) => (item.response_format as { json_schema: unknown }).json_schema), [STAGE_SCHEMAS.product, STAGE_SCHEMAS.architecture, STAGE_SCHEMAS.design, STAGE_SCHEMAS.engineering]);
+  assert.equal(STAGE_SCHEMAS.engineering.properties.spec, APP_SPEC_SCHEMA);
+  assert.doesNotMatch(JSON.stringify(STAGE_SCHEMAS.engineering), /\$ref/);
+  assert.match(JSON.stringify(inputs[1].messages), /自然观察爱好者/);
+  assert.match(JSON.stringify(inputs[2].messages), /dashboard/);
+  assert.match(JSON.stringify(inputs[3].messages), /夜间蓝色/);
+  assert.deepEqual(progress.filter((item) => item.status === "COMPLETED").map((item) => item.role), ["product", "architecture", "design", "engineering"]);
   assert.equal(result.spec.title, "萤火虫观测协作台");
-  assert.equal(result.steps[0].summary, modelEnvelope.steps[0].summary);
   assert.equal(result.generation.source, "workers_ai");
-  assert.equal(result.generation.outcome, "SUCCESS");
-  assert.equal(result.generation.failureCode, null);
 });
 
-test("accepts equivalent JSON string and object responses", async () => {
-  const fromString = await generateAppWithAI("做一个萤火虫观测协作台", undefined, { run: async () => ({ response: JSON.stringify(modelEnvelope) }) });
-  const fromObject = await generateAppWithAI("做一个萤火虫观测协作台", undefined, { run: async () => ({ response: structuredClone(modelEnvelope) }) });
-  assert.equal(fromString.generation.source, "workers_ai");
-  assert.equal(fromObject.generation.source, "workers_ai");
-  assert.deepEqual(fromObject.spec, fromString.spec);
-  assert.deepEqual(fromObject.steps, fromString.steps);
+test("repairs engineering exactly once when a required capability is missing", async () => {
+  let calls = 0; const invalid = { ...engineering, spec: { ...engineering.spec, filters: [], cards: engineering.spec.cards.map((card) => ({ id: card.id, title: card.title, description: card.description, tag: card.tag })), actions: [{ id: "notice", label: "提示", kind: "show_toast", message: "完成" }] } };
+  const runner: AiRunner = { run: async (_model, input) => { const index = calls++; if (index < 3) return { response: [product, architecture, design][index] }; if (index === 3) return { response: invalid }; assert.match(JSON.stringify(input.messages), /MISSING_REQUIRED_CAPABILITY:filter/); return { response: engineering }; } };
+  const result = await generateAppWithAgents("做一个可筛选观测台", undefined, runner);
+  assert.equal(calls, 5);
+  assert.equal(result.generation.source, "workers_ai");
+  assert.equal(result.steps[3].attemptNo, 2);
+  assert.equal(result.steps[3].artifact?.repaired, true);
 });
 
-test("object responses cannot bypass envelope size or validation", async () => {
-  const circular: Record<string, unknown> = {};
-  circular.self = circular;
-  const cases: Array<[string, unknown, string]> = [
-    ["null", null, "INVALID_ENVELOPE"],
-    ["array", [], "INVALID_ENVELOPE"],
-    ["number", 7, "INVALID_ENVELOPE"],
-    ["boolean", true, "INVALID_ENVELOPE"],
-    ["circular", circular, "INVALID_ENVELOPE"],
-    ["oversized", { ...modelEnvelope, summary: "x".repeat(49 * 1024) }, "RESPONSE_TOO_LARGE"],
-    ["extra field", { ...modelEnvelope, debug: true }, "INVALID_ENVELOPE"],
-    ["nested extra field", { ...modelEnvelope, spec: { ...modelEnvelope.spec, debug: true } }, "INVALID_ENVELOPE"],
-    ["invalid app spec", { ...modelEnvelope, spec: { ...modelEnvelope.spec, kind: "database" } }, "INVALID_APP_SPEC"],
-  ];
-  for (const [name, response, code] of cases) {
-    const result = await generateAppWithAI("做一个旅行计划看板", undefined, { run: async () => ({ response }) });
-    assert.equal(result.generation.source, "deterministic", name);
-    assert.equal(result.generation.failureCode, code, name);
-    assert.ok(!JSON.stringify(result.generation).includes("debug"), name);
-  }
+test("invalid upstream artifact stops downstream AI and falls back safely", async () => {
+  let calls = 0; const runner: AiRunner = { run: async () => { calls++; return { response: { ...product, debug: true } }; } };
+  const result = await generateAppWithAgents("做一个旅行计划看板", undefined, runner);
+  assert.equal(calls, 1);
+  assert.equal(result.generation.source, "deterministic");
+  assert.equal(result.generation.failureCode, "INVALID_PRODUCT_ARTIFACT");
+  assert.ok(result.spec.cards.length > 0);
 });
 
-test("invalid, oversized and extra-field model responses fall back safely", async () => {
-  const cases: Array<[string, unknown, string]> = [
-    ["invalid json", { response: "not-json" }, "INVALID_JSON"],
-    ["extra envelope field", { response: JSON.stringify({ ...modelEnvelope, debug: true }) }, "INVALID_ENVELOPE"],
-    ["wrong role order", { response: JSON.stringify({ ...modelEnvelope, steps: [...modelEnvelope.steps].reverse() }) }, "INVALID_ENVELOPE"],
-    ["oversized", { response: "x".repeat(49 * 1024) }, "RESPONSE_TOO_LARGE"],
-  ];
-  for (const [name, response, code] of cases) {
-    const result = await generateAppWithAI("做一个旅行计划看板", undefined, { run: async () => response });
-    assert.equal(result.generation.source, "deterministic", name);
-    assert.equal(result.generation.outcome, "FALLBACK", name);
-    assert.equal(result.generation.failureCode, code, name);
-    assert.ok(result.spec.cards.length > 0, name);
-  }
-});
-
-test("missing binding, thrown errors and timeout do not expose raw errors", async () => {
-  assert.equal(DEFAULT_MODEL_TIMEOUT_MS, 55_000);
-  const unavailable = await generateAppWithAI("做一个旅行计划看板", undefined, undefined);
+test("missing binding and model errors do not expose upstream text", async () => {
+  assert.equal(MODEL_DEADLINE_MS, 52_000);
+  assert.deepEqual(STAGE_TIMEOUTS_MS, { product: 7_000, architecture: 9_000, design: 7_000, engineering: 22_000, repair: 7_000 });
+  const unavailable = await generateAppWithAgents("做一个旅行计划看板", undefined, undefined);
   assert.equal(unavailable.generation.failureCode, "AI_UNAVAILABLE");
-
-  const failed = await generateAppWithAI("做一个旅行计划看板", undefined, { run: async () => { throw new Error("secret upstream response"); } });
+  const failed = await generateAppWithAgents("做一个旅行计划看板", undefined, { run: async () => { throw new Error("secret upstream response"); } });
   assert.equal(failed.generation.failureCode, "MODEL_ERROR");
-  assert.ok(!JSON.stringify(failed.generation).includes("secret"));
-
-  const jsonModeRejected = await generateAppWithAI("做一个旅行计划看板", undefined, { run: async () => { throw new Error("JSON Mode couldn't be met"); } });
-  assert.equal(jsonModeRejected.generation.source, "deterministic");
-  assert.equal(jsonModeRejected.generation.outcome, "FALLBACK");
-  assert.equal(jsonModeRejected.generation.failureCode, "MODEL_ERROR");
-  assert.ok(!JSON.stringify(jsonModeRejected.generation).includes("couldn't be met"));
-
-  const timedOut = await generateAppWithAI("做一个旅行计划看板", undefined, { run: () => new Promise(() => undefined) }, 2);
-  assert.equal(timedOut.generation.failureCode, "MODEL_TIMEOUT");
+  assert.doesNotMatch(JSON.stringify(failed.generation), /secret/);
 });

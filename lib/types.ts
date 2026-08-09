@@ -46,7 +46,13 @@ export type AgentStep = {
   role: "product" | "architecture" | "design" | "engineering";
   name: string;
   summary: string;
-  status: "COMPLETED" | "FAILED";
+  status: "PENDING" | "RUNNING" | "COMPLETED" | "FAILED";
+  source?: "workers_ai" | "deterministic" | null;
+  model?: string | null;
+  durationMs?: number | null;
+  attemptNo?: number | null;
+  artifact?: Record<string, unknown> | null;
+  errorCode?: string | null;
 };
 
 export type VersionSnapshot = {
@@ -67,6 +73,8 @@ export type ProjectSnapshot = {
   currentVersionId: string | null;
   createdAt: string;
   updatedAt: string;
+  latestRunId: string | null;
+  latestRequestId: string | null;
   messages: Array<{ id: string; role: string; content: string; createdAt: string }>;
   steps: AgentStep[];
   generation: {
