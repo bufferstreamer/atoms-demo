@@ -90,9 +90,9 @@ function checkCapabilities(spec: AppSpec, product: ReturnType<typeof parseProduc
 function stageSystem(role: StageRole, context: string, schema: unknown) {
   const common = "只输出符合 JSON Schema 的 JSON，不要 Markdown、HTML、CSS、JavaScript、URL 或额外字段。使用用户的语言。";
   const contract = `\n输出契约:${JSON.stringify(schema)}`;
-  if (role === "product") return `你是产品 Agent。提炼受众、目标、必须和禁止的交互能力。${common}${contract}`;
-  if (role === "architecture") return `你是架构 Agent。基于已验证产品简报规划 AppSpec 组件、交互与持久化。${common}${contract}\n上下文:${context}`;
-  if (role === "design") return `你是设计 Agent。基于已验证产品与架构产物定义布局、视觉和交互状态。${common}${contract}\n上下文:${context}`;
+  if (role === "product") return `你是产品 Agent。提炼受众、目标、必须和禁止的交互能力。requiredCapabilities 只能使用英文 token filter/form/toggle/stats/toast；forbiddenCapabilities 只能使用这些 token 或 external_script；没有禁止项时返回空数组，不得翻译或创造枚举。${common}${contract}`;
+  if (role === "architecture") return `你是架构 Agent。基于已验证产品简报规划 AppSpec 组件、交互与持久化。kind 只能是 dashboard/tracker/landing；components 只能是 stats/filters/cards/form/actions；interactionPlan 只能是 set_filter/toggle_item/add_item/show_toast。${common}${contract}\n上下文:${context}`;
+  if (role === "design") return `你是设计 Agent。基于已验证产品与架构产物定义布局、视觉和交互状态。layout 只能是 dashboard-grid/tracker-list/landing-sections；interactionStates 只能是 default/filtered/completed/form-valid/form-error/toast。${common}${contract}\n上下文:${context}`;
   return `你是工程 Agent。基于全部已验证产物返回完整安全 AppSpec。所有 id 全局唯一，action target/value 必须存在；必须严格满足 Product required/forbidden capabilities。${common}${contract}\n上下文:${context}`;
 }
 
