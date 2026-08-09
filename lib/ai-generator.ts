@@ -63,11 +63,23 @@ function parseDesign(value: unknown) { const code = "INVALID_DESIGN_ARTIFACT"; c
 function assertAppSpec(value: unknown) {
   const code = "INVALID_APP_SPEC"; const spec = record(value, code);
   exact(spec, ["schemaVersion", "kind", "title", "subtitle", "theme", "stats", "filters", "cards", "actions", ...(spec.form === undefined ? [] : ["form"])], code);
-  try { validateAppSpec(spec as AppSpec); } catch (error) {
+  const candidate = structuredClone(spec) as AppSpec;
+  for (const filter of candidate.filters ?? []) {
+    if (filter.options.length && !filter.options.includes(filter.defaultValue)) filter.defaultValue = filter.options[0];
+    if (filter.allValue !== undefined && !filter.options.includes(filter.allValue)) delete filter.allValue;
+  }
+  for (const action of candidate.actions ?? []) {
+    if (action.kind === "set_filter") {
+      const target = candidate.filters.find((filter) => filter.id === action.targetId) ?? candidate.filters[0];
+      if (target) { action.targetId = target.id; if (!target.options.includes(action.value)) action.value = target.defaultValue; }
+    }
+    if (action.kind === "add_item" && candidate.form) action.targetId = candidate.form.id;
+  }
+  try { validateAppSpec(candidate); } catch (error) {
     const detail = error instanceof Error ? text(error.message, 120, code) : "规格关系校验失败";
     throw new ModelOutputError(code, detail);
   }
-  return spec as AppSpec;
+  return candidate;
 }
 function parseEngineering(value: unknown) { const v = record(value, "INVALID_ENGINEERING_ARTIFACT"); exact(v, ["spec", "summary"], "INVALID_ENGINEERING_ARTIFACT"); assertBytes(v, MAX_ENGINEERING_BYTES, "RESPONSE_TOO_LARGE"); return { spec: assertAppSpec(v.spec), summary: text(v.summary, 180, "INVALID_ENGINEERING_ARTIFACT") }; }
 
