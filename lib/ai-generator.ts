@@ -230,7 +230,7 @@ function extractText(raw: unknown) {
 }
 
 function systemPrompt(previous?: AppSpec) {
-  return `你是 Atomize 的应用生成团队。把用户需求转成安全的 AppSpec v1 JSON。只输出符合 schema 的 JSON，不输出 Markdown。四个 steps 必须依次是 product、architecture、design、engineering，每个摘要说明本角色实际做出的决定。应用必须有真实可操作的筛选、卡片状态、表单或 toast，文案使用用户语言。不要输出 HTML、CSS、JavaScript 或 URL。${previous ? `这是当前版本，返回完整修改版并保留未要求改变的能力：${JSON.stringify(previous)}` : ""}`;
+  return `你是 Atomize 的应用生成团队。把用户需求转成安全的 AppSpec v1 JSON。只输出符合 schema 的 JSON，不输出 Markdown。四个 steps 必须依次是 product、architecture、design、engineering，每个摘要说明本角色实际做出的决定。应用必须有真实可操作的筛选、卡片状态、表单或 toast，文案使用用户语言。所有 id 在 stats、filters、cards、form、fields、actions 之间全局唯一。set_filter.targetId 必须等于某个 filter.id 且 value 必须属于该 filter.options；filter 的 defaultValue/allValue 必须属于 options；card.filterValues 的 key 必须等于已有 filter.id。toggle_item.targetId 必须等于某个 card.id；add_item.targetId 必须等于 form.id，未提供 form 时禁止 add_item；show_toast 必须提供 message。不要输出 HTML、CSS、JavaScript 或 URL。${previous ? `这是当前版本，返回完整修改版并保留未要求改变的能力：${JSON.stringify(previous)}` : ""}`;
 }
 
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {

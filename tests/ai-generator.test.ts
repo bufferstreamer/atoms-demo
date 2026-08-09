@@ -36,6 +36,10 @@ test("uses the real model envelope and exposes auditable generation metadata", a
     assert.deepEqual(APP_SPEC_ENVELOPE_SCHEMA.required, ["spec", "summary", "steps"]);
     assert.equal(APP_SPEC_ENVELOPE_SCHEMA.properties.steps.prefixItems.length, 4);
     assert.equal(APP_SPEC_ENVELOPE_SCHEMA.properties.spec.properties.actions.items.oneOf.length, 4);
+    const messages = input.messages as Array<{ role: string; content: string }>;
+    assert.match(messages[0].content, /所有 id.*全局唯一/);
+    assert.match(messages[0].content, /set_filter\.targetId/);
+    assert.match(messages[0].content, /add_item\.targetId/);
     assert.equal("max_completion_tokens" in input, false);
     assert.equal("reasoning_effort" in input, false);
     return { choices: [{ message: { content: JSON.stringify(modelEnvelope) } }] };
