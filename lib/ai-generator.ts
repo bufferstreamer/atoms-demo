@@ -73,13 +73,17 @@ function assertAppSpec(value: unknown) {
     card.filterValues = card.filterValues ?? {};
     for (const filter of candidate.filters ?? []) {
       const choices = filter.options.filter((option) => option !== filter.allValue);
-      if (!filter.options.includes(card.filterValues[filter.id])) card.filterValues[filter.id] = choices[cardIndex % choices.length] ?? filter.defaultValue;
+      if (!filter.options.includes(card.filterValues[filter.id]) || card.filterValues[filter.id] === filter.allValue) card.filterValues[filter.id] = choices[cardIndex % choices.length] ?? filter.defaultValue;
     }
   }
   for (const action of candidate.actions ?? []) {
     if (action.kind === "set_filter") {
       const target = candidate.filters.find((filter) => filter.id === action.targetId) ?? candidate.filters[0];
-      if (target) { action.targetId = target.id; if (!target.options.includes(action.value)) action.value = target.defaultValue; }
+      if (target) {
+        action.targetId = target.id;
+        const choices = target.options.filter((option) => option !== target.allValue);
+        if (!target.options.includes(action.value) || action.value === target.allValue) action.value = choices[0] ?? target.defaultValue;
+      }
     }
     if (action.kind === "add_item" && candidate.form) action.targetId = candidate.form.id;
   }
