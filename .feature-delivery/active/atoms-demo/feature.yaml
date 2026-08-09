@@ -4,7 +4,7 @@ feature:
   title: Atoms AI App Builder Demo
   risk: high
   delivery_mode: full
-  status: ACCEPTANCE_FROZEN
+  status: IMPLEMENTING
   owner_repository: atoms-demo
   participating_repositories:
   - atoms-demo

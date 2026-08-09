@@ -13,8 +13,19 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Starter Project",
-  description: "A clean starting point for building your site.",
+  title: "Atomize — AI App Builder",
+  description: "Turn one clear idea into an interactive, persistent web app with a visible AI agent workflow.",
+  openGraph: {
+    title: "Atomize — AI App Builder",
+    description: "Describe an idea, watch four agents shape it, and use the generated app immediately.",
+    images: [{ url: "/og-image.png", width: 1536, height: 1024, alt: "Atomize AI app builder" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Atomize — AI App Builder",
+    description: "An interactive, persistent agent-driven app generator.",
+    images: ["/og-image.png"],
+  },
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
@@ -27,7 +38,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="zh-CN">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
