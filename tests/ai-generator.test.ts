@@ -26,7 +26,9 @@ test("runs four real model stages in order and passes validated artifacts downst
   const { runner, inputs } = stagedRunner(); const progress: StageProgress[] = [];
   const result = await generateAppWithAgents("做一个萤火虫观测协作台", undefined, runner, { onStage: async (event) => { progress.push(event); } });
   assert.equal(inputs.length, 4);
-  assert.deepEqual(inputs.map((item) => (item.response_format as { json_schema: unknown }).json_schema), [STAGE_SCHEMAS.product, STAGE_SCHEMAS.architecture, STAGE_SCHEMAS.design, STAGE_SCHEMAS.engineering]);
+  assert.deepEqual(inputs.slice(0, 3).map((item) => item.response_format), [{ type: "json_object" }, { type: "json_object" }, { type: "json_object" }]);
+  assert.deepEqual(inputs[3].response_format, { type: "json_schema", json_schema: STAGE_SCHEMAS.engineering });
+  assert.match(JSON.stringify(inputs[0].messages), new RegExp(STAGE_SCHEMAS.product.required[0]));
   assert.equal(STAGE_SCHEMAS.engineering.properties.spec, APP_SPEC_SCHEMA);
   assert.doesNotMatch(JSON.stringify(STAGE_SCHEMAS.engineering), /\$ref/);
   assert.match(JSON.stringify(inputs[1].messages), /自然观察爱好者/);
@@ -64,4 +66,7 @@ test("missing binding and model errors do not expose upstream text", async () =>
   const failed = await generateAppWithAgents("做一个旅行计划看板", undefined, { run: async () => { throw new Error("secret upstream response"); } });
   assert.equal(failed.generation.failureCode, "MODEL_ERROR");
   assert.doesNotMatch(JSON.stringify(failed.generation), /secret/);
+  const unmet = await generateAppWithAgents("做一个旅行计划看板", undefined, { run: async () => { throw new Error("JSON Mode couldn't be met: raw platform detail"); } });
+  assert.equal(unmet.generation.failureCode, "JSON_MODE_UNMET");
+  assert.doesNotMatch(JSON.stringify(unmet.generation), /platform detail/);
 });

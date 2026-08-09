@@ -33,9 +33,9 @@ export const APP_SPEC_SCHEMA = {
 
 const cap = { type: "string", enum: ["filter", "form", "toggle", "stats", "toast"] } as const;
 export const STAGE_SCHEMAS = {
-  product: { $schema: "https://json-schema.org/draft/2020-12/schema", type: "object", additionalProperties: false, required: ["summary", "audience", "goal", "requiredCapabilities", "forbiddenCapabilities"], properties: { summary: { type: "string", minLength: 1, maxLength: 180 }, audience: { type: "string", minLength: 1, maxLength: 120 }, goal: { type: "string", minLength: 1, maxLength: 180 }, requiredCapabilities: { type: "array", maxItems: 6, items: cap }, forbiddenCapabilities: { type: "array", maxItems: 6, items: { type: "string", enum: ["filter", "form", "toggle", "stats", "toast", "external_script"] } } } },
-  architecture: { $schema: "https://json-schema.org/draft/2020-12/schema", type: "object", additionalProperties: false, required: ["summary", "kind", "components", "interactionPlan", "persistencePlan"], properties: { summary: { type: "string", minLength: 1, maxLength: 180 }, kind: { enum: ["dashboard", "tracker", "landing"] }, components: { type: "array", minItems: 1, maxItems: 8, items: { enum: ["stats", "filters", "cards", "form", "actions"] } }, interactionPlan: { type: "array", minItems: 1, maxItems: 6, items: { enum: ["set_filter", "toggle_item", "add_item", "show_toast"] } }, persistencePlan: { type: "string", minLength: 1, maxLength: 180 } } },
-  design: { $schema: "https://json-schema.org/draft/2020-12/schema", type: "object", additionalProperties: false, required: ["summary", "visualDirection", "layout", "interactionStates", "accessibilityNotes"], properties: { summary: { type: "string", minLength: 1, maxLength: 180 }, visualDirection: { type: "string", minLength: 1, maxLength: 180 }, layout: { enum: ["dashboard-grid", "tracker-list", "landing-sections"] }, interactionStates: { type: "array", minItems: 1, maxItems: 6, items: { enum: ["default", "filtered", "completed", "form-valid", "form-error", "toast"] } }, accessibilityNotes: { type: "array", minItems: 1, maxItems: 4, items: { type: "string", minLength: 1, maxLength: 120 } } } },
+  product: { $schema: "https://json-schema.org/draft/2020-12/schema", type: "object", additionalProperties: false, required: ["summary", "audience", "goal", "requiredCapabilities", "forbiddenCapabilities"], properties: { summary: { type: "string", minLength: 1, maxLength: 180 }, audience: { type: "string", minLength: 1, maxLength: 120 }, goal: { type: "string", minLength: 1, maxLength: 180 }, requiredCapabilities: { type: "array", maxItems: 6, uniqueItems: true, items: cap }, forbiddenCapabilities: { type: "array", maxItems: 6, uniqueItems: true, items: { type: "string", enum: ["filter", "form", "toggle", "stats", "toast", "external_script"] } } } },
+  architecture: { $schema: "https://json-schema.org/draft/2020-12/schema", type: "object", additionalProperties: false, required: ["summary", "kind", "components", "interactionPlan", "persistencePlan"], properties: { summary: { type: "string", minLength: 1, maxLength: 180 }, kind: { enum: ["dashboard", "tracker", "landing"] }, components: { type: "array", minItems: 1, maxItems: 8, uniqueItems: true, items: { enum: ["stats", "filters", "cards", "form", "actions"] } }, interactionPlan: { type: "array", minItems: 1, maxItems: 6, uniqueItems: true, items: { enum: ["set_filter", "toggle_item", "add_item", "show_toast"] } }, persistencePlan: { type: "string", minLength: 1, maxLength: 180 } } },
+  design: { $schema: "https://json-schema.org/draft/2020-12/schema", type: "object", additionalProperties: false, required: ["summary", "visualDirection", "layout", "interactionStates", "accessibilityNotes"], properties: { summary: { type: "string", minLength: 1, maxLength: 180 }, visualDirection: { type: "string", minLength: 1, maxLength: 180 }, layout: { enum: ["dashboard-grid", "tracker-list", "landing-sections"] }, interactionStates: { type: "array", minItems: 1, maxItems: 6, uniqueItems: true, items: { enum: ["default", "filtered", "completed", "form-valid", "form-error", "toast"] } }, accessibilityNotes: { type: "array", minItems: 1, maxItems: 4, uniqueItems: true, items: { type: "string", minLength: 1, maxLength: 120 } } } },
   engineering: { $schema: "https://json-schema.org/draft/2020-12/schema", type: "object", additionalProperties: false, required: ["spec", "summary"], properties: { spec: APP_SPEC_SCHEMA, summary: { type: "string", minLength: 1, maxLength: 180 } } },
 } as const;
 
@@ -75,7 +75,7 @@ function extract(raw: unknown, max: number) {
   assertBytes(value, max, "RESPONSE_TOO_LARGE"); return value;
 }
 function timeout<T>(promise: Promise<T>, ms: number): Promise<T> { return new Promise((resolve, reject) => { const timer = setTimeout(() => reject(new ModelOutputError("MODEL_TIMEOUT")), ms); promise.then((value) => { clearTimeout(timer); resolve(value); }, (error) => { clearTimeout(timer); reject(error); }); }); }
-function errorCode(error: unknown) { return error instanceof ModelOutputError ? error.code : "MODEL_ERROR"; }
+function errorCode(error: unknown) { if (error instanceof ModelOutputError) return error.code; if (error instanceof Error && /JSON Mode couldn't be met/i.test(error.message)) return "JSON_MODE_UNMET"; return "MODEL_ERROR"; }
 
 function abilityPresent(spec: AppSpec, ability: string) {
   if (ability === "filter") return spec.filters.length > 0 && spec.actions.some((a) => a.kind === "set_filter");
@@ -87,12 +87,13 @@ function abilityPresent(spec: AppSpec, ability: string) {
 }
 function checkCapabilities(spec: AppSpec, product: ReturnType<typeof parseProduct>) { for (const ability of product.requiredCapabilities) if (!abilityPresent(spec, ability)) throw new ModelOutputError("MISSING_REQUIRED_CAPABILITY", ability); for (const ability of product.forbiddenCapabilities) if (ability !== "external_script" && abilityPresent(spec, ability)) throw new ModelOutputError("FORBIDDEN_CAPABILITY", ability); }
 
-function stageSystem(role: StageRole, context: string) {
+function stageSystem(role: StageRole, context: string, schema: unknown) {
   const common = "只输出符合 JSON Schema 的 JSON，不要 Markdown、HTML、CSS、JavaScript、URL 或额外字段。使用用户的语言。";
-  if (role === "product") return `你是产品 Agent。提炼受众、目标、必须和禁止的交互能力。${common}`;
-  if (role === "architecture") return `你是架构 Agent。基于已验证产品简报规划 AppSpec 组件、交互与持久化。${common}\n上下文:${context}`;
-  if (role === "design") return `你是设计 Agent。基于已验证产品与架构产物定义布局、视觉和交互状态。${common}\n上下文:${context}`;
-  return `你是工程 Agent。基于全部已验证产物返回完整安全 AppSpec。所有 id 全局唯一，action target/value 必须存在；必须严格满足 Product required/forbidden capabilities。${common}\n上下文:${context}`;
+  const contract = `\n输出契约:${JSON.stringify(schema)}`;
+  if (role === "product") return `你是产品 Agent。提炼受众、目标、必须和禁止的交互能力。${common}${contract}`;
+  if (role === "architecture") return `你是架构 Agent。基于已验证产品简报规划 AppSpec 组件、交互与持久化。${common}${contract}\n上下文:${context}`;
+  if (role === "design") return `你是设计 Agent。基于已验证产品与架构产物定义布局、视觉和交互状态。${common}${contract}\n上下文:${context}`;
+  return `你是工程 Agent。基于全部已验证产物返回完整安全 AppSpec。所有 id 全局唯一，action target/value 必须存在；必须严格满足 Product required/forbidden capabilities。${common}${contract}\n上下文:${context}`;
 }
 
 export async function generateAppWithAgents(prompt: string, previous: AppSpec | undefined, runner: AiRunner | undefined, options: GenerationOptions = {}): Promise<GeneratedApp> {
@@ -106,7 +107,8 @@ export async function generateAppWithAgents(prompt: string, previous: AppSpec | 
     if (remaining <= 0) throw new ModelOutputError("MODEL_BUDGET_EXHAUSTED");
     await progress({ role, status: "RUNNING", attemptNo });
     const context = JSON.stringify({ ...artifacts, previous: previous ?? null, repair: repairReason ?? null });
-    const raw = await timeout(aiRunner.run(WORKERS_AI_MODEL, { messages: [{ role: "system", content: stageSystem(role, context) }, { role: "user", content: prompt }], max_tokens: maxTokens, temperature: role === "engineering" ? 0.25 : 0.2, response_format: { type: "json_schema", json_schema: schema } }), Math.min(configured, remaining));
+    const responseFormat = role === "engineering" ? { type: "json_schema", json_schema: schema } : { type: "json_object" };
+    const raw = await timeout(aiRunner.run(WORKERS_AI_MODEL, { messages: [{ role: "system", content: stageSystem(role, context, schema) }, { role: "user", content: prompt }], max_tokens: maxTokens, temperature: role === "engineering" ? 0.25 : 0.2, response_format: responseFormat }), Math.min(configured, remaining));
     if (now() - started >= MODEL_DEADLINE_MS) throw new ModelOutputError("MODEL_BUDGET_EXHAUSTED");
     const parsed = parser(extract(raw, role === "engineering" ? MAX_ENGINEERING_BYTES : MAX_STAGE_BYTES));
     return { parsed, durationMs: now() - stageStarted };
