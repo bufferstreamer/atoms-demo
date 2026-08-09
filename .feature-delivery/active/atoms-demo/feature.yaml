@@ -4,12 +4,12 @@ feature:
   title: Atoms AI App Builder Demo
   risk: high
   delivery_mode: full
-  status: IMPLEMENTING
+  status: ACCEPTANCE_FROZEN
   owner_repository: atoms-demo
   participating_repositories:
   - atoms-demo
   created_at: '2026-08-09T15:50:06+08:00'
-  updated_at: '2026-08-09T19:16:11+08:00'
+  updated_at: '2026-08-09T19:47:31+08:00'
 artifacts:
   context: .feature-delivery/active/atoms-demo/_context.md
   progress: .feature-delivery/active/atoms-demo/progress.md
@@ -48,7 +48,7 @@ freeze:
       .feature-delivery/active/atoms-demo/source/units.jsonl: 7d06581503d40f30f8d685be435fe003b421f2c5b20e7feff33a701ee5e1ca49
       .feature-delivery/active/atoms-demo/source/coverage.yaml: 2617e8be2c138f711221ed9555c57e8a64f22a7af777b2f5877c919b2897ad8d
       .feature-delivery/active/atoms-demo/source/review.md: 9308ae6cb0b121d18210462da8f3ce9d5d39aae4e5f592909035a2f31d8fde6f
-    at: '2026-08-09T19:15:53+08:00'
+    at: '2026-08-09T19:47:31+08:00'
     by: codex
   design:
     status: FROZEN
@@ -64,7 +64,7 @@ freeze:
       .feature-delivery/active/atoms-demo/source/review.md: 9308ae6cb0b121d18210462da8f3ce9d5d39aae4e5f592909035a2f31d8fde6f
       .feature-delivery/active/atoms-demo/design/technical-design.md: b236d46a7700f3c8fbf51cf2061a88f809ad551cd172fcfb7d349fba7e2129f1
       .feature-delivery/active/atoms-demo/implementation-plan.md: 62260e00980be96a28bb6386e6a15ecd06c12384fbb74a59ec9a06f4771c43a4
-    at: '2026-08-09T19:15:53+08:00'
+    at: '2026-08-09T19:47:31+08:00'
     by: codex
   acceptance:
     status: FROZEN
@@ -82,10 +82,10 @@ freeze:
       .feature-delivery/active/atoms-demo/implementation-plan.md: 62260e00980be96a28bb6386e6a15ecd06c12384fbb74a59ec9a06f4771c43a4
       .vibetest/atoms-demo/rules.md: 2c45f5501dc8a4ade0c4d4ae9c7512de85fd0e8f019aedd886ecd4edd8afdcce
       .vibetest/atoms-demo/cases.md: 75e7382528f5ca542747700b3bc3bf919109ae5a05df3cabc55da84fae1f6151
-      .vibetest/atoms-demo/evidence.md: dd115852dc9a0130a9cc7bd420dc1fdaf4af9c983e0f757979ce2e9345f9ccaa
-      .vibetest/atoms-demo/gaps.md: 82e8e769bf4cd86d44bf575f3c461e9e9f5e87b34f68a0b8b9217963af9e07a8
+      .vibetest/atoms-demo/evidence.md: 4e7f4fa9a83139bbd6e43d75a38c4e88f4f3635b7d27d61f3dd0078395be54ba
+      .vibetest/atoms-demo/gaps.md: 48a0e73e5527ccfa38cd42877279542c8babd97956d28e8175ae2317a6ac78be
       .feature-delivery/active/atoms-demo/agent-work-packet.md: ec47dd4b1f63b8a172ff9d9f2756ee92a9ca4ff2b01452a3cfb0fed300969a50
-    at: '2026-08-09T19:15:54+08:00'
+    at: '2026-08-09T19:47:31+08:00'
     by: codex
 baseline:
   status: FROZEN
