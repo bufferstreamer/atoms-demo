@@ -4,12 +4,12 @@ feature:
   title: Atoms AI App Builder Demo
   risk: high
   delivery_mode: full
-  status: ACCEPTANCE_FROZEN
+  status: IMPLEMENTING
   owner_repository: atoms-demo
   participating_repositories:
   - atoms-demo
   created_at: '2026-08-09T15:50:06+08:00'
-  updated_at: '2026-08-09T18:31:48+08:00'
+  updated_at: '2026-08-09T18:31:57+08:00'
 artifacts:
   context: .feature-delivery/active/atoms-demo/_context.md
   progress: .feature-delivery/active/atoms-demo/progress.md
@@ -88,9 +88,9 @@ freeze:
     at: '2026-08-09T18:31:48+08:00'
     by: codex
 baseline:
-  status: UNSET
-  commit: null
-  at: null
+  status: FROZEN
+  commit: 64f370720fa31399d3247761e04924325f0063ed
+  at: '2026-08-09T18:31:57+08:00'
 verification:
   status: NOT_RUN
   evidence: []
