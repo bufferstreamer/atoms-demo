@@ -59,3 +59,38 @@
 - 最终结论：`CONFIRMED`
 - 确认范围：55 秒模型预算与 65 秒 API E2E 预算、2 分钟 RUNNING 回收、BUILDING 刷新轮询、重复提交保护、timer 清理、composer 恢复，以及 READY workers_ai / READY deterministic fallback / FAILED no-event 三类终态语义。
 - 声明边界：只确认 CHG-004 可重新冻结；VT-017 仍需真实线上 `workers_ai/SUCCESS`。
+
+# CHG-005 Llama 3.1 8B Fast 模型切换独立设计复核
+
+- 日期：2026-08-09
+- Reviewer：`codex-independent-chg005-reviewer`
+- 结论：`REJECTED`
+
+## 已确认
+
+- Cloudflare 官方模型页确认 `@cf/meta/llama-3.1-8b-instruct-fast` 为 Cloudflare-hosted Fast 模型，输入参数使用 `max_tokens`；官方 JSON Mode 支持列表包含该精确模型 ID。
+- DESIGN-004、TASK-006 与 VT-017 已切换到同一模型 ID，55 秒模型预算、65 秒 API E2E、48 KiB、严格 envelope/AppSpec 校验、两阶段持久化、attempt token、fallback 与 2 分钟回收协议未被放宽。
+
+## 阻塞项
+
+### CHG5-DREV-001 — 官方事实引用不可独立稳定读取
+
+`reference/workers-ai-model-facts-2026-08-09.md` 的 Llama 链接仍使用 `https://developers.cloudflare.com/ai/models/@cf/meta/llama-3.1-8b-instruct-fast/`，本轮独立读取出现 redirect loop；Cloudflare 当前可直接读取的 canonical URL 为 `https://developers.cloudflare.com/workers-ai/models/llama-3.1-8b-instruct-fast/`。同时该快照仍声明“仅用于 CHG-003”、末尾仍写“两个模型/CHG-003”，`dependencies.md` 的 REF-009 仍只列 pricing/GLM/Kimi，未索引 Llama 与 JSON Mode。需统一为 CHG-003/005 可复核事实快照并修正依赖索引。
+
+### CHG5-DREV-002 — 冻结后变更影响追踪不完整
+
+CHG-005 的 change-log 影响栏没有 FR/NFR，traceability 只新增 NFR-003；但生产生成模型直接承接 FR-002/003/004/006 与 NFR-001/002/004/005，至少应明确这些需求“契约不变但实现依赖模型替换并需回归”，并追踪到 TASK-006、VT-017/018/019/020 及既有业务回归用例。否则模型切换未满足冻结后变更的受影响需求登记要求。
+
+## 结论边界
+
+在 CHG5-DREV-001/002 关闭前，CHG-005 不能重新冻结。本结论不评价业务代码实现，也不代表 Llama 已在线成功生成。
+
+# CHG-005 Llama 3.1 8B Fast 模型切换独立设计复核（第二轮）
+
+- 日期：2026-08-09
+- Reviewer：`codex-independent-chg005-reviewer`
+- 结论：`CONFIRMED`
+- 关闭项：`CHG5-DREV-001`、`CHG5-DREV-002`
+- 复核依据：模型事实快照已使用 Cloudflare canonical Llama URL，并统一 CHG-003/005、GLM/Llama/Kimi 与 JSON Mode 口径；REF-009 同步索引完整。CHG-005 的 change-log 与 traceability 已覆盖 FR-002/003/004/006、NFR-001/002/003/004/005，关联 DESIGN-004、TASK-006、VT-016~020 及 VT-002/003/005 回归。
+- 设计边界：仅替换生产模型与模型专属参数；55/65 秒预算、严格 envelope/AppSpec 校验、两阶段 run reservation、D1 原子审计、attempt token、超时回收、UI 状态与透明 fallback 均保持不变。
+- 声明边界：CHG-005 设计变更可以重新冻结；本结论不代表业务代码已完成，也不代表 Llama 已在线成功生成。

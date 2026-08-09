@@ -12,4 +12,4 @@
 | REF-006 | 上游 | 官方帮助原始结构化快照 | `reference/raw-official-help-snapshot.md` | 2026-08-09 | 独立复核官方事实 | VERIFIED |
 | REF-007 | 上游 | Atoms 公开 UI 原始结构化快照 | `reference/raw-atoms-public-ui.md` | 2026-08-09 | 独立复核公开 UI | VERIFIED_WITH_LOGIN_LIMIT |
 | REF-008 | 本仓 | 真实配置与代码 | `.openai/hosting.json`、`package.json`、`app/page.tsx`、`db/schema.ts` | 当前 | 独立复核技术现状 | VERIFIED |
-| REF-009 | 下游 | Cloudflare Workers AI | `reference/workers-ai-model-facts-2026-08-09.md`（含 pricing/GLM/Kimi 官方受控 URL） | 2026-08-09 | 真实模型生成 AppSpec 与四角色摘要；模型选择与免费额度 | VERIFIED_WITH_DAILY_QUOTA |
+| REF-009 | 下游 | Cloudflare Workers AI | `reference/workers-ai-model-facts-2026-08-09.md`（含 pricing、GLM、Llama Fast、JSON Mode、Kimi 官方受控 URL） | 2026-08-09 | 真实模型生成 AppSpec 与四角色摘要；模型选择、结构化输出与免费额度 | VERIFIED_WITH_DAILY_QUOTA |

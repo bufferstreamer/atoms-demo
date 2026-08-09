@@ -16,7 +16,7 @@
 flowchart LR
   UI["Workspace UI"] --> API["Project API v1"]
   API --> ORCH["Agent Orchestrator"]
-  ORCH --> AI["Workers AI / GLM-4.7-Flash"]
+  ORCH --> AI["Workers AI / Llama 3.1 8B Fast"]
   AI --> VALIDATE["AppSpec Validator"]
   AI -. "timeout / invalid / unavailable" .-> GEN["Deterministic Fallback"]
   API --> DB[("D1")]
@@ -27,14 +27,14 @@ flowchart LR
 
 ### 2.1 模型生成契约（DESIGN-004）
 
-- 生产模型固定为 Cloudflare Workers AI `@cf/zai-org/glm-4.7-flash`，通过 Worker `AI` binding 调用；不保存外部 API Key。
+- 生产模型固定为 Cloudflare Workers AI `@cf/meta/llama-3.1-8b-instruct-fast`，通过 Worker `AI` binding 调用；不保存外部 API Key。该选择来自 GLM 在四个线上 Worker version 的 25/25/25/55 秒超时证据，以及 Cloudflare 官方对 Fast 版本和 JSON Mode 支持的声明；切模不扩大现有等待预算。
 - 一次调用输出严格 envelope `{ spec, summary, steps }`，顶层和子对象均拒绝额外字段。`summary` 为去控制字符后的 1..160 字符；`steps` 长度必须为 4，按顺序且不重复地包含 `product`、`architecture`、`design`、`engineering`，每项只允许 `{ role, summary }`，摘要为 1..180 字符；服务端补固定角色显示名与 `COMPLETED` 状态，不允许模型控制身份或状态。不得再使用固定摘要冒充模型产出。
 - 服务端只接受 AppSpec v1 白名单 JSON。模型输出先验证完整 envelope，再执行与规则生成相同的 `validateAppSpec`；未知/额外字段、错误类型、悬空引用、越界数组、非法枚举、超长摘要或错误角色顺序均不进入 D1 version。
-- 请求设置 `max_completion_tokens=2200` 和 55 秒模型调用超时；该预算来自 25 秒在三个独立线上 Worker version 均超时的实测，并为 envelope 校验、D1 completion batch/回查与网络响应预留 10 秒，完整 API E2E 预算为 65 秒。提取后的文本响应 UTF-8 最大 48 KiB。binding 缺失、平台错误、超时、空响应、响应过大、JSON 解析失败或 envelope/AppSpec 校验失败时，只记录枚举失败码并尝试确定性生成；若确定性生成也不支持该修改，则返回既有 422 且不移动当前版本。日志不记录 prompt、模型原文或异常堆栈中的外部响应。
+- 请求设置 `max_tokens=2200`、`response_format={type:"json_object"}` 和 55 秒模型调用超时；为 envelope 校验、D1 completion batch/回查与网络响应预留 10 秒，完整 API E2E 预算为 65 秒。提取后的文本响应 UTF-8 最大 48 KiB。binding 缺失、平台错误、超时、空响应、响应过大、JSON 解析失败或 envelope/AppSpec 校验失败时，只记录枚举失败码并尝试确定性生成；若确定性生成也不支持该修改，则返回既有 422 且不移动当前版本。日志不记录 prompt、模型原文或异常堆栈中的外部响应。
 - UI 在请求期间持续显示 BUILDING、保留 composer 输入并禁用提交。页面刷新或并发重放读到 BUILDING 项目时，不新建 requestId、不再调用生成 API，而是每 1.5 秒读取同一 project。READY 后停止轮询并根据成功 event 展示 `workers_ai/SUCCESS` 或 `deterministic/FALLBACK/<failureCode>`；FAILED 后停止轮询，展示 run/request error_code 与重试入口，不得伪造 generation 来源，因为模型与 fallback 都失败时没有成功 event/version/assistant message。轮询读取失败保留画面并允许下次轮询恢复；组件卸载必须清理 timer。
 - 每次成功写入的 run 必须在 `generation_events(run_id, source, model, outcome, failure_code, duration_ms, created_at)` 留下唯一来源审计。event 与 project/run/version/messages/steps/current pointer 位于同一 D1 batch；event 插入失败则整批失败，不能出现已发布 version 无来源或来源成功但 version 不存在。`source` 仅为 `workers_ai` 或 `deterministic`；前端展示最近一次生成来源，线上验收必须证明至少一次 `workers_ai/SUCCESS`，不能用降级结果冒充模型已接通。
 - 初版继续生成把当前 AppSpec 连同用户修改请求传给模型；模型必须返回完整新 AppSpec，版本仍遵守 parent/base/current 的既有乐观并发契约。
-- 模型名称集中配置，后续升级 Kimi 只替换适配层和重新验收，不改变 AppSpec/Renderer/D1 项目契约。
+- 模型名称和参数集中配置，后续升级只替换适配层并重新验收，不改变 AppSpec/Renderer/D1 项目契约。
 
 模型调用采用两阶段受控协议。阶段一先做 requestId 幂等查询，再做 owner/global 限流、项目容量、owner/base/current 和同项目 RUNNING 检查；任何拒绝都发生在 AI 调用前。通过后生成不可猜测的 `attempt_token`，以一个 D1 batch 预占：首次创建写 workspace_request、BUILDING project、RUNNING run（含 token）、PENDING steps 和 user message；继续生成写 RUNNING run（含 token）、PENDING steps、user message 并把既有 project 标为 BUILDING。唯一索引保证相同项目只有一个 RUNNING，workspace ledger 保证相同 owner+requestId 只有一个预占成功；冲突方回读既有状态且 AI 调用次数为 0。
 

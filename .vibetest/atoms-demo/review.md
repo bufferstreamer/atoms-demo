@@ -42,3 +42,38 @@
 - 结论：`CONFIRMED`
 - 新增门禁：R18、VT-020；VT-017/018 增加 55 秒模型与 65 秒 API 双预算证据。
 - 完成边界：线上 artifact 必须关联同次 requestId/runId/event、部署 commit/version/bindings，并提供真实浏览器长等待证据。
+
+# CHG-005 Llama 3.1 8B Fast 验收基线独立复核
+
+- 日期：2026-08-09
+- Reviewer：`codex-independent-chg005-reviewer`
+- 结论：`REJECTED`
+
+## 已确认
+
+- VT-017 已要求同次 requestId 对应 `workers_ai/@cf/meta/llama-3.1-8b-instruct-fast/SUCCESS/null`，并保留 55/65 双预算、D1 duration 对照、部署 commit/version/bindings 与固定线上 artifact。
+- VT-020 的 AI READY 展示已切换为 Llama；VT-018/019 的非法输出、降级、原子写入和版本兼容协议未被削弱。
+
+## 阻塞项
+
+### CHG5-AREV-001 — 缺少模型调用请求契约回归
+
+当前 VT-017 只能在线证明最终成功，VT-018 只锁定 55,000ms timeout，没有固定验证实际 `AiBinding.run` 收到：精确模型 ID `@cf/meta/llama-3.1-8b-instruct-fast`、`max_tokens: 2200`、`response_format: { type: "json_object" }`，以及不再携带 GLM 专属/遗留参数。应在 fake binding/spy 中逐字段断言调用参数，并覆盖 JSON Mode 平台拒绝时映射到枚举失败码和透明 fallback。
+
+### CHG5-AREV-002 — 最高风险 gap 仍指向旧变更
+
+GAP-004 仍写“CHG-003 尚未实现”且没有锁定 CHG-005 的 Llama 模型与 `chg005-online-model-2026-08-09.md`。应更新为当前最高风险门禁：只有同一部署、同一 requestId/runId 的 Llama `workers_ai/SUCCESS` 且满足 55/65 秒预算，才能关闭；GLM 或任意历史成功 event 不得关闭该 gap。
+
+## 结论边界
+
+在 CHG5-AREV-001/002 关闭前，CHG-005 验收基线不可重新冻结；所有新增/修改用例继续保持 pending，不能声明模型接入完成。
+
+# CHG-005 Llama 3.1 8B Fast 验收基线独立复核（第二轮）
+
+- 日期：2026-08-09
+- Reviewer：`codex-independent-chg005-reviewer`
+- 结论：`CONFIRMED`
+- 关闭项：`CHG5-AREV-001`、`CHG5-AREV-002`
+- 参数契约：VT-018 已通过 fake binding/spy 固定精确模型 ID、`max_tokens: 2200`、`response_format: { type: "json_object" }`，并断言不存在 `max_completion_tokens`、`reasoning_effort` 等遗留参数；JSON Mode 平台拒绝映射为 `MODEL_ERROR` 并透明 fallback。
+- 线上门禁：GAP-004 已锁定 CHG-005，只接受同一部署、同一 requestId/runId 的 Llama `workers_ai/SUCCESS`、模型 `<55s`、API `<65s` 与 `artifacts/chg005-online-model-2026-08-09.md`；GLM 或历史 event 无效。
+- 声明边界：CHG-005 验收基线可以重新冻结；VT-016~020 与相关回归继续保持 pending，在线证据完成前不得声明真实模型已接通。
