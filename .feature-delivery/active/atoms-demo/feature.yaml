@@ -4,12 +4,12 @@ feature:
   title: Atoms AI App Builder Demo
   risk: high
   delivery_mode: full
-  status: IMPLEMENTING
+  status: RELEASED
   owner_repository: atoms-demo
   participating_repositories:
   - atoms-demo
   created_at: '2026-08-09T15:50:06+08:00'
-  updated_at: '2026-08-09T17:03:03+08:00'
+  updated_at: '2026-08-09T17:11:22+08:00'
 artifacts:
   context: .feature-delivery/active/atoms-demo/_context.md
   progress: .feature-delivery/active/atoms-demo/progress.md
@@ -92,11 +92,15 @@ baseline:
   commit: 2abed873f26565b8dd5939291590181f8c99c9df
   at: '2026-08-09T17:03:03+08:00'
 verification:
-  status: NOT_RUN
-  evidence: []
-  open_gaps: []
+  status: PASS
+  evidence:
+  - .vibetest/atoms-demo/artifacts/verification-2026-08-09.md
+  open_gaps:
+  - ONLINE_BROWSER_BLOCKED_BY_ENTERPRISE_GATE
+  - HARDENING_FAULT_AND_CONCURRENCY_CASES
+  at: '2026-08-09T17:11:21+08:00'
 release:
-  status: NOT_STARTED
-  deployment: null
-  rollback: null
-  at: null
+  status: RELEASED
+  deployment: appgdep_6a7842c73bc88191a2bce106c7044842
+  rollback: sites-access-custom-then-fix-forward
+  at: '2026-08-09T17:11:22+08:00'
