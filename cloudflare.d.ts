@@ -11,7 +11,8 @@ interface D1Database {
   batch<T = unknown>(statements: D1PreparedStatement[]): Promise<D1Result<T>[]>;
 }
 interface Fetcher { fetch(request: Request): Promise<Response>; }
+interface AiBinding { run(model: string, input: Record<string, unknown>): Promise<unknown>; }
 
 declare module "cloudflare:workers" {
-  export const env: { DB: D1Database; [key: string]: unknown };
+  export const env: { DB: D1Database; AI?: AiBinding; [key: string]: unknown };
 }

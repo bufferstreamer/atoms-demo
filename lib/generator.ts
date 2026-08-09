@@ -163,24 +163,54 @@ export function generateAppSpec(prompt: string, previous?: AppSpec): { spec: App
 }
 
 export function validateAppSpec(spec: AppSpec) {
-  if (spec.schemaVersion !== 1) throw new InputError("APP_SPEC_INVALID", "不支持的应用规格版本。", 422);
-  if (!spec.title || spec.title.length > 60 || spec.cards.length < 1 || spec.cards.length > 12) {
+  if (!spec || typeof spec !== "object" || spec.schemaVersion !== 1) throw new InputError("APP_SPEC_INVALID", "不支持的应用规格版本。", 422);
+  if (!["dashboard", "tracker", "landing"].includes(spec.kind) || typeof spec.title !== "string" || !spec.title || spec.title.length > 60 || typeof spec.subtitle !== "string" || spec.subtitle.length > 140) {
     throw new InputError("APP_SPEC_INVALID", "生成规格超出安全限制。", 422);
+  }
+  if (!spec.theme || !["violet", "coral", "mint", "blue"].includes(spec.theme.accent) || !["comfortable", "compact"].includes(spec.theme.density)) throw new InputError("APP_SPEC_INVALID", "主题规格无效。", 422);
+  if (!Array.isArray(spec.stats) || spec.stats.length > 4 || !Array.isArray(spec.filters) || spec.filters.length > 2 || !Array.isArray(spec.cards) || spec.cards.length < 1 || spec.cards.length > 12 || !Array.isArray(spec.actions) || spec.actions.length < 1 || spec.actions.length > 8) {
+    throw new InputError("APP_SPEC_INVALID", "生成规格超出安全限制。", 422);
+  }
+  const ids = new Set<string>();
+  const register = (id: unknown) => {
+    if (typeof id !== "string" || !id || id.length > 60 || ids.has(id)) throw new InputError("APP_SPEC_INVALID", "应用元素 ID 无效或重复。", 422);
+    ids.add(id);
+  };
+  for (const stat of spec.stats) {
+    register(stat?.id);
+    if (typeof stat.label !== "string" || typeof stat.value !== "string" || (stat.delta !== undefined && typeof stat.delta !== "string")) throw new InputError("APP_SPEC_INVALID", "统计卡规格无效。", 422);
   }
   const filterIds = new Set(spec.filters.map((f) => f.id));
   const cardIds = new Set(spec.cards.map((c) => c.id));
   for (const filter of spec.filters) {
-    if (!filter.options.includes(filter.defaultValue) || (filter.allValue && !filter.options.includes(filter.allValue))) {
+    register(filter?.id);
+    if (typeof filter.label !== "string" || !Array.isArray(filter.options) || filter.options.length < 1 || filter.options.length > 6 || filter.options.some((option) => typeof option !== "string") || typeof filter.defaultValue !== "string" || !filter.options.includes(filter.defaultValue) || (filter.allValue !== undefined && (typeof filter.allValue !== "string" || !filter.options.includes(filter.allValue)))) {
       throw new InputError("APP_SPEC_INVALID", "筛选默认值无效。", 422);
     }
   }
+  for (const card of spec.cards) {
+    register(card?.id);
+    if (typeof card.title !== "string" || typeof card.description !== "string" || typeof card.tag !== "string" || (card.done !== undefined && typeof card.done !== "boolean") || (card.filterValues !== undefined && (!card.filterValues || typeof card.filterValues !== "object" || Array.isArray(card.filterValues)))) throw new InputError("APP_SPEC_INVALID", "卡片规格无效。", 422);
+  }
+  if (spec.form) {
+    register(spec.form.id);
+    if (typeof spec.form.title !== "string" || typeof spec.form.submitLabel !== "string" || !Array.isArray(spec.form.fields) || spec.form.fields.length < 1 || spec.form.fields.length > 4) throw new InputError("APP_SPEC_INVALID", "表单规格无效。", 422);
+    for (const field of spec.form.fields) {
+      register(field?.id);
+      if (typeof field.label !== "string" || typeof field.placeholder !== "string" || typeof field.required !== "boolean") throw new InputError("APP_SPEC_INVALID", "表单字段无效。", 422);
+    }
+  }
   for (const action of spec.actions) {
+    register(action?.id);
+    if (typeof action.label !== "string") throw new InputError("APP_SPEC_INVALID", "动作规格无效。", 422);
     if (action.kind === "set_filter") {
       const filter = spec.filters.find((f) => f.id === action.targetId);
       if (!filter || !filter.options.includes(action.value)) throw new InputError("APP_SPEC_INVALID", "筛选动作无效。", 422);
     }
     if (action.kind === "toggle_item" && !cardIds.has(action.targetId)) throw new InputError("APP_SPEC_INVALID", "卡片动作无效。", 422);
     if (action.kind === "add_item" && spec.form?.id !== action.targetId) throw new InputError("APP_SPEC_INVALID", "表单动作无效。", 422);
+    if (action.kind === "show_toast" && typeof action.message !== "string") throw new InputError("APP_SPEC_INVALID", "提示动作无效。", 422);
+    if (!["set_filter", "toggle_item", "add_item", "show_toast"].includes(action.kind)) throw new InputError("APP_SPEC_INVALID", "动作类型无效。", 422);
   }
   for (const card of spec.cards) {
     for (const filterId of Object.keys(card.filterValues ?? {})) {

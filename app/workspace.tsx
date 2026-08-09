@@ -108,7 +108,7 @@ export function Workspace() {
           ))}
           {!loading && workspace.projects.length === 0 && <p className="no-project">你的第一个想法，会出现在这里。</p>}
         </div>
-        <div className="sidebar-foot"><span className="status-dot" /> D1 持久化已启用</div>
+        <div className="sidebar-foot"><span className="status-dot" /> Workers AI + D1 已启用</div>
       </aside>
 
       <section className="conversation">
@@ -132,7 +132,7 @@ export function Workspace() {
             <div className="thread">
               <div className="user-message"><span>你</span><p>{activeProject.messages.filter((item) => item.role === "user").at(-1)?.content}</p></div>
               <div className="run-card">
-                <div className="run-head"><span className="spark">✦</span><div><strong>{building ? "Agent 团队正在构建" : "构建完成"}</strong><small>{building ? "正在回放已保存的执行步骤" : "所有结果已保存为可恢复版本"}</small></div><em>{building ? `${Math.min(visibleSteps, 4)}/4` : "READY"}</em></div>
+                <div className="run-head"><span className="spark">✦</span><div><strong>{building ? "Agent 团队正在构建" : "构建完成"}</strong><small>{building ? "正在回放已保存的执行步骤" : activeProject.generation?.source === "workers_ai" ? `真实模型生成 · ${activeProject.generation.durationMs}ms` : "规则引擎安全降级 · 结果已保存"}</small></div><em>{building ? `${Math.min(visibleSteps, 4)}/4` : activeProject.generation?.source === "workers_ai" ? "AI · GLM" : "FALLBACK"}</em></div>
                 <div className="agent-steps">
                   {activeProject.steps.map((step, index) => {
                     const shown = index < visibleSteps;
@@ -144,7 +144,7 @@ export function Workspace() {
                   })}
                 </div>
               </div>
-              {!building && <div className="assistant-note"><span>✦</span><p>{activeProject.messages.filter((item) => item.role === "assistant").at(-1)?.content}<br /><small>可以继续告诉我：换个配色、改为紧凑布局、增加统计卡或表单。</small></p></div>}
+              {!building && <div className="assistant-note"><span>✦</span><p>{activeProject.messages.filter((item) => item.role === "assistant").at(-1)?.content}<br /><small>{activeProject.generation?.source === "workers_ai" ? "本版本由 Cloudflare Workers AI 生成并通过 AppSpec 安全校验。" : "模型不可用时已使用规则引擎安全降级。"} 可以继续提出任意具体修改。</small></p></div>}
             </div>
           )}
         </div>

@@ -10,7 +10,7 @@
     "build": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext build",
     "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
     "deploy:cloudflare": "pnpm build && wrangler deploy --config wrangler.deploy.jsonc",
-    "test": "vinext build && node --import tsx --test tests/generator.test.ts",
+    "test": "vinext build && node --import tsx --test tests/*.test.ts",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate"
   },

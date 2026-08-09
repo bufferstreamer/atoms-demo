@@ -68,6 +68,13 @@ export type ProjectSnapshot = {
   updatedAt: string;
   messages: Array<{ id: string; role: string; content: string; createdAt: string }>;
   steps: AgentStep[];
+  generation: {
+    source: "workers_ai" | "deterministic";
+    model: string;
+    outcome: "SUCCESS" | "FALLBACK";
+    failureCode: string | null;
+    durationMs: number;
+  } | null;
   versions: VersionSnapshot[];
 };
 
