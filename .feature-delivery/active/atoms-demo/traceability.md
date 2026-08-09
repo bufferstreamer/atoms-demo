@@ -16,6 +16,12 @@
 | NFR-006 | SRC-001 | PRD 1/7 | DEC-008 | DESIGN-001 | TASK-005 | VT-009 | pending | FROZEN_PENDING |
 | NFR-007 | SRC-006 | PRD 4/7 | DEC-002, DEC-008 | DESIGN-002 | TASK-005 | VT-002, VT-005 | pending | FROZEN_PENDING |
 
+## CHG-003 模型接入追踪
+
+| Requirement | 变更来源 | 设计 | TASK | VibeTest Case | Evidence | 状态 |
+| --- | --- | --- | --- | --- | --- | --- |
+| FR-002/003/004/006, NFR-001/002/004/005 | 用户明确批准接入真实模型；原始挑战已要求智能体驱动 | DESIGN-004 | TASK-006 | VT-016/017/018/019，并回归 VT-002/003/005/006/009 | pending | CHANGE_PENDING_FREEZE |
+
 ## 安全决策追踪
 
 | Decision | 权威输入 | 设计落点 | 验证 |

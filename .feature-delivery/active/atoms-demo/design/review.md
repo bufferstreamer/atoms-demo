@@ -43,3 +43,11 @@
 ## 结论
 
 `CONFIRMED` — DREV-001~005、DREV2-001~003、DREV3-001~002、DREV4-001~002 均已关闭。当前技术方案在真实交互、D1 持久化、Agent 驱动生成、继续修改/版本、匿名 owner 隔离、幂等并发、失败恢复、容量保护和任务验收追踪方面已达到高风险设计冻结要求，可以进入 `DESIGN_FROZEN` 门禁。本结论只确认设计基线，不代表代码实现、验收或发布完成；本轮未执行 freeze 命令。
+# CHG-003 Workers AI 接入独立复核
+
+- 日期：2026-08-09
+- Reviewer：`codex-independent-source-reviewer`
+- 轮次：5
+- 最终结论：`CONFIRMED`
+- 确认范围：官方模型与免费额度事实快照、严格 generation envelope、两阶段 request/run reservation、AI 前幂等/限流/容量/RUNNING 锁、attempt token 完成与迟到守卫、generation event 原子一致性、completion/failure/超时收敛、首版旧库升级、线上 requestId→runId→event 证据链。
+- 声明边界：只确认 CHG-003 设计与验收基线可重新冻结，不代表代码已实现或线上模型已接通。

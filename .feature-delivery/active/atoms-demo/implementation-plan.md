@@ -12,6 +12,7 @@
 | --- | --- | --- | --- | --- |
 | D1 | Sites | 本地 D1 | schema 可迁移 | 托管绑定成功 |
 | Hosting | Sites | localhost | 构建通过 | 在线发布成功 |
+| Workers AI | Cloudflare | fake AI runner + deterministic fallback | `AI` binding 可调用 GLM-4.7-Flash | 线上出现 `workers_ai/SUCCESS` 审计证据 |
 
 ## 3. 实施任务
 
@@ -22,6 +23,7 @@
 | TASK-003 | generator | FR-002/003/004, DEC-002/007/009, DESIGN-001/002 | 四阶段规则编排、AppSpec 校验、幂等/并发/超时 run 恢复 | TASK-002 | 不同输入生成不同可交互预览，失败不覆盖 | VT-002/003/006/012/014 | `PENDING` |
 | TASK-004 | iteration | FR-006, DEC-003/007/008, DESIGN-002/003 | 修改白名单、base/parent、版本激活、乐观并发 | TASK-003 | 新旧版本均可用，负向路径不改指针 | VT-005/015 | `PENDING` |
 | TASK-005 | release | NFR-001/005/006/007, DESIGN-001/003 | 构建、迁移重复执行、在线发布和证据归档 | TASK-001~004 | 在线主流程与关键负向路径通过 | VT-001~015 | `PENDING` |
+| TASK-006 | model gateway + db/API/UI | FR-002/003/004/006, NFR-001/002/004/005, DESIGN-004 | Workers AI binding、严格 envelope、真实四角色摘要、与版本原子写入的来源审计、超时/超大/非法输出降级、UI 来源标识 | TASK-002/003 | 线上至少一次由 GLM 成功生成并持久化；失败不写非法版本且可明确降级；已有 D1 升级后旧项目可读 | VT-016/017/018/019 | `PENDING` |
 
 ## 4. 开发与联调顺序
 

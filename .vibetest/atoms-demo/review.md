@@ -28,3 +28,10 @@
 ## 结论
 
 `CONFIRMED` — AREV-001~004、AREV2-001~002、AREV3-001 均已关闭。当前 Rules、Cases、执行工具协议、Evidence 状态、Gaps、TASK/NFR 映射与在线外部前置形成完整的高风险验收基线，可以进入 `ACCEPTANCE_FROZEN` 门禁。本结论只确认验收基线可执行且可判定，不代表任何用例已运行或功能已通过；本轮未执行 freeze 命令。
+# CHG-003 验收基线独立复核
+
+- 日期：2026-08-09
+- Reviewer：`codex-independent-source-reviewer`
+- 结论：`CONFIRMED`
+- 新增门禁：R15-R17、VT-017-VT-019，并将模型表/旧数据升级接入 VT-016。
+- 最高风险开放项：GAP-004。没有同一部署 commit、Worker version、AI/DB binding、requestId→runId→`workers_ai/SUCCESS` event 的在线证据，不得声明模型已接通。

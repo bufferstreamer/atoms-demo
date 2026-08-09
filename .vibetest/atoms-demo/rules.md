@@ -25,3 +25,6 @@
 | R12 生成幂等、同项目串行、超时 run 可恢复 | D1 一致性 | API/单测 | pending |
 | R13 版本不可变且负向修改不移动指针 | 迭代稳定性 | API/单测 | pending |
 | R14 类型、生产构建与幂等迁移通过 | 基本工程质量 | TypeScript + build + 本地 D1 | pending |
+| R15 生产生成由真实模型完成且来源可审计 | 避免规则模板冒充智能体 | fake binding 单测 + Cloudflare AI/D1/在线 API | pending |
+| R16 模型错误、超时和非法 JSON 安全降级 | 外部模型不稳定且输出不可信 | 单测 + 在线/本地 API | pending |
+| R17 模型输出仍受 AppSpec 白名单约束 | 防止执行任意代码或写入非法版本 | 表驱动单测 + D1 回查 | pending |

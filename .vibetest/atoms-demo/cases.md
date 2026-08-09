@@ -15,9 +15,12 @@
 | VT-011 | 稳定性/容量 | 滥用与输入边界 | 提交超长/控制字符；同 owner 跨两客户端快速生成 7 次；不同 Cookie 合计触发全局测试阈值；创建到 owner/global 项目上限 | 分别 400/429/409或503；窗口恢复后可用；不淘汰已有数据 | pending |
 | VT-012 | 完成度 | 预览恢复 | 向渲染器传未知 schema、悬空 action、set_filter 非法 value、allValue 不在 options 或越界 AppSpec | 服务端拒绝写入；客户端保留上一预览并显示恢复操作 | pending |
 | VT-013 | 稳定性 | 读取失败 | 模拟 workspace/project GET 500 后重试 | 当前画面和输入不清空；错误明确；重试成功恢复 | pending |
-| VT-014 | 工程质量 | 幂等、并发与中断 | 首次建项目分别在 workspace_request 为 RUNNING/COMPLETED/FAILED 时重放同一 owner+requestId；已有项目重放 requestId；并发生成与版本激活；把 RUNNING 回收后模拟迟到完成 | RUNNING 返回202同一项目、COMPLETED返回同一快照、FAILED返回同一错误且均不新建；已有项目只一版；生成期间激活409；迟到 batch 不插 version/不移动指针 | pending |
+| VT-014 | 工程质量 | 幂等、并发与中断 | 首次建项目分别在 workspace_request 为 RUNNING/COMPLETED/FAILED 时重放同一 owner+requestId；两个请求并发相同 requestId；已有项目重放 requestId；并发生成与版本激活；把 RUNNING 回收后模拟迟到完成 | RUNNING 返回202同一项目、COMPLETED返回同一快照、FAILED返回同一错误且均不新建；相同 requestId 只有一个 reservation 且 AI runner 只调用一次；已有项目只一版；生成期间激活409且 AI 调用为0；超时后 run/request/steps 失败、token 清空、project 有版本回 READY/无版本为 FAILED；迟到 batch 不插 version/event、不移动指针 | pending |
 | VT-015 | 稳定性 | 修改负向路径 | 提交不支持修改、过期 base、错误 versionId 与并发激活 | 返回 422/409/404；不写新版本、不改 current，历史 JSON 不变 | pending |
-| VT-016 | 工程质量 | 构建、类型与迁移 | 执行类型检查、生产构建；对空本地 D1 连续执行 schema 初始化两次并查询表/索引 | 全部退出 0；第二次初始化无错误且 schema 与预期一致 | pending |
+| VT-016 | 工程质量 | 构建、类型与迁移 | 执行类型检查、生产构建；对空本地 D1 连续执行 schema 初始化两次；再用包含首版 project/run/version 的旧库执行升级并读取旧项目 | 全部退出 0；第二次初始化无错误；新增 `generation_events` 后旧项目/版本仍可读且旧 run 可无 event | pending |
+| VT-017 | 创新性/完成度 | 真实模型生成 | 注入成功的 AI binding，随后在线提交一个未命中旧模板的具体需求并查询项目快照与 D1 审计 | AppSpec 和四角色摘要来自模型响应；`generation_events` 为 `workers_ai/SUCCESS`；刷新后恢复 | pending |
+| VT-018 | 稳定性 | 模型失败安全降级 | 分别注入 binding 缺失、抛错、超时、空响应、超过 48 KiB、非法 JSON、额外字段、错误类型、超长摘要、错误/重复角色、非法 AppSpec，以及 event/completion/failure batch 异常 | 可降级场景由确定性生成器完成并审计 `deterministic/FALLBACK`；completion 失败时不产生 version/event/current/assistant 成功消息，预占 run/request/steps 进入 FAILED、token 清空、project 恢复 READY 或 FAILED，阶段一 user message 保留；失败码不含 prompt/原始响应 | pending |
+| VT-019 | 安全性/兼容性 | 结构化输出与版本迭代 | 模型基于当前版本生成修改版；再返回悬空 action/越界数组 | 合法修改创建 parent version；非法输出不直接入库而走受校验的降级；旧版本 JSON 不变且 UI 只渲染白名单 | pending |
 
 ## 可重复执行协议
 
@@ -29,6 +32,9 @@
 - VT-011：服务层的 limiter 接收只在测试构造中可覆盖的 `LimitConfig`；本地集成将 owner/global generate 设为 2/3、owner/global projects 设为 2/3，在两个 Cookie 会话中逐次提交并回查 `rate_limits(bucket_key,window_start,action,count)` 与项目数量。生产代码使用冻结默认值 6/120、20/5000，且无 HTTP 参数可覆盖。测试使用临时 D1，结束后删除整个临时目录。
 - VT-012：直接对 `validateAppSpec` 表驱动测试未知 schema、悬空 target、非法 value、非法 allValue、重复 ID 与数组越界；再用临时 D1 走一次 generate service，回查 version 数量与 current pointer 不变。浏览器只验证可读错误和上一预览保留。
 - VT-013：客户端 API 层接受测试 fetch adapter。组件测试让第一次 workspace GET 返回固定 500、第二次返回已保存 snapshot，断言输入 DOM value、预览标题与 project id 在失败期间不变且重试恢复；不通过公开查询参数触发。
-- VT-014：临时 D1 预置 workspace_requests 三种状态并逐一重放；并发测试用 Promise 同时提交两个 requestId；超时测试把 run.updated_at 回拨 3 分钟后 GET project，再模拟原 run 的 guarded completion batch。最终 SQL 回查 project/run/request/step/version 五张表。每例独立数据库，结束删除临时目录。
+- VT-014：临时 D1 预置 workspace_requests 三种状态并逐一重放。并发幂等测试使用同一 owner + 同一 requestId，两次 Promise 在 fake AI runner 的 barrier 前同时提交；runner 维护调用 counter，释放 barrier 后断言 counter=1、`workspace_requests(owner_key,request_id)` 仅一行、仅一个 run/version/event，rate bucket 只按一次预占计数。另用两个不同 requestId 测 PROJECT_BUSY。超时测试把 run.updated_at 回拨 3 分钟后 GET project，再模拟原 attempt token 的 guarded completion batch；分别覆盖已有 current version 和首次无版本，最终 SQL 回查 project.status、run/request/step status/error、attempt_token、version/event 数量与 current pointer。每例独立数据库，结束删除临时目录。
 - VT-015：先保存所有 versions 的 `app_spec_json` 和 current pointer，再依次执行四类负向请求，最后逐字对比 JSON、版本计数与指针。
-- VT-016：schema 初始化函数必须使用 `CREATE ... IF NOT EXISTS`/幂等索引；在同一空本地 D1 连续调用两次后查询 `sqlite_master`。随后运行 TypeScript no-emit 与 production build。临时数据库目录在证据收集后删除。
+- VT-016：schema 初始化函数必须使用 `CREATE ... IF NOT EXISTS`/幂等索引；在同一空本地 D1 连续调用两次后查询 `sqlite_master`。另建首版 schema 和一组 project/run/version fixture，执行新版初始化后通过真实读取函数恢复旧项目，断言旧 run 缺 event 不影响读取。随后运行 TypeScript no-emit 与 production build。临时数据库目录在证据收集后删除。
+- VT-017：单测以 fake `AiBinding` 返回唯一标题、完整 AppSpec 与四个唯一角色摘要，证明解析器使用返回内容而非固定模板。线上证据先记录当前 Git commit、`wrangler deployments status` 的 Worker version、Worker `AI`/`DB` bindings 和 D1 database id；再用独立 Cookie 与固定 requestId 提交独特需求，从响应取得 projectId，并按 `workspace_requests(owner_key,request_id)` 关联 runId，再查 `runs.id/status`、`generation_events.run_id/source/model/outcome/failure_code`、`versions.project_id`。只接受同一次 requestId 对应的 `workers_ai/@cf/zai-org/glm-4.7-flash/SUCCESS/null`，随后刷新 API 证明该 version 恢复；禁止仅查询任意历史成功 event。
+- VT-018：模型适配层接受测试 runner 和超时覆盖。表驱动覆盖 `AI_UNAVAILABLE`、`MODEL_ERROR`、`MODEL_TIMEOUT`、`EMPTY_RESPONSE`、`RESPONSE_TOO_LARGE`、`INVALID_JSON`、`INVALID_ENVELOPE`、`INVALID_APP_SPEC`；每例断言 fallback AppSpec 仍通过 validator，审计失败码为枚举且不包含输入正文。服务层另注入 event insert failure、completion batch failure 与 current/base/attempt token 守卫失效，断言 completion batch 内 version/event/current/run-complete 全回滚；随后 failure batch 使预占 run/request/steps FAILED、token 清空、project 有版本回 READY/无版本为 FAILED，阶段一 user message 恰好一条且没有 assistant 成功消息。再注入 failure batch 失败并通过读取超时回收收敛。模型超时后 resolve fake promise，断言迟到结果不能新增 run/version/event；限流、容量、PROJECT_BUSY 与相同 requestId 重放均断言 AI runner 调用次数为 0。
+- VT-019：fake 模型第一次返回合法完整修改版，第二次返回非法引用/数组；服务层比较 versions 数量、parent、current pointer 和历史 JSON。浏览器回归合法版本的筛选/表单/toggle。
