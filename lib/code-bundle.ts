@@ -114,6 +114,11 @@ function validateJavaScript(javascript: string) {
     [/<\/script/iu, "raw-text"],
   ];
   for (const [pattern, path] of rules) if (pattern.test(javascript)) throw new CodeBundleError("DISALLOWED_JAVASCRIPT", `files.app.js.${path}`);
+  const storageCalls = /(?:window\s*\.\s*)?Atoms\s*\.\s*storage\s*\.\s*(?:get|set|delete|list|clear)\s*\(/gu;
+  for (const match of javascript.matchAll(storageCalls)) {
+    const prefix = javascript.slice(Math.max(0, (match.index ?? 0) - 16), match.index);
+    if (!/await\s*$/u.test(prefix)) throw new CodeBundleError("INVALID_CODE_BUNDLE", "capabilities.storage.await");
+  }
 }
 
 export function validateCodeBundle(value: unknown): CodeBundleV1 {
@@ -247,7 +252,7 @@ export function compileCounterBundle(prompt: string): CodeBundleV1 | null {
   const html = `<main class="counter-card" aria-labelledby="counter-title"><span class="eyebrow">INTERACTIVE APP</span><h1 id="counter-title">${title}</h1><output id="counter-value" aria-live="polite">${intent.initialValue}</output><div class="counter-actions"><button id="decrement" type="button" aria-label="减少 1">−1</button><button id="reset" type="button">重置</button><button id="increment" type="button" aria-label="增加 1">+1</button></div><p id="save-status">${intent.persistence ? "更改会自动保存" : "当前会话状态"}</p></main>`;
   const css = `:root{color-scheme:light;font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:#f4f2ff;color:#18152b}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at top,#ded8ff,transparent 48%),#f7f7fb}.counter-card{width:min(100%,440px);padding:38px;border:1px solid #ded9f6;border-radius:28px;background:rgba(255,255,255,.94);box-shadow:0 24px 70px rgba(67,52,140,.18);text-align:center}.eyebrow{font-size:12px;letter-spacing:.18em;color:#6e63a8;font-weight:800}h1{margin:12px 0 24px;font-size:28px}output{display:block;font-size:84px;line-height:1;font-weight:800;color:#635bff;font-variant-numeric:tabular-nums}.counter-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:30px}button{min-height:48px;border:0;border-radius:14px;background:#ece9ff;color:#393064;font:inherit;font-weight:750;cursor:pointer}button:last-child{background:#635bff;color:white}button:focus-visible{outline:3px solid #9d95ff;outline-offset:2px}#save-status{margin:18px 0 0;color:#77718d;font-size:13px}@media(max-width:420px){.counter-card{padding:28px 20px;border-radius:22px}output{font-size:68px}}`;
   const storageLines = intent.persistence
-    ? [`const saved=await window.Atoms.storage.get("counter.value");`, `if(Number.isInteger(saved)){value=saved;render();}`, `const persist=()=>window.Atoms.storage.set("counter.value",value);`]
+    ? [`const saved=await window.Atoms.storage.get("counter.value");`, `if(Number.isInteger(saved)){value=saved;render();}`, `const persist=async()=>{await window.Atoms.storage.set("counter.value",value);};`]
     : [`const persist=async()=>{};`];
   const javascript = `(async()=>{let value=${intent.initialValue};const initial=${intent.initialValue};const output=document.getElementById("counter-value");const render=()=>{output.textContent=String(value);};${storageLines.join("")}document.getElementById("increment").addEventListener("click",async()=>{value+=1;render();await persist();});document.getElementById("decrement").addEventListener("click",async()=>{value-=1;render();await persist();});document.getElementById("reset").addEventListener("click",async()=>{value=initial;render();await persist();});render();})()`;
   return validateCodeBundle({

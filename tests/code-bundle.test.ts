@@ -48,9 +48,13 @@ test("rejects network, navigation, parent access and raw-text escapes", () => {
 });
 
 test("requires storage capability to match Atoms.storage usage", () => {
-  const storageScript = 'window.Atoms.storage.set("value",1);';
+  const storageScript = 'await window.Atoms.storage.set("value",1);';
   assert.throws(() => validateCodeBundle({ ...safeBundle, files: { ...safeBundle.files, "app.js": storageScript } }), CodeBundleError);
   assert.doesNotThrow(() => validateCodeBundle({ ...safeBundle, files: { ...safeBundle.files, "app.js": storageScript }, capabilities: { storage: true } }));
+  assert.throws(
+    () => validateCodeBundle({ ...safeBundle, files: { ...safeBundle.files, "app.js": 'const value=window.Atoms.storage.get("value");' }, capabilities: { storage: true } }),
+    (error: unknown) => error instanceof CodeBundleError && error.path === "capabilities.storage.await",
+  );
 });
 
 test("builds srcdoc without interpolating generated raw-text", () => {

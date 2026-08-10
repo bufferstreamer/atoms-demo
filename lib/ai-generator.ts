@@ -190,7 +190,7 @@ function planningSystem() {
 }
 function engineeringSystem(plan: PlanningEnvelope, previous: AppSpec | CodeBundleV1 | undefined, repair?: { code: string; path: string; previousRaw: string }) {
   const protocol = `只输出以下纯文本协议，不要 Markdown code fence，不要解释：\n<<<ATOM_META>>>\n{"schemaVersion":1,"kind":"code_bundle","title":"1-60字标题","summary":"1-180字摘要","entry":"index.html","capabilities":{"storage":false}}\n<<<ATOM_FILE:index.html>>>\n仅 body fragment\n<<<ATOM_FILE:styles.css>>>\nCSS\n<<<ATOM_FILE:app.js>>>\n浏览器 JavaScript\n<<<ATOM_END>>>`;
-  const safety = "禁止外部依赖和网络；禁止 script/style/link/iframe/svg、inline on*、fetch/XHR/WebSocket/eval/import/export/Worker/parent/top/postMessage/location/open、无限循环；交互必须使用 addEventListener。需要刷新恢复时只能调用 window.Atoms.storage.get/set/delete/list/clear，并把 capabilities.storage 设为 true。";
+  const safety = "禁止外部依赖和网络；禁止 script/style/link/iframe/svg、inline on*、fetch/XHR/WebSocket/eval/import/export/Worker/parent/top/postMessage/location/open、无限循环；交互必须使用 addEventListener。需要刷新恢复时只能调用 window.Atoms.storage.get/set/delete/list/clear，并把 capabilities.storage 设为 true；这些 storage API 全部返回 Promise，每一次调用前都必须直接写 await，初始化应放进 async 函数或 async IIFE。";
   const previousContext = previous ? JSON.stringify(previous).slice(0, 24 * 1024) : "null";
   const repairContext = repair ? `\n上次输出未通过服务端校验。公开错误=${repair.code}:${repair.path}。请重新返回完整协议。上次输出=${repair.previousRaw.slice(0, 48 * 1024)}` : "";
   return `你是 Engineering Agent，生成一个真正可交互的纯前端应用。${protocol}\n${safety}\n已验证规划=${JSON.stringify(plan)}\n上一版本=${previousContext}${repairContext}`;
