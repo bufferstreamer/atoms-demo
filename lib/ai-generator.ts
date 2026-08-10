@@ -1,220 +1,264 @@
-import { generateAppSpec, validateAppSpec } from "./generator";
-import type { AgentStep, AppSpec } from "./types";
+import { CodeBundleError, compileCounterBundle, parseCodeBundle } from "./code-bundle";
+import type { AgentStep, AppSpec, CodeBundleV1 } from "./types";
 
-export const WORKERS_AI_MODEL = "@cf/meta/llama-3.1-8b-instruct-fast";
+export const PLANNING_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
+export const ENGINEERING_MODEL = "@cf/qwen/qwen2.5-coder-32b-instruct";
 export const MODEL_DEADLINE_MS = 52_000;
 export const PERSISTENCE_DEADLINE_MS = 62_000;
 export const API_DEADLINE_MS = 65_000;
-export const STAGE_TIMEOUTS_MS = { product: 7_000, architecture: 9_000, design: 7_000, engineering: 22_000, repair: 7_000 } as const;
-const MAX_STAGE_BYTES = 12 * 1024;
-const MAX_ENGINEERING_BYTES = 48 * 1024;
-const shortId = { type: "string", minLength: 1, maxLength: 60 } as const;
-const label = { type: "string", minLength: 1, maxLength: 120 } as const;
-
-export const APP_SPEC_SCHEMA = {
-  type: "object", additionalProperties: false,
-  required: ["schemaVersion", "kind", "title", "subtitle", "theme", "stats", "filters", "cards", "actions"],
-  properties: {
-    schemaVersion: { const: 1 }, kind: { enum: ["dashboard", "tracker", "landing"] },
-    title: { type: "string", minLength: 1, maxLength: 60 }, subtitle: { type: "string", maxLength: 140 },
-    theme: { type: "object", additionalProperties: false, required: ["accent", "density"], properties: { accent: { enum: ["violet", "coral", "mint", "blue"] }, density: { enum: ["comfortable", "compact"] } } },
-    stats: { type: "array", maxItems: 4, items: { type: "object", additionalProperties: false, required: ["id", "label", "value"], properties: { id: shortId, label, value: label, delta: { type: "string", maxLength: 120 } } } },
-    filters: { type: "array", maxItems: 2, items: { type: "object", additionalProperties: false, required: ["id", "label", "options", "defaultValue"], properties: { id: shortId, label, options: { type: "array", minItems: 1, maxItems: 6, items: { type: "string", minLength: 1, maxLength: 80 } }, defaultValue: { type: "string", minLength: 1, maxLength: 80 }, allValue: { type: "string", minLength: 1, maxLength: 80 } } } },
-    cards: { type: "array", minItems: 1, maxItems: 12, items: { type: "object", additionalProperties: false, required: ["id", "title", "description", "tag"], properties: { id: shortId, title: label, description: { type: "string", maxLength: 240 }, tag: { type: "string", maxLength: 80 }, filterValues: { type: "object", additionalProperties: { type: "string", maxLength: 80 } }, done: { type: "boolean" } } } },
-    form: { type: "object", additionalProperties: false, required: ["id", "title", "fields", "submitLabel"], properties: { id: shortId, title: label, fields: { type: "array", minItems: 1, maxItems: 4, items: { type: "object", additionalProperties: false, required: ["id", "label", "placeholder", "required"], properties: { id: shortId, label, placeholder: { type: "string", maxLength: 160 }, required: { type: "boolean" } } } }, submitLabel: { type: "string", minLength: 1, maxLength: 80 } } },
-    actions: { type: "array", minItems: 1, maxItems: 8, items: { oneOf: [
-      { type: "object", additionalProperties: false, required: ["id", "label", "kind", "targetId", "value"], properties: { id: shortId, label, kind: { const: "set_filter" }, targetId: shortId, value: { type: "string", minLength: 1, maxLength: 80 } } },
-      { type: "object", additionalProperties: false, required: ["id", "label", "kind", "targetId"], properties: { id: shortId, label, kind: { const: "toggle_item" }, targetId: shortId } },
-      { type: "object", additionalProperties: false, required: ["id", "label", "kind", "targetId"], properties: { id: shortId, label, kind: { const: "add_item" }, targetId: shortId } },
-      { type: "object", additionalProperties: false, required: ["id", "label", "kind", "message"], properties: { id: shortId, label, kind: { const: "show_toast" }, message: { type: "string", minLength: 1, maxLength: 180 } } },
-    ] } },
-  },
-} as const;
-
-const cap = { type: "string", enum: ["filter", "form", "toggle", "stats", "toast"] } as const;
-export const STAGE_SCHEMAS = {
-  product: { $schema: "https://json-schema.org/draft/2020-12/schema", type: "object", additionalProperties: false, required: ["summary", "audience", "goal", "requiredCapabilities", "forbiddenCapabilities"], properties: { summary: { type: "string", minLength: 1, maxLength: 180 }, audience: { type: "string", minLength: 1, maxLength: 120 }, goal: { type: "string", minLength: 1, maxLength: 180 }, requiredCapabilities: { type: "array", maxItems: 6, uniqueItems: true, items: cap }, forbiddenCapabilities: { type: "array", maxItems: 6, uniqueItems: true, items: { type: "string", enum: ["filter", "form", "toggle", "stats", "toast", "external_script"] } } } },
-  architecture: { $schema: "https://json-schema.org/draft/2020-12/schema", type: "object", additionalProperties: false, required: ["summary", "kind", "components", "interactionPlan", "persistencePlan"], properties: { summary: { type: "string", minLength: 1, maxLength: 180 }, kind: { enum: ["dashboard", "tracker", "landing"] }, components: { type: "array", minItems: 1, maxItems: 8, uniqueItems: true, items: { enum: ["stats", "filters", "cards", "form", "actions"] } }, interactionPlan: { type: "array", minItems: 1, maxItems: 6, uniqueItems: true, items: { enum: ["set_filter", "toggle_item", "add_item", "show_toast"] } }, persistencePlan: { type: "string", minLength: 1, maxLength: 180 } } },
-  design: { $schema: "https://json-schema.org/draft/2020-12/schema", type: "object", additionalProperties: false, required: ["summary", "visualDirection", "layout", "interactionStates", "accessibilityNotes"], properties: { summary: { type: "string", minLength: 1, maxLength: 180 }, visualDirection: { type: "string", minLength: 1, maxLength: 180 }, layout: { enum: ["dashboard-grid", "tracker-list", "landing-sections"] }, interactionStates: { type: "array", minItems: 1, maxItems: 6, uniqueItems: true, items: { enum: ["default", "filtered", "completed", "form-valid", "form-error", "toast"] } }, accessibilityNotes: { type: "array", minItems: 1, maxItems: 4, uniqueItems: true, items: { type: "string", minLength: 1, maxLength: 120 } } } },
-  engineering: { $schema: "https://json-schema.org/draft/2020-12/schema", type: "object", additionalProperties: false, required: ["spec", "summary"], properties: { spec: APP_SPEC_SCHEMA, summary: { type: "string", minLength: 1, maxLength: 180 } } },
-} as const;
-
-export const APP_SPEC_ENVELOPE_SCHEMA = STAGE_SCHEMAS.engineering;
+export const STAGE_TIMEOUTS_MS = { planning: 12_000, engineering: 32_000, repair: 8_000 } as const;
+const MAX_PLAN_BYTES = 32 * 1024;
 const ROLE_NAMES = { product: "Emma · Product", architecture: "Bob · Architect", design: "Iris · Designer", engineering: "Alex · Engineer" } as const;
 
+const textSchema = (maxLength: number) => ({ type: "string", minLength: 1, maxLength });
+export const PRODUCT_SCHEMA = {
+  type: "object", additionalProperties: false,
+  required: ["schemaVersion", "summary", "audience", "goal", "features", "dataEntities", "persistenceRequired"],
+  properties: {
+    schemaVersion: { const: 1 }, summary: textSchema(180), audience: textSchema(120), goal: textSchema(180),
+    features: { type: "array", minItems: 1, maxItems: 8, uniqueItems: true, items: textSchema(120) },
+    dataEntities: { type: "array", maxItems: 6, uniqueItems: true, items: textSchema(80) },
+    persistenceRequired: { type: "boolean" },
+  },
+} as const;
+export const ARCHITECTURE_SCHEMA = {
+  type: "object", additionalProperties: false,
+  required: ["schemaVersion", "summary", "components", "interactions", "stateModel", "storageKeys", "constraints"],
+  properties: {
+    schemaVersion: { const: 1 }, summary: textSchema(180),
+    components: { type: "array", minItems: 1, maxItems: 10, uniqueItems: true, items: textSchema(80) },
+    interactions: { type: "array", minItems: 1, maxItems: 10, uniqueItems: true, items: textSchema(120) },
+    stateModel: textSchema(240),
+    storageKeys: { type: "array", maxItems: 10, uniqueItems: true, items: { type: "string", pattern: "^[A-Za-z0-9._-]{1,64}$" } },
+    constraints: { type: "array", maxItems: 8, uniqueItems: true, items: textSchema(120) },
+  },
+} as const;
+export const DESIGN_SCHEMA = {
+  type: "object", additionalProperties: false,
+  required: ["schemaVersion", "summary", "visualDirection", "layout", "colorTokens", "interactionStates", "responsiveNotes", "accessibilityNotes"],
+  properties: {
+    schemaVersion: { const: 1 }, summary: textSchema(180), visualDirection: textSchema(180), layout: textSchema(120),
+    colorTokens: { type: "object", additionalProperties: false, required: ["background", "surface", "text", "accent", "muted"], properties: Object.fromEntries(["background", "surface", "text", "accent", "muted"].map((key) => [key, { type: "string", pattern: "^#[0-9A-Fa-f]{6}$" }])) },
+    interactionStates: { type: "array", minItems: 1, maxItems: 10, uniqueItems: true, items: textSchema(100) },
+    responsiveNotes: { type: "array", minItems: 1, maxItems: 6, uniqueItems: true, items: textSchema(120) },
+    accessibilityNotes: { type: "array", minItems: 1, maxItems: 6, uniqueItems: true, items: textSchema(120) },
+  },
+} as const;
+export const PLANNING_SCHEMA = {
+  $schema: "https://json-schema.org/draft/2020-12/schema",
+  type: "object", additionalProperties: false, required: ["schemaVersion", "product", "architecture", "design"],
+  properties: { schemaVersion: { const: 1 }, product: PRODUCT_SCHEMA, architecture: ARCHITECTURE_SCHEMA, design: DESIGN_SCHEMA },
+} as const;
+
+type ProductPlan = {
+  schemaVersion: 1; summary: string; audience: string; goal: string; features: string[]; dataEntities: string[]; persistenceRequired: boolean;
+};
+type ArchitecturePlan = {
+  schemaVersion: 1; summary: string; components: string[]; interactions: string[]; stateModel: string; storageKeys: string[]; constraints: string[];
+};
+type DesignPlan = {
+  schemaVersion: 1; summary: string; visualDirection: string; layout: string;
+  colorTokens: { background: string; surface: string; text: string; accent: string; muted: string };
+  interactionStates: string[]; responsiveNotes: string[]; accessibilityNotes: string[];
+};
+type PlanningEnvelope = { schemaVersion: 1; product: ProductPlan; architecture: ArchitecturePlan; design: DesignPlan };
+
 export type AiRunner = { run(model: string, input: Record<string, unknown>): Promise<unknown> };
-export type GenerationMeta = { source: "workers_ai" | "deterministic"; model: string; outcome: "SUCCESS" | "FALLBACK"; failureCode: string | null; durationMs: number };
-export type GeneratedApp = { spec: AppSpec; summary: string; steps: AgentStep[]; generation: GenerationMeta };
+export type GenerationMeta = {
+  source: "workers_ai" | "deterministic";
+  model: string;
+  outcome: "SUCCESS";
+  failureCode: string | null;
+  fallbackReason: string | null;
+  durationMs: number;
+  artifactKind: "code_bundle";
+  inputTokens?: number | null;
+  outputTokens?: number | null;
+};
+export type GeneratedApp = { bundle: CodeBundleV1; summary: string; steps: AgentStep[]; generation: GenerationMeta };
 export type StageRole = "product" | "architecture" | "design" | "engineering";
-export type StageProgress = { role: StageRole; status: "RUNNING" | "COMPLETED"; summary?: string; artifact?: Record<string, unknown>; source?: "workers_ai" | "deterministic"; model?: string; durationMs?: number; attemptNo?: number; errorCode?: string | null };
+export type StageProgress = {
+  role: StageRole; status: "RUNNING" | "COMPLETED"; summary?: string; artifact?: Record<string, unknown>;
+  source?: "workers_ai" | "deterministic"; model?: string; durationMs?: number; attemptNo?: number; errorCode?: string | null; sharedCallId?: string | null;
+};
 export type GenerationOptions = { now?: () => number; onStage?: (progress: StageProgress) => Promise<void> };
 
-class ModelOutputError extends Error { constructor(readonly code: string, readonly path = "") { super(code); } }
-function record(value: unknown, code: string): Record<string, unknown> { if (!value || typeof value !== "object" || Array.isArray(value)) throw new ModelOutputError(code); return value as Record<string, unknown>; }
-function exact(value: Record<string, unknown>, keys: string[], code: string) { const a = Object.keys(value).sort(); const b = [...keys].sort(); if (a.length !== b.length || a.some((key, i) => key !== b[i])) throw new ModelOutputError(code); }
-function text(value: unknown, max: number, code: string) { if (typeof value !== "string") throw new ModelOutputError(code); const clean = Array.from(value, (character) => { const point = character.codePointAt(0) ?? 0; return point < 32 || point === 127 ? " " : character; }).join("").replace(/\s+/g, " ").trim(); if (!clean || clean.length > max) throw new ModelOutputError(code); return clean; }
-function list(value: unknown, allowed: readonly string[], max: number, code: string, min = 0) { if (!Array.isArray(value) || value.length < min || value.length > max || new Set(value).size !== value.length || value.some((item) => typeof item !== "string" || !allowed.includes(item))) throw new ModelOutputError(code); return value as string[]; }
-function assertBytes(value: unknown, max: number, code: string) { let json: string; try { json = JSON.stringify(value); } catch { throw new ModelOutputError(code); } if (new TextEncoder().encode(json).byteLength > max) throw new ModelOutputError(code); return json; }
-
-function parseProduct(value: unknown) { const code = "INVALID_PRODUCT_ARTIFACT"; const v = record(value, code); exact(v, ["summary", "audience", "goal", "requiredCapabilities", "forbiddenCapabilities"], code); const artifact = { summary: text(v.summary, 180, code), audience: text(v.audience, 120, code), goal: text(v.goal, 180, code), requiredCapabilities: list(v.requiredCapabilities, ["filter", "form", "toggle", "stats", "toast"], 6, code), forbiddenCapabilities: list(v.forbiddenCapabilities, ["filter", "form", "toggle", "stats", "toast", "external_script"], 6, code) }; if (artifact.requiredCapabilities.some((capability) => artifact.forbiddenCapabilities.includes(capability))) throw new ModelOutputError(code, "CAPABILITY_CONFLICT"); if (["filter", "form", "toggle", "toast"].every((capability) => artifact.forbiddenCapabilities.includes(capability))) throw new ModelOutputError(code, "NO_ALLOWED_ACTION"); assertBytes(artifact, MAX_STAGE_BYTES, code); return artifact; }
-function parseArchitecture(value: unknown) { const code = "INVALID_ARCHITECTURE_ARTIFACT"; const v = record(value, code); exact(v, ["summary", "kind", "components", "interactionPlan", "persistencePlan"], code); const kind = list([v.kind], ["dashboard", "tracker", "landing"], 1, code, 1)[0] as AppSpec["kind"]; const artifact = { summary: text(v.summary, 180, code), kind, components: list(v.components, ["stats", "filters", "cards", "form", "actions"], 8, code, 1), interactionPlan: list(v.interactionPlan, ["set_filter", "toggle_item", "add_item", "show_toast"], 6, code, 1), persistencePlan: text(v.persistencePlan, 180, code) }; assertBytes(artifact, MAX_STAGE_BYTES, code); return artifact; }
-function parseDesign(value: unknown) { const code = "INVALID_DESIGN_ARTIFACT"; const v = record(value, code); exact(v, ["summary", "visualDirection", "layout", "interactionStates", "accessibilityNotes"], code); const layout = list([v.layout], ["dashboard-grid", "tracker-list", "landing-sections"], 1, code, 1)[0]; const artifact = { summary: text(v.summary, 180, code), visualDirection: text(v.visualDirection, 180, code), layout, interactionStates: list(v.interactionStates, ["default", "filtered", "completed", "form-valid", "form-error", "toast"], 6, code, 1), accessibilityNotes: Array.isArray(v.accessibilityNotes) ? v.accessibilityNotes.map((item) => text(item, 120, code)) : (() => { throw new ModelOutputError(code); })() }; if (artifact.accessibilityNotes.length < 1 || artifact.accessibilityNotes.length > 4 || new Set(artifact.accessibilityNotes).size !== artifact.accessibilityNotes.length) throw new ModelOutputError(code); assertBytes(artifact, MAX_STAGE_BYTES, code); return artifact; }
-
-function assertAppSpec(value: unknown) {
-  const code = "INVALID_APP_SPEC"; const spec = record(value, code);
-  exact(spec, ["schemaVersion", "kind", "title", "subtitle", "theme", "stats", "filters", "cards", "actions", ...(spec.form === undefined ? [] : ["form"])], code);
-  const candidate = structuredClone(spec) as AppSpec;
-  const normalizationCodes: string[] = [];
-  const normalized = (value: string) => { if (!normalizationCodes.includes(value)) normalizationCodes.push(value); };
-  for (const stat of candidate.stats ?? []) if (stat.delta && /^(null|undefined)$/i.test(stat.delta.trim())) { delete stat.delta; normalized("STAT_NULL_SENTINEL"); }
-  for (const filter of candidate.filters ?? []) {
-    if (filter.options.length && !filter.options.includes(filter.defaultValue)) { filter.defaultValue = filter.options[0]; normalized("FILTER_DEFAULT_VALUE"); }
-    if (filter.allValue !== undefined && !filter.options.includes(filter.allValue)) { filter.allValue = filter.defaultValue; normalized("FILTER_ALL_VALUE"); }
+export class GenerationFailure extends Error {
+  constructor(readonly code: string, readonly path = "") {
+    super(path ? `${code}:${path}` : code);
+    this.name = "GenerationFailure";
   }
-  for (const [cardIndex, card] of (candidate.cards ?? []).entries()) {
-    card.filterValues = card.filterValues ?? {};
-    for (const filter of candidate.filters ?? []) {
-      const choices = filter.options.filter((option) => option !== filter.allValue);
-      if (!filter.options.includes(card.filterValues[filter.id]) || card.filterValues[filter.id] === filter.allValue) { card.filterValues[filter.id] = choices[cardIndex % choices.length] ?? filter.defaultValue; normalized("CARD_FILTER_VALUES"); }
-    }
-  }
-  for (const action of candidate.actions ?? []) {
-    if (action.kind === "set_filter") {
-      const target = candidate.filters.find((filter) => filter.id === action.targetId) ?? candidate.filters[0];
-      if (target) {
-        const targetChanged = action.targetId !== target.id;
-        action.targetId = target.id;
-        const choices = target.options.filter((option) => option !== target.allValue);
-        if (targetChanged || !target.options.includes(action.value) || action.value === target.allValue) normalized("SET_FILTER_REFERENCE");
-        if (!target.options.includes(action.value) || action.value === target.allValue) action.value = choices[0] ?? target.defaultValue;
-      }
-    }
-    if (action.kind === "add_item" && candidate.form && action.targetId !== candidate.form.id) { action.targetId = candidate.form.id; normalized("ADD_ITEM_REFERENCE"); }
-  }
-  try { validateAppSpec(candidate); } catch (error) {
-    const detail = error instanceof Error ? text(error.message, 120, code) : "规格关系校验失败";
-    throw new ModelOutputError(code, detail);
-  }
-  return { spec: candidate, normalizationCodes };
 }
-function parseEngineering(value: unknown) { const v = record(value, "INVALID_ENGINEERING_ARTIFACT"); exact(v, ["spec", "summary"], "INVALID_ENGINEERING_ARTIFACT"); assertBytes(v, MAX_ENGINEERING_BYTES, "RESPONSE_TOO_LARGE"); return { ...assertAppSpec(v.spec), summary: text(v.summary, 180, "INVALID_ENGINEERING_ARTIFACT") }; }
 
-function extract(raw: unknown, max: number) {
+function utf8Bytes(value: string) { return new TextEncoder().encode(value).byteLength; }
+function object(value: unknown, code: string, path: string): Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) throw new GenerationFailure(code, path);
+  return value as Record<string, unknown>;
+}
+function exact(value: Record<string, unknown>, keys: string[], code: string, path: string) {
+  const actual = Object.keys(value).sort(); const expected = [...keys].sort();
+  if (actual.length !== expected.length || actual.some((key, index) => key !== expected[index])) throw new GenerationFailure(code, path);
+}
+function text(value: unknown, max: number, code: string, path: string) {
+  if (typeof value !== "string") throw new GenerationFailure(code, path);
+  const trimmed = value.trim();
+  const points = Array.from(trimmed);
+  if (points.length < 1 || points.length > max || points.some((character) => { const point = character.codePointAt(0) ?? 0; return point < 32 || point === 127; })) throw new GenerationFailure(code, path);
+  return trimmed;
+}
+function stringList(value: unknown, min: number, max: number, itemMax: number, code: string, path: string, pattern?: RegExp) {
+  if (!Array.isArray(value) || value.length < min || value.length > max) throw new GenerationFailure(code, path);
+  const parsed = value.map((item, index) => text(item, itemMax, code, `${path}.${index}`));
+  if (new Set(parsed).size !== parsed.length || (pattern && parsed.some((item) => !pattern.test(item)))) throw new GenerationFailure(code, path);
+  return parsed;
+}
+function parseProduct(value: unknown): ProductPlan {
+  const code = "INVALID_PLANNING_ARTIFACT"; const path = "product"; const item = object(value, code, path);
+  exact(item, ["schemaVersion", "summary", "audience", "goal", "features", "dataEntities", "persistenceRequired"], code, path);
+  if (item.schemaVersion !== 1 || typeof item.persistenceRequired !== "boolean") throw new GenerationFailure(code, path);
+  return { schemaVersion: 1, summary: text(item.summary, 180, code, `${path}.summary`), audience: text(item.audience, 120, code, `${path}.audience`), goal: text(item.goal, 180, code, `${path}.goal`), features: stringList(item.features, 1, 8, 120, code, `${path}.features`), dataEntities: stringList(item.dataEntities, 0, 6, 80, code, `${path}.dataEntities`), persistenceRequired: item.persistenceRequired };
+}
+function parseArchitecture(value: unknown): ArchitecturePlan {
+  const code = "INVALID_PLANNING_ARTIFACT"; const path = "architecture"; const item = object(value, code, path);
+  exact(item, ["schemaVersion", "summary", "components", "interactions", "stateModel", "storageKeys", "constraints"], code, path);
+  if (item.schemaVersion !== 1) throw new GenerationFailure(code, path);
+  return { schemaVersion: 1, summary: text(item.summary, 180, code, `${path}.summary`), components: stringList(item.components, 1, 10, 80, code, `${path}.components`), interactions: stringList(item.interactions, 1, 10, 120, code, `${path}.interactions`), stateModel: text(item.stateModel, 240, code, `${path}.stateModel`), storageKeys: stringList(item.storageKeys, 0, 10, 64, code, `${path}.storageKeys`, /^[A-Za-z0-9._-]{1,64}$/u), constraints: stringList(item.constraints, 0, 8, 120, code, `${path}.constraints`) };
+}
+function parseDesign(value: unknown): DesignPlan {
+  const code = "INVALID_PLANNING_ARTIFACT"; const path = "design"; const item = object(value, code, path);
+  exact(item, ["schemaVersion", "summary", "visualDirection", "layout", "colorTokens", "interactionStates", "responsiveNotes", "accessibilityNotes"], code, path);
+  if (item.schemaVersion !== 1) throw new GenerationFailure(code, path);
+  const colors = object(item.colorTokens, code, `${path}.colorTokens`); exact(colors, ["background", "surface", "text", "accent", "muted"], code, `${path}.colorTokens`);
+  const color = (key: string) => { const value = text(colors[key], 7, code, `${path}.colorTokens.${key}`); if (!/^#[0-9A-Fa-f]{6}$/u.test(value)) throw new GenerationFailure(code, `${path}.colorTokens.${key}`); return value; };
+  return { schemaVersion: 1, summary: text(item.summary, 180, code, `${path}.summary`), visualDirection: text(item.visualDirection, 180, code, `${path}.visualDirection`), layout: text(item.layout, 120, code, `${path}.layout`), colorTokens: { background: color("background"), surface: color("surface"), text: color("text"), accent: color("accent"), muted: color("muted") }, interactionStates: stringList(item.interactionStates, 1, 10, 100, code, `${path}.interactionStates`), responsiveNotes: stringList(item.responsiveNotes, 1, 6, 120, code, `${path}.responsiveNotes`), accessibilityNotes: stringList(item.accessibilityNotes, 1, 6, 120, code, `${path}.accessibilityNotes`) };
+}
+function extractJson(raw: unknown) {
   let value = raw;
-  if (typeof raw !== "string") { const wrapper = record(raw, "INVALID_ENVELOPE"); value = "response" in wrapper ? wrapper.response : wrapper; }
-  if (typeof value === "string") { if (new TextEncoder().encode(value).byteLength > max) throw new ModelOutputError("RESPONSE_TOO_LARGE"); try { return JSON.parse(value); } catch { throw new ModelOutputError("INVALID_JSON"); } }
-  assertBytes(value, max, "RESPONSE_TOO_LARGE"); return value;
+  if (value && typeof value === "object" && !Array.isArray(value) && "response" in value) value = (value as { response?: unknown }).response;
+  if (typeof value === "string") { if (utf8Bytes(value) > MAX_PLAN_BYTES) throw new GenerationFailure("RESPONSE_TOO_LARGE", "planning"); try { value = JSON.parse(value); } catch { throw new GenerationFailure("INVALID_JSON", "planning"); } }
+  let serialized: string; try { serialized = JSON.stringify(value); } catch { throw new GenerationFailure("INVALID_JSON", "planning"); }
+  if (utf8Bytes(serialized) > MAX_PLAN_BYTES) throw new GenerationFailure("RESPONSE_TOO_LARGE", "planning");
+  return value;
 }
-function timeout<T>(promise: Promise<T>, ms: number): Promise<T> { return new Promise((resolve, reject) => { const timer = setTimeout(() => reject(new ModelOutputError("MODEL_TIMEOUT")), ms); promise.then((value) => { clearTimeout(timer); resolve(value); }, (error) => { clearTimeout(timer); reject(error); }); }); }
-function errorCode(error: unknown) { if (error instanceof ModelOutputError) return error.code; if (error instanceof Error && /JSON Mode couldn't be met/i.test(error.message)) return "JSON_MODE_UNMET"; return "MODEL_ERROR"; }
+export function parsePlanningEnvelope(raw: unknown): PlanningEnvelope {
+  const item = object(extractJson(raw), "INVALID_PLANNING_ARTIFACT", "planning");
+  exact(item, ["schemaVersion", "product", "architecture", "design"], "INVALID_PLANNING_ARTIFACT", "planning");
+  if (item.schemaVersion !== 1) throw new GenerationFailure("INVALID_PLANNING_ARTIFACT", "planning.schemaVersion");
+  return { schemaVersion: 1, product: parseProduct(item.product), architecture: parseArchitecture(item.architecture), design: parseDesign(item.design) };
+}
 
-function abilityPresent(spec: AppSpec, ability: string) {
-  if (ability === "filter") return spec.actions.some((action) => {
-    if (action.kind !== "set_filter") return false;
-    const filter = spec.filters.find((candidate) => candidate.id === action.targetId);
-    if (!filter || action.value === filter.allValue || !filter.options.includes(action.value)) return false;
-    const visible = spec.cards.filter((card) => card.filterValues?.[filter.id] === action.value).length;
-    return visible > 0 && visible < spec.cards.length;
+function short(value: string, max: number) { return Array.from(value.replace(/\s+/gu, " ").trim()).slice(0, max).join(""); }
+function persistence(prompt: string) { return /刷新|保存|持久|记住|restore|persist|save/iu.test(prompt); }
+function intent(prompt: string) {
+  if (/计数器|数字计数|counter|stepper/iu.test(prompt)) return "counter";
+  if (/todo|待办|任务清单|阅读清单|habit|习惯/iu.test(prompt)) return "todo";
+  if (/calculator|计算器|计算|账单|小费|预算/iu.test(prompt)) return "calculator";
+  if (/form|表单|报名|申请|landing|落地页/iu.test(prompt)) return "form";
+  return "default";
+}
+export function deterministicPlanning(prompt: string): PlanningEnvelope {
+  const idea = short(prompt, 120) || "可交互应用"; const persistent = persistence(prompt); const kind = intent(prompt);
+  const architecture = {
+    counter: { components: ["计数显示", "增减与重置控件"], interactions: ["增加", "减少", "重置"] },
+    todo: { components: ["任务列表", "新增表单", "状态筛选"], interactions: ["新增任务", "切换完成", "删除任务", "筛选任务"] },
+    calculator: { components: ["数字输入", "运算控件", "结果显示"], interactions: ["输入数字", "选择运算", "清空结果"] },
+    form: { components: ["内容区", "表单", "成功提示"], interactions: ["填写表单", "校验必填项", "显示成功提示"] },
+    default: { components: ["内容区", "主要控件", "状态提示"], interactions: ["操作主要控件", "更新页面状态"] },
+  }[kind];
+  const layouts = { counter: "居中卡片与水平操作区", todo: "表单、筛选与纵向列表", calculator: "数字面板与结果区", form: "内容区与表单卡片", default: "单栏响应式卡片" } as const;
+  const storageKeys = persistent ? kind === "counter" ? ["counter.value"] : kind === "todo" ? ["todo.items"] : ["app.state"] : [];
+  return parsePlanningEnvelope({ schemaVersion: 1, product: { schemaVersion: 1, summary: `将需求转为可运行前端应用：${idea}`, audience: "应用的直接使用者", goal: short(prompt, 180) || idea, features: [idea], dataEntities: persistent ? ["app-state"] : [], persistenceRequired: persistent }, architecture: { schemaVersion: 1, summary: `纯前端沙箱架构：${idea}`, components: architecture.components, interactions: architecture.interactions, stateModel: persistent ? "内存状态与 Atoms.storage 持久状态" : "页面内存状态", storageKeys, constraints: ["纯前端", "禁止外部网络", "沙箱运行"] }, design: { schemaVersion: 1, summary: `清晰、响应式的界面：${idea}`, visualDirection: "现代、简洁、强调主要操作", layout: layouts[kind], colorTokens: { background: "#F5F7FB", surface: "#FFFFFF", text: "#172033", accent: "#635BFF", muted: "#6B7280" }, interactionStates: ["默认", "悬停", "聚焦", "禁用", "成功", "错误"], responsiveNotes: ["窄屏改为单列", "触控目标至少44像素"], accessibilityNotes: ["表单控件具有关联标签", "状态变化可被辅助技术感知"] } });
+}
+
+function timeout<T>(promise: Promise<T>, milliseconds: number): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new GenerationFailure("MODEL_TIMEOUT")), milliseconds);
+    promise.then((value) => { clearTimeout(timer); resolve(value); }, (error) => { clearTimeout(timer); reject(error); });
   });
-  if (ability === "form") return Boolean(spec.form) && spec.actions.some((a) => a.kind === "add_item");
-  if (ability === "toggle") return spec.actions.some((a) => a.kind === "toggle_item");
-  if (ability === "stats") return spec.stats.length > 0;
-  if (ability === "toast") return spec.actions.some((a) => a.kind === "show_toast");
-  return false;
 }
-function forbiddenStructurePresent(spec: AppSpec, ability: string) {
-  if (ability === "filter") return spec.filters.length > 0 || spec.actions.some((action) => action.kind === "set_filter");
-  if (ability === "form") return Boolean(spec.form) || spec.actions.some((action) => action.kind === "add_item");
-  if (ability === "toggle") return spec.actions.some((action) => action.kind === "toggle_item");
-  if (ability === "stats") return spec.stats.length > 0;
-  if (ability === "toast") return spec.actions.some((action) => action.kind === "show_toast");
-  return false;
+function publicError(error: unknown) {
+  if (error instanceof GenerationFailure || error instanceof CodeBundleError) return { code: error.code, path: error.path };
+  if (error instanceof Error && /JSON Mode couldn't be met/iu.test(error.message)) return { code: "JSON_MODE_UNMET", path: "planning" };
+  return { code: "MODEL_ERROR", path: "" };
 }
-function checkCapabilities(spec: AppSpec, product: ReturnType<typeof parseProduct>) { for (const ability of product.requiredCapabilities) if (!abilityPresent(spec, ability)) throw new ModelOutputError("MISSING_REQUIRED_CAPABILITY", ability); for (const ability of product.forbiddenCapabilities) if (ability !== "external_script" && forbiddenStructurePresent(spec, ability)) throw new ModelOutputError("FORBIDDEN_CAPABILITY", ability); }
-
-function completeRequiredCapabilities(input: AppSpec, product: ReturnType<typeof parseProduct>) {
-  const spec = structuredClone(input);
-  const normalizationCodes: string[] = [];
-  const ids = new Set([...spec.stats, ...spec.filters, ...spec.cards, ...spec.actions, ...(spec.form ? [spec.form, ...spec.form.fields] : [])].map((item) => item.id));
-  const actionId = (base: string) => { let id = base; let suffix = 2; while (ids.has(id)) id = `${base}-${suffix++}`; ids.add(id); return id; };
-  const add = (action: AppSpec["actions"][number]) => { if (spec.actions.length < 8) spec.actions.push(action); };
-  if (product.requiredCapabilities.includes("filter") && !abilityPresent(spec, "filter") && spec.filters[0]) {
-    const filter = spec.filters[0]; const choices = filter.options.filter((option) => option !== filter.allValue); add({ id: actionId("agent-filter"), label: `筛选${filter.label}`, kind: "set_filter", targetId: filter.id, value: choices[0] ?? filter.defaultValue }); normalizationCodes.push("ADD_FILTER_ACTION");
-  }
-  if (product.requiredCapabilities.includes("form") && !abilityPresent(spec, "form") && spec.form) { add({ id: actionId("agent-submit"), label: spec.form.submitLabel, kind: "add_item", targetId: spec.form.id }); normalizationCodes.push("ADD_FORM_ACTION"); }
-  if (product.requiredCapabilities.includes("toggle") && !abilityPresent(spec, "toggle") && spec.cards[0]) { add({ id: actionId("agent-toggle"), label: "切换状态", kind: "toggle_item", targetId: spec.cards[0].id }); normalizationCodes.push("ADD_TOGGLE_ACTION"); }
-  if (product.requiredCapabilities.includes("toast") && !abilityPresent(spec, "toast")) { add({ id: actionId("agent-toast"), label: "查看提示", kind: "show_toast", message: "操作已完成。" }); normalizationCodes.push("ADD_TOAST_ACTION"); }
-  validateAppSpec(spec);
-  return { spec, normalizationCodes };
+async function digest(value: string) {
+  const result = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+  return Array.from(new Uint8Array(result), (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+function planningSystem() {
+  return `你是一个产品、架构和体验设计联合 Agent。只返回一个 JSON object，不要 Markdown 或额外字段。必须严格满足以下 canonical schema：${JSON.stringify(PLANNING_SCHEMA)}。使用用户的语言；不得添加外部网络、第三方脚本、支付、OAuth 或后端服务。`;
+}
+function engineeringSystem(plan: PlanningEnvelope, previous: AppSpec | CodeBundleV1 | undefined, repair?: { code: string; path: string; previousRaw: string }) {
+  const protocol = `只输出以下纯文本协议，不要 Markdown code fence，不要解释：\n<<<ATOM_META>>>\n{"schemaVersion":1,"kind":"code_bundle","title":"1-60字标题","summary":"1-180字摘要","entry":"index.html","capabilities":{"storage":false}}\n<<<ATOM_FILE:index.html>>>\n仅 body fragment\n<<<ATOM_FILE:styles.css>>>\nCSS\n<<<ATOM_FILE:app.js>>>\n浏览器 JavaScript\n<<<ATOM_END>>>`;
+  const safety = "禁止外部依赖和网络；禁止 script/style/link/iframe/svg、inline on*、fetch/XHR/WebSocket/eval/import/export/Worker/parent/top/postMessage/location/open、无限循环；交互必须使用 addEventListener。需要刷新恢复时只能调用 window.Atoms.storage.get/set/delete/list/clear，并把 capabilities.storage 设为 true。";
+  const previousContext = previous ? JSON.stringify(previous).slice(0, 24 * 1024) : "null";
+  const repairContext = repair ? `\n上次输出未通过服务端校验。公开错误=${repair.code}:${repair.path}。请重新返回完整协议。上次输出=${repair.previousRaw.slice(0, 48 * 1024)}` : "";
+  return `你是 Engineering Agent，生成一个真正可交互的纯前端应用。${protocol}\n${safety}\n已验证规划=${JSON.stringify(plan)}\n上一版本=${previousContext}${repairContext}`;
 }
 
-type MutableSchema = { properties?: Record<string, MutableSchema>; required?: string[]; items?: MutableSchema; oneOf?: MutableSchema[]; const?: string; minItems?: number; maxItems?: number };
-export function engineeringSchemaFor(product: { requiredCapabilities: string[]; forbiddenCapabilities: string[] }) {
-  const schema = structuredClone(STAGE_SCHEMAS.engineering) as unknown as MutableSchema;
-  const spec = schema.properties!.spec;
-  if (product.requiredCapabilities.includes("form") && !spec.required!.includes("form")) spec.required!.push("form");
-  if (product.requiredCapabilities.includes("filter")) spec.properties!.filters.minItems = 1;
-  if (product.requiredCapabilities.includes("stats")) spec.properties!.stats.minItems = 1;
-  if (product.forbiddenCapabilities.includes("form")) delete spec.properties!.form;
-  if (product.forbiddenCapabilities.includes("filter")) spec.properties!.filters.maxItems = 0;
-  if (product.forbiddenCapabilities.includes("stats")) spec.properties!.stats.maxItems = 0;
-  const forbiddenActions = new Set(product.forbiddenCapabilities.map((capability) => ({ filter: "set_filter", form: "add_item", toggle: "toggle_item", toast: "show_toast" }[capability])).filter(Boolean));
-  const actionItems = spec.properties!.actions.items!;
-  if (forbiddenActions.size) actionItems.oneOf = actionItems.oneOf!.filter((branch) => !forbiddenActions.has(branch.properties!.kind.const));
-  return schema;
-}
-
-async function sha256Json(value: unknown) {
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(JSON.stringify(value)));
-  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
-}
-
-function stageSystem(role: StageRole, context: string, schema: unknown) {
-  const common = "只输出符合 JSON Schema 的 JSON，不要 Markdown、HTML、CSS、JavaScript、URL 或额外字段。使用用户的语言。";
-  const contract = `\n以下是约束定义，仅用于约束。必须输出满足它的数据实例，绝对禁止返回 $schema/type/properties/required/additionalProperties 等 Schema 定义字段:${JSON.stringify(schema)}`;
-  if (role === "product") return `你是产品 Agent。提炼受众、目标、必须和禁止的交互能力。requiredCapabilities 只能使用英文 token filter/form/toggle/stats/toast；forbiddenCapabilities 只能使用这些 token 或 external_script；没有禁止项时返回空数组，不得翻译或创造枚举。实例形状示意：{"summary":"决策摘要","audience":"目标用户","goal":"产品目标","requiredCapabilities":["filter"],"forbiddenCapabilities":[]}。${common}${contract}`;
-  if (role === "architecture") return `你是架构 Agent。基于已验证产品简报规划 AppSpec 组件、交互与持久化。kind 只能是 dashboard/tracker/landing；components 只能是 stats/filters/cards/form/actions；interactionPlan 只能是 set_filter/toggle_item/add_item/show_toast。实例必须是业务数据，不是 Schema 定义。${common}${contract}\n上下文:${context}`;
-  if (role === "design") return `你是设计 Agent。基于已验证产品与架构产物定义布局、视觉和交互状态。layout 只能是 dashboard-grid/tracker-list/landing-sections；interactionStates 只能是 default/filtered/completed/form-valid/form-error/toast。实例必须是业务数据，不是 Schema 定义。${common}${contract}\n上下文:${context}`;
-  return `你是工程 Agent。基于全部已验证产物返回完整安全 AppSpec。所有 stat/filter/card/form/field/action 的 id 必须全局唯一；filter.defaultValue 和可选 allValue 必须出现在该 filter.options；set_filter.targetId 必须引用 filter.id 且 value 必须出现在 options；add_item.targetId 必须引用 form.id；toggle_item.targetId 必须引用 card.id；card.filterValues 的 key 必须引用 filter.id；必须严格满足 Product required/forbidden capabilities。若上下文 repair 非空，必须针对其中的校验错误修复并返回完整新实例。${common}${contract}\n上下文:${context}`;
-}
-
-export async function generateAppWithAgents(prompt: string, previous: AppSpec | undefined, runner: AiRunner | undefined, options: GenerationOptions = {}): Promise<GeneratedApp> {
-  const now = options.now ?? Date.now; const started = now(); const artifacts: Record<string, Record<string, unknown>> = {}; const steps: AgentStep[] = [];
+export async function generateAppWithAgents(prompt: string, previous: AppSpec | CodeBundleV1 | undefined, runner: AiRunner | undefined, options: GenerationOptions = {}): Promise<GeneratedApp> {
+  const now = options.now ?? Date.now; const started = now(); const sharedCallId = crypto.randomUUID(); const steps: AgentStep[] = [];
+  let attemptNo = 1;
   const progress = async (item: StageProgress) => { await options.onStage?.(item); };
-  if (!runner) return fallback("AI_UNAVAILABLE");
-  const aiRunner = runner;
+  let plan: PlanningEnvelope; let planningSource: "workers_ai" | "deterministic" = "workers_ai"; let planningFailure: string | null = null; let planningDuration = 0;
 
-  async function call(role: StageRole, schema: unknown, maxTokens: number, parser: (value: unknown) => Record<string, unknown>, attemptNo = 1, repairReason?: string) {
-    const stageStarted = now(); const configured = role === "engineering" && attemptNo === 2 ? STAGE_TIMEOUTS_MS.repair : STAGE_TIMEOUTS_MS[role]; const remaining = MODEL_DEADLINE_MS - (stageStarted - started);
-    if (remaining <= 0) throw new ModelOutputError("MODEL_BUDGET_EXHAUSTED");
-    await progress({ role, status: "RUNNING", attemptNo });
-    const context = JSON.stringify({ ...artifacts, previous: previous ?? null, repair: repairReason ?? null });
-    const responseFormat = role === "engineering" ? { type: "json_schema", json_schema: schema } : { type: "json_object" };
-    const raw = await timeout(aiRunner.run(WORKERS_AI_MODEL, { messages: [{ role: "system", content: stageSystem(role, context, schema) }, { role: "user", content: prompt }], max_tokens: maxTokens, temperature: role === "engineering" ? 0.25 : 0.2, response_format: responseFormat }), Math.min(configured, remaining));
-    if (now() - started >= MODEL_DEADLINE_MS) throw new ModelOutputError("MODEL_BUDGET_EXHAUSTED");
-    const extracted = extract(raw, role === "engineering" ? MAX_ENGINEERING_BYTES : MAX_STAGE_BYTES);
-    const parsed = parser(extracted);
-    return { parsed, durationMs: now() - stageStarted };
+  if (!runner) {
+    plan = deterministicPlanning(prompt); planningSource = "deterministic"; planningFailure = "AI_UNAVAILABLE";
+  } else {
+    const planStarted = now(); await progress({ role: "product", status: "RUNNING", attemptNo: 1, sharedCallId });
+    try {
+      const remaining = MODEL_DEADLINE_MS - (now() - started);
+      if (remaining <= 0) throw new GenerationFailure("MODEL_BUDGET_EXHAUSTED");
+      const raw = await timeout(runner.run(PLANNING_MODEL, { messages: [{ role: "system", content: planningSystem() }, { role: "user", content: prompt }], max_tokens: 1800, temperature: 0.2, response_format: { type: "json_object" } }), Math.min(STAGE_TIMEOUTS_MS.planning, remaining));
+      if (now() - started >= MODEL_DEADLINE_MS) throw new GenerationFailure("MODEL_BUDGET_EXHAUSTED");
+      plan = parsePlanningEnvelope(raw); planningDuration = now() - planStarted;
+    } catch (error) {
+      const failure = publicError(error); plan = deterministicPlanning(prompt); planningSource = "deterministic"; planningFailure = failure.code; planningDuration = now() - planStarted;
+    }
   }
 
-  try {
-    const productResult = await call("product", STAGE_SCHEMAS.product, 420, (value) => parseProduct(value)); const product = productResult.parsed as ReturnType<typeof parseProduct>; artifacts.product = product; await progress({ role: "product", status: "COMPLETED", summary: product.summary, artifact: product, source: "workers_ai", model: WORKERS_AI_MODEL, durationMs: productResult.durationMs, attemptNo: 1 }); steps.push({ role: "product", name: ROLE_NAMES.product, summary: product.summary, status: "COMPLETED", source: "workers_ai", model: WORKERS_AI_MODEL, durationMs: productResult.durationMs, attemptNo: 1, artifact: product });
-    const architectureResult = await call("architecture", STAGE_SCHEMAS.architecture, 520, (value) => parseArchitecture(value)); const architecture = architectureResult.parsed as ReturnType<typeof parseArchitecture>; artifacts.architecture = architecture; await progress({ role: "architecture", status: "COMPLETED", summary: architecture.summary, artifact: architecture, source: "workers_ai", model: WORKERS_AI_MODEL, durationMs: architectureResult.durationMs, attemptNo: 1 }); steps.push({ role: "architecture", name: ROLE_NAMES.architecture, summary: architecture.summary, status: "COMPLETED", source: "workers_ai", model: WORKERS_AI_MODEL, durationMs: architectureResult.durationMs, attemptNo: 1, artifact: architecture });
-    const designResult = await call("design", STAGE_SCHEMAS.design, 420, (value) => parseDesign(value)); const design = designResult.parsed as ReturnType<typeof parseDesign>; artifacts.design = design; await progress({ role: "design", status: "COMPLETED", summary: design.summary, artifact: design, source: "workers_ai", model: WORKERS_AI_MODEL, durationMs: designResult.durationMs, attemptNo: 1 }); steps.push({ role: "design", name: ROLE_NAMES.design, summary: design.summary, status: "COMPLETED", source: "workers_ai", model: WORKERS_AI_MODEL, durationMs: designResult.durationMs, attemptNo: 1, artifact: design });
-    const engineeringSchema = engineeringSchemaFor(product);
-    let engineering: ReturnType<typeof parseEngineering>; let engineeringDuration = 0; let repaired = false;
-    try { const result = await call("engineering", engineeringSchema, 2200, (value) => parseEngineering(value)); engineering = result.parsed as ReturnType<typeof parseEngineering>; const completed = completeRequiredCapabilities(engineering.spec, product); engineering.spec = completed.spec; engineering.normalizationCodes.push(...completed.normalizationCodes); engineeringDuration += result.durationMs; checkCapabilities(engineering.spec, product); }
-    catch (firstError) { const code = errorCode(firstError); if (!["INVALID_ENGINEERING_ARTIFACT", "INVALID_APP_SPEC", "MISSING_REQUIRED_CAPABILITY", "FORBIDDEN_CAPABILITY"].includes(code)) throw firstError; const reason = `${code}${firstError instanceof ModelOutputError && firstError.path ? `:${firstError.path}` : ""}`; const result = await call("engineering", engineeringSchema, 2200, (value) => parseEngineering(value), 2, reason); engineering = result.parsed as ReturnType<typeof parseEngineering>; const completed = completeRequiredCapabilities(engineering.spec, product); engineering.spec = completed.spec; engineering.normalizationCodes.push(...completed.normalizationCodes); engineeringDuration += result.durationMs; checkCapabilities(engineering.spec, product); repaired = true; }
-    const normalizationCodes = [...new Set(engineering.normalizationCodes)];
-    const completedCapabilities = normalizationCodes.flatMap((code) => ({ ADD_FILTER_ACTION: ["filter"], ADD_FORM_ACTION: ["form"], ADD_TOGGLE_ACTION: ["toggle"], ADD_TOAST_ACTION: ["toast"] }[code] ?? []));
-    const engineeringArtifact = { summary: engineering.summary, repaired, normalized: normalizationCodes.length > 0, normalizationVersion: "appspec-normalizer-v1", normalizationCodes, completedCapabilities, baseAppSpecSchemaSha: await sha256Json(APP_SPEC_SCHEMA), derivedEngineeringSchemaSha: await sha256Json(engineeringSchema) }; await progress({ role: "engineering", status: "COMPLETED", summary: engineering.summary, artifact: engineeringArtifact, source: "workers_ai", model: WORKERS_AI_MODEL, durationMs: engineeringDuration, attemptNo: repaired ? 2 : 1 }); steps.push({ role: "engineering", name: ROLE_NAMES.engineering, summary: engineering.summary, status: "COMPLETED", source: "workers_ai", model: WORKERS_AI_MODEL, durationMs: engineeringDuration, attemptNo: repaired ? 2 : 1, artifact: engineeringArtifact });
-    return { spec: engineering.spec, summary: engineering.summary, steps, generation: { source: "workers_ai", model: WORKERS_AI_MODEL, outcome: "SUCCESS", failureCode: null, durationMs: now() - started } };
-  } catch (error) { return fallback(errorCode(error)); }
+  for (const [index, role] of (["product", "architecture", "design"] as const).entries()) {
+    const artifact = plan[role]; const step: AgentStep = { role, name: ROLE_NAMES[role], summary: artifact.summary, status: "COMPLETED", source: planningSource, model: planningSource === "workers_ai" ? PLANNING_MODEL : "deterministic-planner-v1", durationMs: index === 0 ? planningDuration : 0, attemptNo: 1, artifact: artifact as unknown as Record<string, unknown>, errorCode: planningFailure, sharedCallId };
+    steps.push(step); await progress({ role, status: "COMPLETED", summary: step.summary, artifact: step.artifact ?? undefined, source: step.source ?? undefined, model: step.model ?? undefined, durationMs: step.durationMs ?? undefined, attemptNo: 1, errorCode: step.errorCode, sharedCallId });
+  }
 
-  async function fallback(code: string): Promise<GeneratedApp> {
-    const generated = generateAppSpec(prompt, previous); const fallbackSteps = generated.steps.map((step) => ({ ...step, source: "deterministic" as const, model: "deterministic-v1", durationMs: 0, attemptNo: 1, artifact: { summary: step.summary, fallback: true } }));
-    for (const step of fallbackSteps) await progress({ role: step.role, status: "COMPLETED", summary: step.summary, artifact: step.artifact, source: "deterministic", model: "deterministic-v1", durationMs: 0, attemptNo: 1, errorCode: code });
-    return { ...generated, steps: fallbackSteps, generation: { source: "deterministic", model: "deterministic-v1", outcome: "FALLBACK", failureCode: code, durationMs: now() - started } };
+  if (!runner) return deterministicResult("AI_UNAVAILABLE");
+  let rawEngineering = ""; let engineeringDuration = 0;
+  try {
+    await progress({ role: "engineering", status: "RUNNING", attemptNo: 1 });
+    const stageStarted = now(); const remaining = MODEL_DEADLINE_MS - (now() - started);
+    if (remaining <= 0) throw new GenerationFailure("MODEL_BUDGET_EXHAUSTED");
+    const raw = await timeout(runner.run(ENGINEERING_MODEL, { messages: [{ role: "system", content: engineeringSystem(plan, previous) }, { role: "user", content: prompt }], max_tokens: 6000, temperature: 0.25 }), Math.min(STAGE_TIMEOUTS_MS.engineering, remaining));
+    rawEngineering = typeof raw === "string" ? raw : typeof (raw as { response?: unknown })?.response === "string" ? String((raw as { response: string }).response) : "";
+    let bundle: CodeBundleV1;
+    try { bundle = parseCodeBundle(raw); }
+    catch (firstError) {
+      const first = publicError(firstError); const repairRemaining = MODEL_DEADLINE_MS - (now() - started);
+      if (repairRemaining < 500) throw firstError;
+      attemptNo = 2;
+      await progress({ role: "engineering", status: "RUNNING", attemptNo: 2 });
+      const repaired = await timeout(runner.run(ENGINEERING_MODEL, { messages: [{ role: "system", content: engineeringSystem(plan, previous, { code: first.code, path: first.path, previousRaw: rawEngineering }) }, { role: "user", content: prompt }], max_tokens: 6000, temperature: 0.15 }), Math.min(STAGE_TIMEOUTS_MS.repair, repairRemaining));
+      bundle = parseCodeBundle(repaired);
+    }
+    if (now() - started >= MODEL_DEADLINE_MS) throw new GenerationFailure("MODEL_BUDGET_EXHAUSTED");
+    engineeringDuration = now() - stageStarted;
+    const fileBytes = Object.fromEntries(Object.entries(bundle.files).map(([name, value]) => [name, utf8Bytes(value)]));
+    const artifact = { artifactKind: "code_bundle", bytes: Object.values(fileBytes).reduce((sum, value) => sum + value, 0), fileBytes, sha256: await digest(JSON.stringify(bundle)), capabilities: bundle.capabilities, repaired: attemptNo === 2 };
+    const step: AgentStep = { role: "engineering", name: ROLE_NAMES.engineering, summary: bundle.summary, status: "COMPLETED", source: "workers_ai", model: ENGINEERING_MODEL, durationMs: engineeringDuration, attemptNo, artifact };
+    steps.push(step); await progress({ role: "engineering", status: "COMPLETED", summary: step.summary, artifact, source: "workers_ai", model: ENGINEERING_MODEL, durationMs: engineeringDuration, attemptNo });
+    return { bundle, summary: bundle.summary, steps, generation: { source: "workers_ai", model: ENGINEERING_MODEL, outcome: "SUCCESS", failureCode: null, fallbackReason: planningFailure, durationMs: now() - started, artifactKind: "code_bundle" } };
+  } catch (error) {
+    const failure = publicError(error);
+    return deterministicResult(failure.code);
+  }
+
+  async function deterministicResult(code: string): Promise<GeneratedApp> {
+    const bundle = compileCounterBundle(prompt);
+    if (!bundle) throw new GenerationFailure(code);
+    const artifact = { artifactKind: "code_bundle", bytes: utf8Bytes(bundle.files["index.html"]) + utf8Bytes(bundle.files["styles.css"]) + utf8Bytes(bundle.files["app.js"]), sha256: await digest(JSON.stringify(bundle)), capabilities: bundle.capabilities, compiler: "counter-compiler-v1" };
+    const step: AgentStep = { role: "engineering", name: ROLE_NAMES.engineering, summary: bundle.summary, status: "COMPLETED", source: "deterministic", model: "counter-compiler-v1", durationMs: 0, attemptNo, artifact, errorCode: code };
+    steps.push(step); await progress({ role: "engineering", status: "COMPLETED", summary: step.summary, artifact, source: "deterministic", model: "counter-compiler-v1", durationMs: 0, attemptNo, errorCode: code });
+    return { bundle, summary: bundle.summary, steps, generation: { source: "deterministic", model: "counter-compiler-v1", outcome: "SUCCESS", failureCode: null, fallbackReason: code, durationMs: now() - started, artifactKind: "code_bundle" } };
   }
 }
 

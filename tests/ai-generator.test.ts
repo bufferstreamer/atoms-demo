@@ -1,193 +1,125 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { APP_SPEC_SCHEMA, generateAppWithAgents, MODEL_DEADLINE_MS, STAGE_SCHEMAS, STAGE_TIMEOUTS_MS, WORKERS_AI_MODEL, type AiRunner, type StageProgress } from "../lib/ai-generator";
+import {
+  ENGINEERING_MODEL,
+  GenerationFailure,
+  MODEL_DEADLINE_MS,
+  PLANNING_MODEL,
+  PLANNING_SCHEMA,
+  STAGE_TIMEOUTS_MS,
+  deterministicPlanning,
+  generateAppWithAgents,
+  parsePlanningEnvelope,
+  type AiRunner,
+  type StageProgress,
+} from "../lib/ai-generator";
+import { serializeCodeBundle } from "../lib/code-bundle";
+import type { CodeBundleV1 } from "../lib/types";
 
-const product = { summary: "为观测者规划地点和天气筛选。", audience: "自然观察爱好者", goal: "记录萤火虫观测", requiredCapabilities: ["filter"], forbiddenCapabilities: ["external_script"] };
-const architecture = { summary: "用筛选与卡片组织观测记录。", kind: "dashboard", components: ["filters", "cards", "actions"], interactionPlan: ["set_filter"], persistencePlan: "版本保存到 D1" };
-const design = { summary: "以夜间蓝色视觉突出观测信息。", visualDirection: "安静的夜间蓝色", layout: "dashboard-grid", interactionStates: ["default", "filtered"], accessibilityNotes: ["控件包含可读标签"] };
-const engineering = {
-  spec: {
-    schemaVersion: 1, kind: "dashboard", title: "萤火虫观测协作台", subtitle: "记录观测地点、天气与发现",
-    theme: { accent: "blue", density: "comfortable" }, stats: [],
-    filters: [{ id: "weather", label: "天气", options: ["全部", "晴朗", "多云"], defaultValue: "全部", allValue: "全部" }],
-    cards: [{ id: "site-a", title: "溪谷入口", description: "20:30 开始观测", tag: "晴朗", filterValues: { weather: "晴朗" } }, { id: "site-b", title: "林间步道", description: "湿度较高", tag: "多云", filterValues: { weather: "多云" } }],
-    actions: [{ id: "sunny", label: "只看晴朗", kind: "set_filter", targetId: "weather", value: "晴朗" }],
-  }, summary: "实现了可筛选的萤火虫观测协作台。",
+const planning = deterministicPlanning("做一个可保存的旅行预算计算器");
+const bundle: CodeBundleV1 = {
+  schemaVersion: 1,
+  kind: "code_bundle",
+  title: "旅行预算计算器",
+  summary: "输入预算与人数后实时计算人均预算。",
+  entry: "index.html",
+  files: {
+    "index.html": '<main><h1>旅行预算计算器</h1><label>总预算<input id="budget" type="number"></label><label>人数<input id="people" type="number" value="1"></label><button id="calculate">计算</button><output id="result" aria-live="polite">¥0</output></main>',
+    "styles.css": "body{font-family:system-ui;margin:0;padding:32px;background:#f5f7fb}main{max-width:520px;margin:auto;padding:24px;background:white;border-radius:20px}label{display:grid;gap:6px;margin:12px 0}input,button{min-height:44px}button{background:#635bff;color:white;border:0;border-radius:10px}",
+    "app.js": 'const budget=document.getElementById("budget");const people=document.getElementById("people");const result=document.getElementById("result");document.getElementById("calculate").addEventListener("click",()=>{const total=Number(budget.value)||0;const count=Math.max(1,Number(people.value)||1);result.textContent=`¥${(total/count).toFixed(2)}`;});',
+  },
+  capabilities: { storage: false },
 };
 
-function stagedRunner(overrides: Partial<Record<number, unknown>> = {}) {
-  const inputs: Array<Record<string, unknown>> = [];
-  const values = [product, architecture, design, engineering];
-  const runner: AiRunner = { run: async (model, input) => { assert.equal(model, WORKERS_AI_MODEL); const index = inputs.length; inputs.push(input); return { response: overrides[index] ?? values[index] }; } };
-  return { runner, inputs };
+function runnerFor(values: unknown[]) {
+  const calls: Array<{ model: string; input: Record<string, unknown> }> = [];
+  const runner: AiRunner = {
+    run: async (model, input) => {
+      const value = values[calls.length];
+      calls.push({ model, input });
+      return value;
+    },
+  };
+  return { runner, calls };
 }
 
-test("runs four real model stages in order and passes validated artifacts downstream", async () => {
-  const { runner, inputs } = stagedRunner(); const progress: StageProgress[] = [];
-  const result = await generateAppWithAgents("做一个萤火虫观测协作台", undefined, runner, { onStage: async (event) => { progress.push(event); } });
-  assert.equal(inputs.length, 4);
-  assert.deepEqual(inputs.slice(0, 3).map((item) => item.response_format), [{ type: "json_object" }, { type: "json_object" }, { type: "json_object" }]);
-  const engineeringFormat = inputs[3].response_format as { type: string; json_schema: { properties: { spec: { properties: { filters: { minItems?: number } } } } } };
-  assert.equal(engineeringFormat.type, "json_schema");
-  assert.equal(engineeringFormat.json_schema.properties.spec.properties.filters.minItems, 1);
-  assert.ok(!("minItems" in STAGE_SCHEMAS.engineering.properties.spec.properties.filters));
-  assert.match(JSON.stringify(inputs[0].messages), new RegExp(STAGE_SCHEMAS.product.required[0]));
-  assert.equal(STAGE_SCHEMAS.engineering.properties.spec, APP_SPEC_SCHEMA);
-  assert.doesNotMatch(JSON.stringify(STAGE_SCHEMAS.engineering), /\$ref/);
-  assert.match(JSON.stringify(inputs[1].messages), /自然观察爱好者/);
-  assert.match(JSON.stringify(inputs[2].messages), /dashboard/);
-  assert.match(JSON.stringify(inputs[3].messages), /夜间蓝色/);
+test("uses one planning call and one Qwen engineering call", async () => {
+  const { runner, calls } = runnerFor([{ response: planning }, { response: serializeCodeBundle(bundle) }]);
+  const progress: StageProgress[] = [];
+  const result = await generateAppWithAgents("做一个旅行预算计算器", undefined, runner, {
+    onStage: async (event) => { progress.push(event); },
+  });
+
+  assert.equal(calls.length, 2);
+  assert.deepEqual(calls.map((call) => call.model), [PLANNING_MODEL, ENGINEERING_MODEL]);
+  assert.deepEqual(calls[0].input.response_format, { type: "json_object" });
+  assert.equal(calls[0].input.max_tokens, 1800);
+  assert.equal(calls[1].input.max_tokens, 6000);
+  assert.match(JSON.stringify(calls[0].input.messages), /canonical schema/);
+  assert.match(JSON.stringify(calls[1].input.messages), /ATOM_FILE:app\.js/);
   assert.deepEqual(progress.filter((item) => item.status === "COMPLETED").map((item) => item.role), ["product", "architecture", "design", "engineering"]);
-  assert.equal(result.spec.title, "萤火虫观测协作台");
+  assert.equal(result.bundle.title, "旅行预算计算器");
   assert.equal(result.generation.source, "workers_ai");
+  assert.equal(result.generation.model, ENGINEERING_MODEL);
+  assert.equal(result.generation.fallbackReason, null);
+  assert.equal(result.steps[0].sharedCallId, result.steps[1].sharedCallId);
 });
 
-test("repairs engineering exactly once when a required capability is missing", async () => {
-  let calls = 0; const invalid = { ...engineering, spec: { ...engineering.spec, filters: [], cards: engineering.spec.cards.map((card) => ({ id: card.id, title: card.title, description: card.description, tag: card.tag })), actions: [{ id: "notice", label: "提示", kind: "show_toast", message: "完成" }] } };
-  const runner: AiRunner = { run: async (_model, input) => { const index = calls++; if (index < 3) return { response: [product, architecture, design][index] }; if (index === 3) return { response: invalid }; assert.match(JSON.stringify(input.messages), /MISSING_REQUIRED_CAPABILITY:filter/); return { response: engineering }; } };
-  const result = await generateAppWithAgents("做一个可筛选观测台", undefined, runner);
-  assert.equal(calls, 5);
-  assert.equal(result.generation.source, "workers_ai");
+test("repairs an invalid code bundle exactly once", async () => {
+  const invalid = serializeCodeBundle(bundle).replace(bundle.files["app.js"], 'fetch("https://example.com")');
+  const { runner, calls } = runnerFor([{ response: planning }, { response: invalid }, { response: serializeCodeBundle(bundle) }]);
+  const result = await generateAppWithAgents("做一个旅行预算计算器", undefined, runner);
+
+  assert.equal(calls.length, 3);
+  assert.deepEqual(calls.map((call) => call.model), [PLANNING_MODEL, ENGINEERING_MODEL, ENGINEERING_MODEL]);
+  assert.match(JSON.stringify(calls[2].input.messages), /DISALLOWED_JAVASCRIPT/);
   assert.equal(result.steps[3].attemptNo, 2);
   assert.equal(result.steps[3].artifact?.repaired, true);
-});
-
-test("rejects conflicting product capabilities before downstream calls", async () => {
-  let calls = 0;
-  const runner: AiRunner = { run: async () => { calls++; return { response: { ...product, forbiddenCapabilities: ["filter"] } }; } };
-  const result = await generateAppWithAgents("做一个筛选看板", undefined, runner);
-  assert.equal(calls, 1);
-  assert.equal(result.generation.source, "deterministic");
-  assert.equal(result.generation.failureCode, "INVALID_PRODUCT_ARTIFACT");
-});
-
-test("rejects a product with no allowed action before engineering schema derivation", async () => {
-  let calls = 0;
-  const runner: AiRunner = { run: async () => { calls++; return { response: { ...product, requiredCapabilities: [], forbiddenCapabilities: ["filter", "form", "toggle", "toast"] } }; } };
-  const result = await generateAppWithAgents("做一个无交互看板", undefined, runner);
-  assert.equal(calls, 1);
-  assert.equal(result.generation.source, "deterministic");
-  assert.equal(result.generation.failureCode, "INVALID_PRODUCT_ARTIFACT");
-});
-
-test("every forbidden capability is rejected by the server from its structure", async () => {
-  for (const forbidden of ["form", "filter", "toggle", "stats", "toast"] as const) {
-    const forbiddenProduct = { ...product, requiredCapabilities: [], forbiddenCapabilities: [forbidden] };
-    const baseCards = forbidden === "filter" ? engineering.spec.cards : engineering.spec.cards.map((card) => ({ id: card.id, title: card.title, description: card.description, tag: card.tag }));
-    const baseActions = forbidden === "filter" || forbidden === "form" || forbidden === "stats" ? [{ id: "notice", label: "提示", kind: "show_toast", message: "完成" }] : engineering.spec.actions;
-    const forbiddenSpec = {
-      ...engineering,
-      spec: {
-        ...engineering.spec,
-        stats: forbidden === "stats" ? [{ id: "total", label: "总数", value: "2" }] : [],
-        filters: forbidden === "filter" ? engineering.spec.filters : [],
-        cards: baseCards,
-        ...(forbidden === "form" ? { form: { id: "entry-form", title: "新增观测", fields: [{ id: "entry-name", label: "名称", placeholder: "请输入", required: true }], submitLabel: "提交" } } : {}),
-        actions: forbidden === "toggle" ? [{ id: "toggle", label: "切换", kind: "toggle_item", targetId: "site-a" }] : forbidden === "toast" ? [{ id: "notice", label: "提示", kind: "show_toast", message: "完成" }] : baseActions,
-      },
-    };
-    const values = [forbiddenProduct, architecture, design, forbiddenSpec, forbiddenSpec]; let calls = 0;
-    const runner: AiRunner = { run: async () => ({ response: values[calls++] }) };
-    const result = await generateAppWithAgents(`禁止 ${forbidden}`, undefined, runner);
-    assert.equal(calls, 5);
-    assert.equal(result.generation.source, "deterministic");
-    assert.equal(result.generation.failureCode, "FORBIDDEN_CAPABILITY");
-  }
-});
-
-test("safely completes required toggle and toast capabilities", async () => {
-  for (const required of ["toggle", "toast"] as const) {
-    const requiredProduct = { ...product, requiredCapabilities: [required], forbiddenCapabilities: ["external_script"] };
-    const incomplete = { ...engineering, spec: { ...engineering.spec, filters: [], cards: engineering.spec.cards.map((card) => ({ id: card.id, title: card.title, description: card.description, tag: card.tag })), actions: required === "toast" ? [{ id: "toggle", label: "切换", kind: "toggle_item", targetId: "site-a" }] : [{ id: "notice", label: "已有动作", kind: "show_toast", message: "完成" }] } };
-    const values = [requiredProduct, architecture, design, incomplete]; let calls = 0;
-    const runner: AiRunner = { run: async () => ({ response: values[calls++] }) };
-    const result = await generateAppWithAgents(`必须支持 ${required}`, undefined, runner);
-    assert.equal(calls, 4);
-    assert.equal(result.generation.source, "workers_ai");
-    assert.deepEqual(result.steps[3].artifact?.completedCapabilities, [required]);
-  }
-});
-
-test("falls back when the action limit prevents required capability completion", async () => {
-  const requiredProduct = { ...product, requiredCapabilities: ["toggle"], forbiddenCapabilities: ["external_script"] };
-  const fullActions = Array.from({ length: 8 }, (_, index) => ({ id: `notice-${index}`, label: `提示 ${index}`, kind: "show_toast", message: "完成" }));
-  const full = { ...engineering, spec: { ...engineering.spec, filters: [], cards: engineering.spec.cards.map((card) => ({ id: card.id, title: card.title, description: card.description, tag: card.tag })), actions: fullActions } };
-  const values = [requiredProduct, architecture, design, full, full]; let calls = 0;
-  const runner: AiRunner = { run: async () => ({ response: values[calls++] }) };
-  const result = await generateAppWithAgents("必须支持切换", undefined, runner);
-  assert.equal(calls, 5);
-  assert.equal(result.generation.source, "deterministic");
-  assert.equal(result.generation.failureCode, "MISSING_REQUIRED_CAPABILITY");
-});
-
-test("audits bounded AppSpec normalization and completes required actions", async () => {
-  const requiredProduct = { ...product, requiredCapabilities: ["filter", "form", "stats"], forbiddenCapabilities: ["toggle", "external_script"] };
-  const normalizedEngineering = {
-    ...engineering,
-    spec: {
-      ...engineering.spec,
-      stats: [{ id: "total", label: "总数", value: "2", delta: "null" }],
-      filters: [{ ...engineering.spec.filters[0], defaultValue: "未知", allValue: "不存在" }],
-      cards: engineering.spec.cards.map((card) => ({ ...card, filterValues: { weather: "不存在" } })),
-      form: { id: "entry-form", title: "新增观测", fields: [{ id: "entry-name", label: "名称", placeholder: "请输入", required: true }], submitLabel: "提交" },
-      actions: [{ id: "notice", label: "提示", kind: "show_toast", message: "完成" }],
-    },
-  };
-  const originalEngineeringJson = JSON.stringify(normalizedEngineering);
-  const values = [requiredProduct, architecture, design, normalizedEngineering]; let calls = 0;
-  const runner: AiRunner = { run: async () => ({ response: values[calls++] }) };
-  const result = await generateAppWithAgents("做一个带筛选、表单和统计的观测台", undefined, runner);
   assert.equal(result.generation.source, "workers_ai");
-  assert.equal(calls, 4);
-  assert.equal(result.steps[3].artifact?.normalized, true);
-  assert.equal(result.steps[3].artifact?.normalizationVersion, "appspec-normalizer-v1");
-  assert.deepEqual(result.steps[3].artifact?.normalizationCodes, ["STAT_NULL_SENTINEL", "FILTER_DEFAULT_VALUE", "FILTER_ALL_VALUE", "CARD_FILTER_VALUES", "ADD_FILTER_ACTION", "ADD_FORM_ACTION"]);
-  assert.deepEqual(result.steps[3].artifact?.completedCapabilities, ["filter", "form"]);
-  assert.match(String(result.steps[3].artifact?.baseAppSpecSchemaSha), /^[a-f0-9]{64}$/);
-  assert.match(String(result.steps[3].artifact?.derivedEngineeringSchemaSha), /^[a-f0-9]{64}$/);
-  assert.equal(JSON.stringify(normalizedEngineering), originalEngineeringJson);
-  assert.equal(result.spec.stats[0].delta, undefined);
-  assert.ok(result.spec.actions.some((action) => action.kind === "set_filter" && action.value !== result.spec.filters[0].allValue));
-  assert.ok(result.spec.actions.some((action) => action.kind === "add_item" && action.targetId === result.spec.form?.id));
-  assert.ok(result.spec.actions.every((action) => action.kind !== "toggle_item"));
 });
 
-test("required filter without a narrowing result cannot be normalized as success", async () => {
-  const oneCardEngineering = {
-    ...engineering,
-    spec: {
-      ...engineering.spec,
-      filters: [{ id: "only", label: "状态", options: ["全部"], defaultValue: "全部", allValue: "全部" }],
-      cards: [{ id: "single", title: "唯一卡片", description: "没有可收窄集合", tag: "全部", filterValues: { only: "全部" } }],
-      actions: [{ id: "notice", label: "提示", kind: "show_toast", message: "完成" }],
-    },
-  };
-  const values = [product, architecture, design, oneCardEngineering, oneCardEngineering]; let calls = 0;
-  const runner: AiRunner = { run: async () => ({ response: values[calls++] }) };
-  const result = await generateAppWithAgents("做一个必须可筛选的看板", undefined, runner);
-  assert.equal(calls, 5);
+test("falls back to deterministic planning but still uses Qwen", async () => {
+  const { runner, calls } = runnerFor([{ response: { unexpected: true } }, { response: serializeCodeBundle(bundle) }]);
+  const result = await generateAppWithAgents("做一个旅行预算计算器", undefined, runner);
+
+  assert.equal(calls.length, 2);
+  assert.equal(result.steps[0].source, "deterministic");
+  assert.equal(result.steps[0].errorCode, "INVALID_PLANNING_ARTIFACT");
+  assert.equal(result.generation.source, "workers_ai");
+  assert.equal(result.generation.fallbackReason, "INVALID_PLANNING_ARTIFACT");
+});
+
+test("uses the narrow deterministic compiler only for an explicit counter", async () => {
+  const result = await generateAppWithAgents("做一个计数器，初始值 3，支持增加、减少、重置，刷新后保存", undefined, undefined);
+
   assert.equal(result.generation.source, "deterministic");
-  assert.equal(result.generation.failureCode, "MISSING_REQUIRED_CAPABILITY");
+  assert.equal(result.generation.outcome, "SUCCESS");
+  assert.equal(result.generation.failureCode, null);
+  assert.equal(result.generation.fallbackReason, "AI_UNAVAILABLE");
+  assert.equal(result.bundle.capabilities.storage, true);
+  assert.match(result.bundle.files["app.js"], /Atoms\.storage/);
+
+  await assert.rejects(
+    () => generateAppWithAgents("做一个旅行待办应用", undefined, undefined),
+    (error: unknown) => error instanceof GenerationFailure && error.code === "AI_UNAVAILABLE",
+  );
 });
 
-test("invalid upstream artifact stops downstream AI and falls back safely", async () => {
-  let calls = 0; const runner: AiRunner = { run: async () => { calls++; return { response: { ...product, debug: true } }; } };
-  const result = await generateAppWithAgents("做一个旅行计划看板", undefined, runner);
-  assert.equal(calls, 1);
-  assert.equal(result.generation.source, "deterministic");
-  assert.equal(result.generation.failureCode, "INVALID_PRODUCT_ARTIFACT");
-  assert.ok(result.spec.cards.length > 0);
+test("planning envelope rejects extra fields and unsafe sizes", () => {
+  assert.equal(PLANNING_SCHEMA.additionalProperties, false);
+  assert.throws(
+    () => parsePlanningEnvelope({ ...planning, debug: true }),
+    (error: unknown) => error instanceof GenerationFailure && error.code === "INVALID_PLANNING_ARTIFACT",
+  );
+  assert.throws(
+    () => parsePlanningEnvelope({ ...planning, product: { ...planning.product, summary: "x".repeat(181) } }),
+    (error: unknown) => error instanceof GenerationFailure && error.code === "INVALID_PLANNING_ARTIFACT",
+  );
 });
 
-test("missing binding and model errors do not expose upstream text", async () => {
+test("keeps model and deadline contracts bounded", () => {
   assert.equal(MODEL_DEADLINE_MS, 52_000);
-  assert.deepEqual(STAGE_TIMEOUTS_MS, { product: 7_000, architecture: 9_000, design: 7_000, engineering: 22_000, repair: 7_000 });
-  const unavailable = await generateAppWithAgents("做一个旅行计划看板", undefined, undefined);
-  assert.equal(unavailable.generation.failureCode, "AI_UNAVAILABLE");
-  const failed = await generateAppWithAgents("做一个旅行计划看板", undefined, { run: async () => { throw new Error("secret upstream response"); } });
-  assert.equal(failed.generation.failureCode, "MODEL_ERROR");
-  assert.doesNotMatch(JSON.stringify(failed.generation), /secret/);
-  const unmet = await generateAppWithAgents("做一个旅行计划看板", undefined, { run: async () => { throw new Error("JSON Mode couldn't be met: raw platform detail"); } });
-  assert.equal(unmet.generation.failureCode, "JSON_MODE_UNMET");
-  assert.doesNotMatch(JSON.stringify(unmet.generation), /platform detail/);
+  assert.deepEqual(STAGE_TIMEOUTS_MS, { planning: 12_000, engineering: 32_000, repair: 8_000 });
+  assert.equal(PLANNING_MODEL, "@cf/meta/llama-3.3-70b-instruct-fp8-fast");
+  assert.equal(ENGINEERING_MODEL, "@cf/qwen/qwen2.5-coder-32b-instruct");
 });

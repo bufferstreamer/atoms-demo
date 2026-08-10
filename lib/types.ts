@@ -42,6 +42,22 @@ export type AppSpec = {
   >;
 };
 
+export type CodeBundleV1 = {
+  schemaVersion: 1;
+  kind: "code_bundle";
+  title: string;
+  summary: string;
+  entry: "index.html";
+  files: {
+    "index.html": string;
+    "styles.css": string;
+    "app.js": string;
+  };
+  capabilities: { storage: boolean };
+};
+
+export type ArtifactKind = "app_spec" | "code_bundle";
+
 export type AgentStep = {
   role: "product" | "architecture" | "design" | "engineering";
   name: string;
@@ -53,16 +69,21 @@ export type AgentStep = {
   attemptNo?: number | null;
   artifact?: Record<string, unknown> | null;
   errorCode?: string | null;
+  sharedCallId?: string | null;
 };
 
-export type VersionSnapshot = {
+type VersionCommon = {
   id: string;
   versionNo: number;
   parentVersionId: string | null;
   changeSummary: string;
-  appSpec: AppSpec;
   createdAt: string;
 };
+
+export type VersionSnapshot = VersionCommon & (
+  | { artifactKind: "app_spec"; appSpec: AppSpec; codeBundle: null }
+  | { artifactKind: "code_bundle"; appSpec: null; codeBundle: CodeBundleV1 }
+);
 
 export type ProjectSnapshot = {
   id: string;
@@ -82,7 +103,9 @@ export type ProjectSnapshot = {
     model: string;
     outcome: "SUCCESS" | "FALLBACK";
     failureCode: string | null;
+    fallbackReason?: string | null;
     durationMs: number;
+    artifactKind?: ArtifactKind | null;
   } | null;
   versions: VersionSnapshot[];
 };

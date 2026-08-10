@@ -1,23 +1,43 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
-import type { AppSpec, ProjectSnapshot, WorkspaceSnapshot } from "../lib/types";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { createSandboxDocument } from "../lib/code-bundle";
+import type { AppSpec, CodeBundleV1, ProjectSnapshot, VersionSnapshot, WorkspaceSnapshot } from "../lib/types";
 
 type ApiResult<T> = { data: T | null; error: { code: string; message: string } | null };
 
 const templates = [
-  { label: "旅行看板", prompt: "帮我做一个个人旅行计划看板，能按状态筛选行程" },
-  { label: "发布清单", prompt: "创建一个产品发布任务清单，可以添加任务和切换完成状态" },
-  { label: "产品官网", prompt: "为一个 AI 效率工具制作产品落地页，带真实申请表单" },
+  { label: "交互计数器", prompt: "创建一个计数器，显示数字，提供 +1、-1、重置，刷新后保留结果。" },
+  { label: "Todo 清单", prompt: "创建 Todo 清单，可新增、完成、删除任务，刷新后恢复。" },
+  { label: "小费计算器", prompt: "Build a tip calculator with bill amount, percentage, people count, calculated total and reset." },
 ];
 
 const roleInitials: Record<string, string> = { product: "EM", architecture: "BO", design: "IR", engineering: "AL" };
+
+function randomChannelToken() {
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/\+/gu, "-").replace(/\//gu, "_").replace(/=+$/gu, "");
+}
 
 async function api<T>(url: string, init?: RequestInit) {
   const response = await fetch(url, { ...init, headers: { "content-type": "application/json", ...init?.headers } });
   const payload = (await response.json()) as ApiResult<T>;
   if (!response.ok || payload.error) throw new Error(payload.error?.message ?? "请求失败");
   return payload.data as T;
+}
+
+async function executeProject(projectId: string, requestId: string) {
+  const response = await fetch(`/api/projects/${projectId}/execute`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ requestId }) });
+  const payload = await response.json() as ApiResult<ProjectSnapshot> | { project: ProjectSnapshot; run: { id: string; publicStatus: "FINALIZING" }; retryAfterMs: number };
+  if (!response.ok && response.status !== 202) {
+    const error = "error" in payload ? payload.error : null;
+    throw new Error(error?.message ?? "生成失败");
+  }
+  if (response.status === 202 && "project" in payload) return payload.project;
+  if ("data" in payload && payload.data) return payload.data;
+  throw new Error("生成响应格式无效");
 }
 
 export function Workspace() {
@@ -28,9 +48,11 @@ export function Workspace() {
   const [error, setError] = useState("");
   const [visibleSteps, setVisibleSteps] = useState(4);
   const [device, setDevice] = useState<"desktop" | "mobile">("desktop");
+  const [previewMode, setPreviewMode] = useState<"preview" | "code">("preview");
 
   const activeProject = workspace.projects.find((project) => project.id === workspace.activeProjectId) ?? null;
   const isBuilding = building || activeProject?.status === "BUILDING";
+  const activeVersion = activeProject?.versions.find((version) => version.id === activeProject.currentVersionId) ?? activeProject?.versions[0] ?? null;
 
   useEffect(() => {
     api<WorkspaceSnapshot>("/api/workspace")
@@ -92,10 +114,7 @@ export function Workspace() {
         projects: [project, ...current.projects.filter((item) => item.id !== project.id)],
         activeProjectId: project.id,
       }));
-      const completed = await api<ProjectSnapshot>(`/api/projects/${project.id}/execute`, {
-        method: "POST",
-        body: JSON.stringify({ requestId }),
-      });
+      const completed = await executeProject(project.id, requestId);
       setWorkspace((current) => ({ projects: [completed, ...current.projects.filter((item) => item.id !== completed.id)], activeProjectId: completed.id }));
       if (completed.status === "READY") setPrompt("");
       setVisibleSteps(4);
@@ -123,6 +142,7 @@ export function Workspace() {
     setWorkspace((current) => ({ ...current, activeProjectId: projectId }));
     setPrompt("");
     setError("");
+    setPreviewMode("preview");
   }
 
   return (
@@ -164,7 +184,7 @@ export function Workspace() {
             <div className="thread">
               <div className="user-message"><span>你</span><p>{activeProject.messages.filter((item) => item.role === "user").at(-1)?.content}</p></div>
               <div className="run-card">
-                <div className="run-head"><span className="spark">✦</span><div><strong>{isBuilding ? "Agent 团队正在构建" : activeProject.status === "FAILED" ? "构建未完成" : "构建完成"}</strong><small>{isBuilding ? "真实模型正在生成，刷新后也会继续恢复" : activeProject.status === "FAILED" ? `错误：${activeProject.errorCode ?? "GENERATION_FAILED"}` : activeProject.generation?.source === "workers_ai" ? `真实模型生成 · ${activeProject.generation.durationMs}ms` : `规则引擎安全降级 · ${activeProject.generation?.failureCode ?? "AI_UNAVAILABLE"}`}</small></div><em>{isBuilding ? "BUILDING" : activeProject.status === "FAILED" ? "FAILED" : activeProject.generation?.source === "workers_ai" ? "AI · LLAMA" : "FALLBACK"}</em></div>
+                <div className="run-head"><span className="spark">✦</span><div><strong>{isBuilding ? "Agent 团队正在构建" : activeProject.status === "FAILED" ? "构建未完成" : "构建完成"}</strong><small>{isBuilding ? "AI 正在规划并生成代码，刷新后会继续恢复" : activeProject.status === "FAILED" ? `错误：${activeProject.errorCode ?? "GENERATION_FAILED"}` : activeProject.generation?.source === "workers_ai" ? `Qwen 代码生成 · ${activeProject.generation.durationMs}ms` : `计数器编译器 · ${activeProject.generation?.fallbackReason ?? "AI_UNAVAILABLE"}`}</small></div><em>{isBuilding ? "BUILDING" : activeProject.status === "FAILED" ? "FAILED" : activeProject.generation?.source === "workers_ai" ? "AI · QWEN" : "DETERMINISTIC"}</em></div>
                 <div className="agent-steps">
                   {activeProject.steps.map((step, index) => {
                     const shown = step.status === "COMPLETED" && (isBuilding || index < visibleSteps);
@@ -177,7 +197,7 @@ export function Workspace() {
                   })}
                 </div>
               </div>
-              {!isBuilding && activeProject.status === "READY" && <div className="assistant-note"><span>✦</span><p>{activeProject.messages.filter((item) => item.role === "assistant").at(-1)?.content}<br /><small>{activeProject.generation?.source === "workers_ai" ? "本版本由 Cloudflare Workers AI 生成并通过 AppSpec 安全校验。" : `模型未完成（${activeProject.generation?.failureCode ?? "AI_UNAVAILABLE"}），已使用规则引擎安全降级。`} 可以继续提出任意具体修改。</small></p></div>}
+              {!isBuilding && activeProject.status === "READY" && <div className="assistant-note"><span>✦</span><p>{activeProject.messages.filter((item) => item.role === "assistant").at(-1)?.content}<br /><small>{activeProject.generation?.source === "workers_ai" ? "本版本由 Cloudflare Workers AI 生成 HTML、CSS、JavaScript，并通过服务端安全校验。" : `AI 代码生成未完成（${activeProject.generation?.fallbackReason ?? "AI_UNAVAILABLE"}），本计数器由需求对齐的安全编译器生成。`} 可以继续提出具体修改。</small></p></div>}
             </div>
           )}
         </div>
@@ -185,8 +205,8 @@ export function Workspace() {
         <div className="composer-wrap">
           {error && <div className="error-banner"><span>!</span>{error}<button onClick={() => setError("")}>×</button></div>}
           <form className="composer" onSubmit={submit}>
-            <textarea value={prompt} onChange={(event) => setPrompt(event.target.value)} maxLength={800} placeholder={activeProject ? "继续修改这个应用，例如：换成暖色并增加统计卡…" : "告诉 Agent 团队你想构建什么…"} />
-            <div className="composer-actions"><span>{prompt.length}/800</span><button disabled={!prompt.trim() || isBuilding}>{isBuilding ? "构建中" : activeProject ? "继续迭代 ↗" : "开始构建 ↗"}</button></div>
+            <textarea value={prompt} onChange={(event) => setPrompt(event.target.value)} maxLength={2000} placeholder={activeProject ? "继续修改这个应用，例如：增加搜索、换成暖色并保存状态…" : "描述你想构建的纯前端应用…"} />
+            <div className="composer-actions"><span>{prompt.length}/2000</span><button disabled={!prompt.trim() || isBuilding}>{isBuilding ? "构建中" : activeProject ? "继续迭代 ↗" : "开始构建 ↗"}</button></div>
           </form>
         </div>
       </section>
@@ -194,17 +214,78 @@ export function Workspace() {
       <section className="preview-panel">
         <header className="preview-toolbar">
           <div className="window-dots"><i /><i /><i /></div>
+          {activeVersion?.artifactKind === "code_bundle" && <div className="preview-tabs"><button className={previewMode === "preview" ? "active" : ""} onClick={() => setPreviewMode("preview")}>预览</button><button className={previewMode === "code" ? "active" : ""} onClick={() => setPreviewMode("code")}>代码</button></div>}
           <div className="device-toggle"><button className={device === "desktop" ? "active" : ""} onClick={() => setDevice("desktop")}>▱</button><button className={device === "mobile" ? "active" : ""} onClick={() => setDevice("mobile")}>▯</button></div>
           {activeProject ? <select aria-label="选择版本" value={activeProject.currentVersionId ?? ""} onChange={(event) => activate(event.target.value)}>{activeProject.versions.map((version) => <option key={version.id} value={version.id}>Version {version.versionNo}</option>)}</select> : <span className="preview-badge">LIVE PREVIEW</span>}
         </header>
         <div className={`preview-stage ${device}`}>
-          {activeProject?.currentVersionId ? (
-            <AppPreview key={activeProject.currentVersionId} spec={activeProject.versions.find((version) => version.id === activeProject.currentVersionId)?.appSpec ?? activeProject.versions[0].appSpec} />
+          {activeProject?.currentVersionId && activeVersion ? (
+            activeVersion.artifactKind === "code_bundle"
+              ? <CodeBundleView key={activeVersion.id} projectId={activeProject.id} version={activeVersion} mode={previewMode} />
+              : <AppPreview key={activeVersion.id} spec={activeVersion.appSpec} />
           ) : <PreviewEmpty loading={loading} />}
         </div>
       </section>
     </main>
   );
+}
+
+function CodeBundleView({ projectId, version, mode }: { projectId: string; version: Extract<VersionSnapshot, { artifactKind: "code_bundle" }>; mode: "preview" | "code" }) {
+  const [runtimeError, setRuntimeError] = useState("");
+  const [file, setFile] = useState<keyof CodeBundleV1["files"]>("index.html");
+  const [copied, setCopied] = useState(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [channelToken, setChannelToken] = useState(randomChannelToken);
+  const srcDoc = useMemo(() => createSandboxDocument(version.codeBundle, channelToken), [version.codeBundle, channelToken]);
+
+  useEffect(() => {
+    const allowedOps = new Set(["get", "set", "delete", "list", "clear"]);
+    const listener = async (event: MessageEvent) => {
+      if (event.source !== iframeRef.current?.contentWindow || event.origin !== "null") return;
+      const data = event.data as Record<string, unknown> | null;
+      if (!data || typeof data !== "object" || Array.isArray(data) || data.channelToken !== channelToken) return;
+      if (data.type === "atoms:runtime:error") {
+        if (typeof data.code === "string") setRuntimeError(data.code === "RUNTIME_ERROR" ? "生成应用运行时出现错误。" : "生成应用中的异步操作失败。");
+        return;
+      }
+      if (data.type !== "atoms:storage:request" || typeof data.requestId !== "string" || typeof data.op !== "string" || !allowedOps.has(data.op)) return;
+      const op = data.op;
+      const expected = op === "set" ? ["type", "channelToken", "requestId", "op", "key", "value"] : op === "get" || op === "delete" ? ["type", "channelToken", "requestId", "op", "key"] : ["type", "channelToken", "requestId", "op"];
+      const actual = Object.keys(data).sort(); const expectedSorted = [...expected].sort();
+      if (actual.length !== expectedSorted.length || actual.some((key, index) => key !== expectedSorted[index])) return;
+      if ((op === "get" || op === "set" || op === "delete") && typeof data.key !== "string") return;
+      const body: Record<string, unknown> = { requestId: data.requestId, op };
+      if ("key" in data) body.key = data.key;
+      if (op === "set") body.value = data.value;
+      try {
+        const response = await fetch(`/api/projects/${projectId}/storage`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+        const payload = await response.json() as { ok: boolean; data?: unknown; error?: { code?: string; message?: string } };
+        iframeRef.current?.contentWindow?.postMessage(payload.ok
+          ? { type: "atoms:storage:response", channelToken, requestId: data.requestId, ok: true, data: payload.data }
+          : { type: "atoms:storage:response", channelToken, requestId: data.requestId, ok: false, error: { code: payload.error?.code ?? "PERSISTENCE_ERROR", message: payload.error?.message ?? "状态保存失败" } }, "*");
+      } catch {
+        iframeRef.current?.contentWindow?.postMessage({ type: "atoms:storage:response", channelToken, requestId: data.requestId, ok: false, error: { code: "PERSISTENCE_ERROR", message: "状态服务不可用" } }, "*");
+      }
+    };
+    window.addEventListener("message", listener);
+    return () => window.removeEventListener("message", listener);
+  }, [channelToken, projectId]);
+
+  async function copyCode() {
+    await navigator.clipboard.writeText(version.codeBundle.files[file]);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1600);
+  }
+
+  if (mode === "code") return <div className="code-viewer">
+    <div className="code-file-tabs">{(Object.keys(version.codeBundle.files) as Array<keyof CodeBundleV1["files"]>).map((name) => <button key={name} className={file === name ? "active" : ""} onClick={() => setFile(name)}>{name}</button>)}<button className="copy-code" onClick={copyCode}>{copied ? "已复制" : "复制"}</button></div>
+    <pre><code>{version.codeBundle.files[file]}</code></pre>
+  </div>;
+
+  return <div className="sandbox-wrap">
+    {runtimeError && <div className="sandbox-error"><span>!</span><p>{runtimeError}<small>代码仍被保留，可重置预览后重试。</small></p><button onClick={() => { setRuntimeError(""); setChannelToken(randomChannelToken()); }}>重置预览</button></div>}
+    <iframe key={channelToken} ref={iframeRef} title={`${version.codeBundle.title} 交互预览`} sandbox="allow-scripts" srcDoc={srcDoc} />
+  </div>;
 }
 
 function PreviewEmpty({ loading }: { loading: boolean }) {
