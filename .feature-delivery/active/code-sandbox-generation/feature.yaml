@@ -9,7 +9,7 @@ feature:
   participating_repositories:
   - atoms-demo
   created_at: '2026-08-10T16:08:00+08:00'
-  updated_at: '2026-08-10T17:07:40+08:00'
+  updated_at: '2026-08-10T17:09:24+08:00'
 artifacts:
   context: .feature-delivery/active/code-sandbox-generation/_context.md
   progress: .feature-delivery/active/code-sandbox-generation/progress.md
@@ -88,9 +88,9 @@ freeze:
       .vibetest/code-sandbox-generation/gaps.md: 9b1ff4ee5234b6b66d7e3b48f2f3e06e0b85b893e1aed837e0b49f4485b29fdf
       .feature-delivery/active/code-sandbox-generation/agent-work-packet.md: 604a31ffeb23a90f694c45b6e920597c97014d333051f9a93149ace512e53e85
 baseline:
-  status: UNSET
-  commit: null
-  at: null
+  status: FROZEN
+  commit: 07de30069c49ac2b48634604952853124136cf59
+  at: '2026-08-10T17:09:24+08:00'
 verification:
   status: NOT_RUN
   evidence: []
