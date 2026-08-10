@@ -511,7 +511,7 @@ export async function handleStorage(ownerKey: string, projectId: string, rawInpu
   if (!owned) throw new InputError("NOT_FOUND", "项目不存在。", 404);
   if (input.op === "get") {
     const row = await queryFirst("SELECT value_json FROM app_state WHERE owner_key=? AND project_id=? AND state_key=?", ownerKey, projectId, input.key);
-    return { op: "get" as const, value: row ? JSON.parse(String(row.value_json)) as JsonValue : null };
+    return { op: "get" as const, found: Boolean(row), value: row ? JSON.parse(String(row.value_json)) as JsonValue : null };
   }
   if (input.op === "list") {
     const rows = await queryAll("SELECT state_key,value_json FROM app_state WHERE owner_key=? AND project_id=? ORDER BY state_key", ownerKey, projectId);

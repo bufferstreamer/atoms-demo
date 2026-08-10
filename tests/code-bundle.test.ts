@@ -61,6 +61,7 @@ test("builds srcdoc without interpolating generated raw-text", () => {
   const document = createSandboxDocument(safeBundle, "abcdefghijklmnopqrstuvwxyz012345");
   assert.match(document, /Content-Security-Policy/);
   assert.match(document, /connect-src 'none'/);
+  assert.match(document, /data\.data\.found\?data\.data\.value:undefined/);
   assert.doesNotMatch(document, /<main><h1>欢迎/);
   assert.doesNotMatch(document, /document\.getElementById\("go"\)/);
 });
