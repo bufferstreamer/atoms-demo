@@ -1,0 +1,3226 @@
+schema_version: 1
+units:
+  S001-U0001:
+    content_sha256: 958d6f20d75d1f155d52d583ff4375606d50cfc1a85799ce67d4f95d8b913d4c
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S001-U0002:
+    content_sha256: d47c8fdea4f881d39cd7a1616220d9ed34c154b973a59cde8d429f75fa4a7c99
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S001-U0003:
+    content_sha256: 950040a4f82d4f3b2ddf3dc8d3db15dcd7587589660b2476bc8dd7d9d36fd357
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-001
+      quote: 先阅读 `https://support.mgx.dev/en`，再结合实际体验设计并实现应用。
+      statement: 先阅读 `https://support.mgx.dev/en`，再结合实际体验设计并实现应用。
+      disposition: SRC
+      src_id: SRC-001
+      requirement_ids:
+      - FR-001
+  S001-U0004:
+    content_sha256: 2b4adc0dd51bca1173fb7c520d19519386068476edaa95dafe8953633831e650
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-002
+      quote: 实现一个可运行的网页应用，具备类似 Atoms 的能力与 UI 交互体验。
+      statement: 实现一个可运行的网页应用，具备类似 Atoms 的能力与 UI 交互体验。
+      disposition: SRC
+      src_id: SRC-002
+      requirement_ids:
+      - FR-001
+  S001-U0005:
+    content_sha256: a412462d306bdaa9d6bcc05cf7f8f79e6765c52382a7b0a04ea1f55af36d8445
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-003
+      quote: 用户通过智能体驱动的方式完成代码或应用生成，并以可视化网页展示生成结果。
+      statement: 用户通过智能体驱动的方式完成代码或应用生成，并以可视化网页展示生成结果。
+      disposition: SRC
+      src_id: SRC-003
+      requirement_ids:
+      - FR-002
+  S001-U0006:
+    content_sha256: de896cecfbe97d31a61a8a64579c56116db02a80cc4f25b167da896f16ea56fc
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-004
+      quote: Demo 必须具备真实交互，不能是纯静态展示。
+      statement: Demo 必须具备真实交互，不能是纯静态展示。
+      disposition: SRC
+      src_id: SRC-004
+      requirement_ids:
+      - FR-003
+  S001-U0007:
+    content_sha256: 4e7e95a8ddc71f426df97587d8160cb5b23eb83d0cda6c8e3b1d3b14929b47a3
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-005
+      quote: Demo 必须具备数据持久化。
+      statement: Demo 必须具备数据持久化。
+      disposition: SRC
+      src_id: SRC-005
+      requirement_ids:
+      - FR-004
+  S001-U0008:
+    content_sha256: 77750ed33dea6420d2280ad24a58890aa9e83608ff58dd92dc9ba00c996e1736
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-006
+      quote: 在资源允许时覆盖初始化或注册、核心主流程，以及至少一个延展能力。
+      statement: 在资源允许时覆盖初始化或注册、核心主流程，以及至少一个延展能力。
+      disposition: SRC
+      src_id: SRC-006
+      requirement_ids:
+      - FR-005
+  S001-U0009:
+    content_sha256: c1a2dff6b2bb42d89c785f673530c9d905d3eabca14a54202d5e8f0b55cf6240
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-007
+      quote: 最终必须提供可测试的在线访问链接和实际可用功能，不能只有概念验证。
+      statement: 最终必须提供可测试的在线访问链接和实际可用功能，不能只有概念验证。
+      disposition: SRC
+      src_id: SRC-007
+      requirement_ids:
+      - NFR-001
+  S001-U0010:
+    content_sha256: 405bc2f62d0843cde4a49902f6c79fd129812df1d3faaa88b2b85cf32f2882f7
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S001-U0011:
+    content_sha256: fe326835c4ad4fa11fe0a5752903199265476788570931da4de53d58cb677775
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-008
+      quote: 完成度：功能完整性、稳定性与基本工程质量。
+      statement: 完成度：功能完整性、稳定性与基本工程质量。
+      disposition: SRC
+      src_id: SRC-008
+      requirement_ids:
+      - NFR-002
+      - NFR-004
+      - NFR-006
+  S001-U0012:
+    content_sha256: 73012f250b36eec483c16b6ff2b67997ee9fa67ff3a1e70de4c6ffddaeace5be
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-009
+      quote: 工程思维：任务拆解、技术选型、复杂度控制与取舍能力。
+      statement: 工程思维：任务拆解、技术选型、复杂度控制与取舍能力。
+      disposition: SRC
+      src_id: SRC-009
+      requirement_ids:
+      - NFR-002
+      - NFR-004
+  S001-U0013:
+    content_sha256: 2a0c06fb722f872f5db4afaef97cbb66eaa53705da42d4ef6909eceb84f7611d
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-010
+      quote: 用户体验：交互是否清晰、流程是否顺畅、是否可用。
+      statement: 用户体验：交互是否清晰、流程是否顺畅、是否可用。
+      disposition: SRC
+      src_id: SRC-010
+      requirement_ids:
+      - FR-001
+      - FR-006
+      - FR-009
+      - NFR-002
+  S001-U0014:
+    content_sha256: 2c908399a742da62bb05d0d984cd9125d52c555d38bfa5e33086f876c6efc183
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-011
+      quote: 创新性：是否有亮点设计、独特视角或可扩展潜力。
+      statement: 创新性：是否有亮点设计、独特视角或可扩展潜力。
+      disposition: SRC
+      src_id: SRC-011
+      requirement_ids:
+      - FR-005
+      - NFR-002
+  S001-U0015:
+    content_sha256: f375335706204fe795b2917e0f09055dbf2aa37d5fe1723159469b03bf183a08
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-012
+      quote: 可交付性：文档清晰度、可运行程度、整体完成质量。
+      statement: 可交付性：文档清晰度、可运行程度、整体完成质量。
+      disposition: SRC
+      src_id: SRC-012
+      requirement_ids:
+      - NFR-001
+      - NFR-002
+  S002-U0001:
+    content_sha256: c361c9f7b302b75ff68d9f49e66c0cd3c4eda36a699b4d4f35444c3a8a1dbc36
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S002-U0002:
+    content_sha256: fd97be8d34bd1ba5e9563ccbd622f03ac36b309aad38394a3f7091f12e9b657e
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S002-U0003:
+    content_sha256: 3be0ced42688eb833d5b6e779934cb2455ffd91954b0deaca379351e9e8a5267
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S002-U0004:
+    content_sha256: 6338c291c378cca7358fc71aa50b684380a8ec467798d8f2b68862ea3f3b299f
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-013
+      quote: 反馈目前界面可以打开 页面流程和基础预览可以展示 但是实际输入需求后生成结果出现多次异常 并返回与当前需求不一致的演示内容
+      statement: 反馈目前界面可以打开 页面流程和基础预览可以展示 但是实际输入需求后生成结果出现多次异常 并返回与当前需求不一致的演示内容
+      disposition: SRC
+      src_id: SRC-013
+      requirement_ids:
+      - FR-006
+  S002-U0005:
+    content_sha256: ee9cffc267e99fbdf02f071b9693a7e860e945e2c4d6e722569c1f48f732e389
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S002-U0006:
+    content_sha256: f131b1d6637b150483fe30fe2079766762b260a4af81ab7bd754e22dc821b50b
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-014
+      quote: 为什么只允许这几个类型的交互？
+      statement: 为什么只允许这几个类型的交互？
+      disposition: OUT
+      reason: 能力边界追问，不单独扩写为实现义务；具体目标由 S002-U0012~15 承载
+  S002-U0007:
+    content_sha256: d902c9fb04a4902202b179f915e4ca8c00ef7ce96452a914f62b79e1b87585c4
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-015
+      quote: 我们目前系统的能力边界在哪里 我没理解
+      statement: 我们目前系统的能力边界在哪里 我没理解
+      disposition: OUT
+      reason: 能力边界追问，不单独扩写为实现义务；具体目标由 S002-U0012~15 承载
+  S002-U0008:
+    content_sha256: a81bcf40182a7fbab60f5238562e6bf256d81787fbdd4267f89c08e99da3593e
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-016
+      quote: 所以这应该不符合他们的要求吧 我们能改成ai生成任意吗？
+      statement: 所以这应该不符合他们的要求吧 我们能改成ai生成任意吗？
+      disposition: OUT
+      reason: 方案询问本身不定义协议；后续已对齐边界由 S002-U0012~15 承载
+  S002-U0009:
+    content_sha256: fb0ae20f2c2665f3508b223f9c61b0577a85bf93e7b611c5bce564470338045a
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S002-U0010:
+    content_sha256: 4faac61fef628d73b9387c41db9401fbb1cd750e0ca684c47bf07f5944588672
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-017
+      quote: 嗯 OK 开始吧
+      statement: 嗯 OK 开始吧
+      disposition: OUT
+      reason: 一般实施授权，不作为代码包、沙箱或计数器的语义证据
+  S002-U0011:
+    content_sha256: 7a0a2ad789609d8b85843fe9663f9c0f50381721e9313ec0bb41728a9095b3a7
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S002-U0012:
+    content_sha256: d4a07e898dbb81b66066674b6e61fe7869fc3f5d76ac8f67f2c9b92dfa0a1227
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-018
+      quote: 当前固定 AppSpec 只能生成结构化看板、清单或落地页，不能满足计数器等自定义前端逻辑，因此不再作为目标生成协议。
+      statement: 当前固定 AppSpec 只能生成结构化看板、清单或落地页，不能满足计数器等自定义前端逻辑，因此不再作为目标生成协议。
+      disposition: SRC
+      src_id: SRC-014
+      requirement_ids:
+      - FR-002
+      - FR-006
+  S002-U0013:
+    content_sha256: 83313f39d6ea973529ad79edd68294ecaadd253d4cac44296230131f474c4c4c
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-019
+      quote: “AI 生成任意”按安全可交付边界解释为：AI 生成可在隔离沙箱中运行的纯前端 HTML、CSS、JavaScript 代码包；
+      statement: “AI 生成任意”按安全可交付边界解释为：AI 生成可在隔离沙箱中运行的纯前端 HTML、CSS、JavaScript 代码包；
+      disposition: SRC
+      src_id: SRC-015
+      requirement_ids:
+      - FR-002
+      - FR-003
+      - FR-007
+  S002-U0014:
+    content_sha256: 0eb54a9b51b2d46dc25a811088bb9ab809d78cfd4527c3d7d57cff8154652e41
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-020
+      quote: 不解释为在服务端执行任意命令、安装任意依赖或获取平台密钥。
+      statement: 不解释为在服务端执行任意命令、安装任意依赖或获取平台密钥。
+      disposition: SRC
+      src_id: SRC-016
+      requirement_ids:
+      - NFR-003
+  S002-U0015:
+    content_sha256: 6206317889ac79b67ae5b26407d523f65e191465a8306ea58802abc4a244f3e1
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-021
+      quote: 计数器需求必须成为首个回归门禁：支持 `+1`、`-1`、重置，并在刷新后恢复状态。
+      statement: 计数器需求必须成为首个回归门禁：支持 `+1`、`-1`、重置，并在刷新后恢复状态。
+      disposition: SRC
+      src_id: SRC-017
+      requirement_ids:
+      - FR-004
+      - FR-008
+  S003-U0001:
+    content_sha256: 6c595d099cba94770b22177b34d9312502cc5591f9a59f6f32db1d4e697d94ea
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S003-U0002:
+    content_sha256: 7e0a062b146d457fe73ac19f084cff74f18d769a1c2df400e6f22cf19bf5f3dc
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S003-U0003:
+    content_sha256: b4b3925e536ed551e3741648765e80c1cbec71a23c1315e6a090d43551b82bf5
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S003-U0004:
+    content_sha256: d74681d1135565ad0b7f1733879485439a5dde05faf282c5897f03bdc5c7e2e7
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S003-U0005:
+    content_sha256: 1fe07057e4e568e92c5e467c1436cc60e91678455c430cecd776ed7628126a72
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S003-U0006:
+    content_sha256: 9dc6eacd5866de912f2d926e9f797488f291c1383a1fcc3d559fb5ab66a4fda0
+    status: NO_REQUIREMENT
+    reason: 来源说明、过渡文本或用例定位，不单独承载需求
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S003-U0007:
+    content_sha256: a7851a365911775e2167f91e87239885fbe50d2a0f8ea852d6d6b7a2a56b2a3b
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-022
+      quote: 创建一个可交互的计数器网页应用：页面显示当前数字，包含“+1”“-1”和“重置”按钮；
+      statement: 创建一个可交互的计数器网页应用：页面显示当前数字，包含“+1”“-1”和“重置”按钮；
+      disposition: FACT
+      evidence_id: EV-003
+  S003-U0008:
+    content_sha256: 7dbf1b2e3a92a0ff07ffbae5ba1ed6763a51be86b48ab142c2780bc15f13e120
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-023
+      quote: 点击按钮后数字立即变化；
+      statement: 点击按钮后数字立即变化；
+      disposition: FACT
+      evidence_id: EV-003
+  S003-U0009:
+    content_sha256: b69c9eb1b723295aab8480fccd58808ca8bae37b99f36a19e612ea0baeba3fdc
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-024
+      quote: 刷新后保留数字。
+      statement: 刷新后保留数字。
+      disposition: FACT
+      evidence_id: EV-003
+  S003-U0010:
+    content_sha256: 18f3169af120d8a521f3d9e3511a4465e50be62360cce80b80b828a5f4429972
+    status: NO_REQUIREMENT
+    reason: 来源说明、过渡文本或用例定位，不单独承载需求
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S003-U0011:
+    content_sha256: d6e76f32783dfdd4c7dec9dac096fe160011e66dff62737fc79fa8678e7c9d5c
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-025
+      quote: '| source | outcome | failure_code | 持久化标题 | 首卡片 | 首动作 |'
+      statement: '| source | outcome | failure_code | 持久化标题 | 首卡片 | 首动作 |'
+      disposition: FACT
+      evidence_id: EV-003
+  S003-U0012:
+    content_sha256: e653cd0564e3cd8b552c45df2fb95e7f590e52914af134b6db61f39c55eb8bdf
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S003-U0013:
+    content_sha256: d2e032eb3e5ecfefc5f9f151ced9d42b7824283ada86e274e0e1b2bff4ab4446
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-026
+      quote: '| deterministic | FALLBACK | INVALID_DESIGN_ARTIFACT | Spark 项目看板 | 项目 Alpha | set_filter |'
+      statement: '| deterministic | FALLBACK | INVALID_DESIGN_ARTIFACT | Spark 项目看板 | 项目 Alpha | set_filter |'
+      disposition: FACT
+      evidence_id: EV-003
+  S003-U0014:
+    content_sha256: 5c932bef2b2cce91792b0b2692f616db788883bb31d74a6a7aae7510e9811c1a
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-027
+      quote: '| deterministic | FALLBACK | INVALID_APP_SPEC | Spark 项目看板 | 项目 Alpha | set_filter |'
+      statement: '| deterministic | FALLBACK | INVALID_APP_SPEC | Spark 项目看板 | 项目 Alpha | set_filter |'
+      disposition: FACT
+      evidence_id: EV-003
+  S003-U0015:
+    content_sha256: cb2efa27c0e11b1a92fffc912cb851d5a10704d64c89ba457adce8755ef3ea49
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-028
+      quote: 结论：系统没有生成计数器，而是在模型阶段失败后写入与需求无关的固定项目看板。
+      statement: 结论：系统没有生成计数器，而是在模型阶段失败后写入与需求无关的固定项目看板。
+      disposition: FACT
+      evidence_id: EV-003
+  S003-U0016:
+    content_sha256: c37d169d4071b14d65651a0ccdc5e491b4ba2f173c64fe12602508f6c3954826
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S003-U0017:
+    content_sha256: 0563de66649b2d0e9a26084fc68cb4cbd9f679079e1a53cba4ca448a27acd00a
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-029
+      quote: '`generation_events` 共 50 条：'
+      statement: '`generation_events` 共 50 条：'
+      disposition: FACT
+      evidence_id: EV-003
+  S003-U0018:
+    content_sha256: cedb0335ba075e4062a5e48a1531a7b6a061c0259df8fe00505b6e41d31b1f88
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-030
+      quote: '`workers_ai / SUCCESS`：18 条，占 36%。'
+      statement: '`workers_ai / SUCCESS`：18 条，占 36%。'
+      disposition: FACT
+      evidence_id: EV-003
+  S003-U0019:
+    content_sha256: 007b9a443a230363daa1ef4223884719d6d7867e5e135a281ad8dff9b7331919
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-031
+      quote: '`deterministic / FALLBACK`：32 条，占 64%。'
+      statement: '`deterministic / FALLBACK`：32 条，占 64%。'
+      disposition: FACT
+      evidence_id: EV-003
+  S003-U0020:
+    content_sha256: a2cc06cb1da7e6c100bf00139ad21b03f57ed7a1b0b0a50202c17cc4c7fcc3e7
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-032
+      quote: 主要失败码：`INVALID_APP_SPEC` 9、`INVALID_JSON` 5、`INVALID_PRODUCT_ARTIFACT` 4、`MODEL_TIMEOUT` 4、`INVALID_DESIGN_ARTIFACT` 3、`INVALID_ARCHITECTURE_ARTIFACT` 2、`MISSING_REQUIRED_CAPABILITY` 2、`MODEL_ERROR` 2、`INVALID_ENVELOPE` 1。
+      statement: 主要失败码：`INVALID_APP_SPEC` 9、`INVALID_JSON` 5、`INVALID_PRODUCT_ARTIFACT` 4、`MODEL_TIMEOUT` 4、`INVALID_DESIGN_ARTIFACT` 3、`INVALID_ARCHITECTURE_ARTIFACT` 2、`MISSING_REQUIRED_CAPABILITY` 2、`MODEL_ERROR` 2、`INVALID_ENVELOPE` 1。
+      disposition: FACT
+      evidence_id: EV-003
+  S003-U0021:
+    content_sha256: a5175ac27e42f79e70fc6eda14dcafcd6925d4c8a40da78f4d2e3513ae111e96
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S003-U0022:
+    content_sha256: 35b80326719c579016a1ea311e0743f276c2622d61c2fb678986a4454cd7fca6
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-033
+      quote: 查询证明生产数据库中的最终来源、失败类别和落库结果。
+      statement: 查询证明生产数据库中的最终来源、失败类别和落库结果。
+      disposition: FACT
+      evidence_id: EV-003
+  S003-U0023:
+    content_sha256: 8fb9080f7f01963cd4313fd208b6bffbc214ff518492422bbaa03a22592028e2
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-034
+      quote: 现有审计没有保存被拒绝模型输出或精确字段路径，因此不能从数据库还原每一次 schema 失败的原始字段。
+      statement: 现有审计没有保存被拒绝模型输出或精确字段路径，因此不能从数据库还原每一次 schema 失败的原始字段。
+      disposition: FACT
+      evidence_id: EV-003
+  S003-U0024:
+    content_sha256: b7cc353b6a39ac40f45db9d2446c25cf1a2491af4ae5f137a781d989bc5b0539
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-035
+      quote: 本期必须增加不含敏感原文的阶段错误路径和代码包校验原因审计，不能只保存粗粒度失败码。
+      statement: 本期必须增加不含敏感原文的阶段错误路径和代码包校验原因审计，不能只保存粗粒度失败码。
+      disposition: OUT
+      reason: 分析者提出的改进建议，不冒充 Cloudflare D1 事实；审计要求由挑战质量维度和当前模型验收策略承载
+  S004-U0001:
+    content_sha256: 820bc91af08cf681f6224f2ebd5d03bd1a080211440125c01672129959eaeaa2
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S004-U0002:
+    content_sha256: 0708be9ccf2e075bdac167f92b04505fffda941478b4bafbc0464b61138c44fc
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S004-U0003:
+    content_sha256: ebffd6bc9c75aedf57fcb9859791bf10eaaa07484109840bc6b44199f06b7e9a
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-036
+      quote: 基线提交：`0c7783f48e54f26c982d39688c560e71785318ec`。
+      statement: 基线提交：`0c7783f48e54f26c982d39688c560e71785318ec`。
+      disposition: FACT
+      evidence_id: EV-004
+  S004-U0004:
+    content_sha256: df5b2bad9231fa0cac957eb1dcd8b56076974314e517ce018ddf8e73418d920a
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S004-U0005:
+    content_sha256: 399f35dedd73940b4247f903afdf01bf161f88ec6f22b77c38a913dd3e9e3424
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-037
+      quote: '`lib/ai-generator.ts` 要求 Engineering 最终输出 `AppSpec v1`。'
+      statement: '`lib/ai-generator.ts` 要求 Engineering 最终输出 `AppSpec v1`。'
+      disposition: FACT
+      evidence_id: EV-004
+  S004-U0006:
+    content_sha256: 6e2e5c0e45ead1bc90b16ad234909180616e834272434615b39c483e07380a65
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-038
+      quote: 页面种类只允许 `dashboard`、`tracker`、`landing`。
+      statement: 页面种类只允许 `dashboard`、`tracker`、`landing`。
+      disposition: FACT
+      evidence_id: EV-004
+  S004-U0007:
+    content_sha256: eb8ca6080540656c44460330d9e20d125ce245e18deeed4eb26d206bd7793d8e
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-039
+      quote: 动作只允许 `set_filter`、`toggle_item`、`add_item`、`show_toast`。
+      statement: 动作只允许 `set_filter`、`toggle_item`、`add_item`、`show_toast`。
+      disposition: FACT
+      evidence_id: EV-004
+  S004-U0008:
+    content_sha256: 44dff8823caa1e3f75fbaa6c63bb607001934a5db43937c424776e4dd6b18459
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-040
+      quote: 最终运行时没有通用变量、算术、条件、循环、自定义事件或代码文件概念。
+      statement: 最终运行时没有通用变量、算术、条件、循环、自定义事件或代码文件概念。
+      disposition: FACT
+      evidence_id: EV-004
+  S004-U0009:
+    content_sha256: 2114b181f764a8eb73c05d312dd725998b04e5de8a509e72c869f148f263b6f7
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S004-U0010:
+    content_sha256: 164745c1b9dea787874c5397c9e7a97a06cde14cc3b64053512d0ca18f63f0a3
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-041
+      quote: Product、Architecture、Design、Engineering 任一阶段异常都会被外层 `catch` 捕获并调用规则降级。
+      statement: Product、Architecture、Design、Engineering 任一阶段异常都会被外层 `catch` 捕获并调用规则降级。
+      disposition: FACT
+      evidence_id: EV-004
+  S004-U0011:
+    content_sha256: 8bf5536216904dcdcab24d88a9a03e507e296469d562fffd003cc4f4ef883825
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-042
+      quote: 只有 Engineering 的部分校验错误具有一次 repair；
+      statement: 只有 Engineering 的部分校验错误具有一次 repair；
+      disposition: FACT
+      evidence_id: EV-004
+  S004-U0012:
+    content_sha256: ac8548944f5f0a65e3d655f5fb6ef9eb11de6b17619db97911f3336cfb893c64
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-043
+      quote: 前三阶段没有独立重试。
+      statement: 前三阶段没有独立重试。
+      disposition: FACT
+      evidence_id: EV-004
+  S004-U0013:
+    content_sha256: 796dce4212295dd32f82eac06a78ac668d2c89ad0ae966e77b9604349985c9a3
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-044
+      quote: '`lib/generator.ts` 的规则降级只识别旅行、健身、客户、读书、发布等少量主题，未命中时固定返回 `Spark / 项目`。'
+      statement: '`lib/generator.ts` 的规则降级只识别旅行、健身、客户、读书、发布等少量主题，未命中时固定返回 `Spark / 项目`。'
+      disposition: FACT
+      evidence_id: EV-004
+  S004-U0014:
+    content_sha256: 8aaa9b2ad142965475c0a035572a1dbb15ebc0364955bd58a712e7955f09e3a2
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-045
+      quote: 规则降级写入合法 version 并呈现为 `deterministic/FALLBACK`，因此技术上透明，但产品结果可能与输入不一致。
+      statement: 规则降级写入合法 version 并呈现为 `deterministic/FALLBACK`，因此技术上透明，但产品结果可能与输入不一致。
+      disposition: FACT
+      evidence_id: EV-004
+  S004-U0015:
+    content_sha256: 4e33904ad19267e2c1a04797eb447fcdceeaa2a4e87369c8de08a0dda4c99fb8
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S004-U0016:
+    content_sha256: 06bc86b191c8bffffd337d56d5227034483093f995d432c7556fc1e46eb795b0
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-046
+      quote: D1 已保存 project、workspace request、message、run、run step、version、generation event 和 rate limit。
+      statement: D1 已保存 project、workspace request、message、run、run step、version、generation event 和 rate limit。
+      disposition: FACT
+      evidence_id: EV-004
+  S004-U0017:
+    content_sha256: 62bd0fead873e20e72775df39dce7e25008ce77b9a80a12e4bcb6f04ae171f46
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-047
+      quote: '`versions.app_spec_json` 保存生成页面配置；'
+      statement: '`versions.app_spec_json` 保存生成页面配置；'
+      disposition: FACT
+      evidence_id: EV-004
+  S004-U0018:
+    content_sha256: 663d3be9ca9dd89609d10205287ff20ed4517f135e0faf77bcd98d86c186d1f3
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-048
+      quote: 版本不可变并带父版本。
+      statement: 版本不可变并带父版本。
+      disposition: FACT
+      evidence_id: EV-004
+  S004-U0019:
+    content_sha256: cc5ba928f48772df69302e9119e2af9f23fb07f88e743661a71fbcdfe0fde0d7
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-049
+      quote: 生成应用内的筛选、toggle、draft、added card、toast 属于 React 临时状态，不是 D1 业务事实；
+      statement: 生成应用内的筛选、toggle、draft、added card、toast 属于 React 临时状态，不是 D1 业务事实；
+      disposition: FACT
+      evidence_id: EV-004
+  S004-U0020:
+    content_sha256: 84ef429c6bf7a99eeaaaaa5bfa13417443f7b0ec857a62c79c8a667b85ae933f
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-050
+      quote: 刷新只恢复 AppSpec 初始状态。
+      statement: 刷新只恢复 AppSpec 初始状态。
+      disposition: FACT
+      evidence_id: EV-004
+  S004-U0021:
+    content_sha256: aa8f21fc5f2d1173b974a997fb0bcc69932705e1eb9617189dca657f8e4222fd
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S004-U0022:
+    content_sha256: 14f37814304a86b918e9387d54f009aa72ae0eafb475aa6528353b57d1a1336e
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-051
+      quote: 三栏工作台、首次生成和继续修改流程。
+      statement: 三栏工作台、首次生成和继续修改流程。
+      disposition: FACT
+      evidence_id: EV-004
+  S004-U0023:
+    content_sha256: ae283fe884b8ac3cb2bfcede61cf277197f72c409daa87c8f687423e66d9ba8b
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-052
+      quote: 四阶段 Agent 状态与产物审计。
+      statement: 四阶段 Agent 状态与产物审计。
+      disposition: FACT
+      evidence_id: EV-004
+  S004-U0024:
+    content_sha256: 321355b2c0dc467e712624178fd2f7182688fcae8c029614bc1b400cd703c3e9
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-053
+      quote: owner 隔离、幂等、并发锁、超时回收、限流和项目容量保护。
+      statement: owner 隔离、幂等、并发锁、超时回收、限流和项目容量保护。
+      disposition: FACT
+      evidence_id: EV-004
+  S004-U0025:
+    content_sha256: fb646b0151de43fb332ce6103252d5b0f1c767c50843b8fb1fc7a5d4ae1d0d96
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-054
+      quote: D1 project/message/run/version 数据链路。
+      statement: D1 project/message/run/version 数据链路。
+      disposition: FACT
+      evidence_id: EV-004
+  S004-U0026:
+    content_sha256: e5983bf8939c16baafaf8e214cb89c9eebcc82a3a02eb478e73a98a89bc8f729
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-055
+      quote: Cloudflare Workers AI 与公网部署配置。
+      statement: Cloudflare Workers AI 与公网部署配置。
+      disposition: FACT
+      evidence_id: EV-004
+  S004-U0027:
+    content_sha256: afc4482d99e91996169a9bded1742156b14f801cab6bbaf63f5168443b7771f9
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S004-U0028:
+    content_sha256: 22275e39a4be6d2496542dff94703c90d65b9bb5c0728ad8306ca3e50ab4b158
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-056
+      quote: 计数器、计算器、番茄钟等含通用运行状态和计算逻辑的应用。
+      statement: 计数器、计算器、番茄钟等含通用运行状态和计算逻辑的应用。
+      disposition: FACT
+      evidence_id: EV-004
+  S004-U0029:
+    content_sha256: c072dbbbf45a0d3f3251f947ff6a7bf46de0186969ae4d80e29c40f6e5b47841
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-057
+      quote: 自定义按钮事件、任意 DOM 结构和自定义 CSS/JavaScript。
+      statement: 自定义按钮事件、任意 DOM 结构和自定义 CSS/JavaScript。
+      disposition: FACT
+      evidence_id: EV-004
+  S004-U0030:
+    content_sha256: fe126329dd293d6ca64f2a091a2687471602cb3e36e38bce86408579ff29d9b7
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-058
+      quote: 生成应用自身的数据持久化。
+      statement: 生成应用自身的数据持久化。
+      disposition: FACT
+      evidence_id: EV-004
+  S004-U0031:
+    content_sha256: 7a6329fdcd3e59b898420c1ff82c93415e544c5d9d2772776f01898bbb54743f
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-059
+      quote: 第三方 API、任意依赖、独立后端服务或服务端代码执行。
+      statement: 第三方 API、任意依赖、独立后端服务或服务端代码执行。
+      disposition: FACT
+      evidence_id: EV-004
+  S005-U0001:
+    content_sha256: 4949649daa45766723e4b65c483851d7a364ffe5654b462dd5c92bca7d37ee17
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S005-U0002:
+    content_sha256: 09a838a479dcf6801dbfc9b6b83f14d773448390b5b9882245e42124e8c31274
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S005-U0003:
+    content_sha256: 2ff911e13dbcdbb9db5b599a762115eeb2712fa59cc76aca3b0ca2009b0f884a
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-060
+      quote: 以下为本地 Sites Building 官方参考文档的逐字摘录，原始文件分别为 `references/persistence-and-storage.md` 与 `references/authentication.md`。
+      statement: 以下为本地 Sites Building 官方参考文档的逐字摘录，原始文件分别为 `references/persistence-and-storage.md` 与 `references/authentication.md`。
+      disposition: OUT
+      reason: 背景说明或重复表述，已由对应原子覆盖，不新增独立需求
+  S005-U0004:
+    content_sha256: 10b302d52cfdc7ec198e30a408db6d45cf04868bcfe2a1865210bb11b384587f
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored:
+    - quote: '```'
+      reason: Markdown 代码围栏，不承载契约
+    - quote: text
+      reason: Markdown 代码围栏语言标记，不承载契约
+    atoms:
+    - id: ATOM-061
+      quote: Use D1 for persistent structured state that needs to survive page reloads or sessions, especially when it represents product data rather than transient UI state.
+      statement: Use D1 for persistent structured state that needs to survive page reloads or sessions, especially when it represents product data rather than transient UI state.
+      disposition: SRC
+      src_id: SRC-018
+      requirement_ids:
+      - FR-004
+      - NFR-005
+    - id: ATOM-062
+      quote: Use browser storage only for device-local, non-authoritative UI preferences such as dismissed banners, theme choice, or temporary draft state. Do not use localStorage, sessionStorage, or in-memory state as the source of truth for user data that the product is expected to remember.
+      statement: Use browser storage only for device-local, non-authoritative UI preferences such as dismissed banners, theme choice, or temporary draft state. Do not use localStorage, sessionStorage, or in-memory state as the source of truth for user data that the product is expected to remember.
+      disposition: SRC
+      src_id: SRC-019
+      requirement_ids:
+      - FR-004
+      - NFR-005
+    - id: ATOM-063
+      quote: 'Set the needed logical bindings in .openai/hosting.json: use d1, usually DB, when D1 is required; use r2 when R2 is required; leave unused bindings null.'
+      statement: 'Set the needed logical bindings in .openai/hosting.json: use d1, usually DB, when D1 is required; use r2 when R2 is required; leave unused bindings null.'
+      disposition: SRC
+      src_id: SRC-020
+      requirement_ids:
+      - NFR-005
+    - id: ATOM-064
+      quote: 'For D1-backed state: put schema definitions in db/schema.ts; keep D1 access behind a small helper; use prepared statements on the raw D1 binding for application queries and runtime initialization.'
+      statement: 'For D1-backed state: put schema definitions in db/schema.ts; keep D1 access behind a small helper; use prepared statements on the raw D1 binding for application queries and runtime initialization.'
+      disposition: SRC
+      src_id: SRC-021
+      requirement_ids:
+      - FR-004
+      - NFR-005
+  S005-U0005:
+    content_sha256: 230c8b6a7c312586b17370a301ceef8c52aa1fd271afdee6f5a0efc2dc7e8cea
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored:
+    - quote: '```'
+      reason: Markdown 代码围栏，不承载契约
+    - quote: text
+      reason: Markdown 代码围栏语言标记，不承载契约
+    atoms:
+    - id: ATOM-065
+      quote: Signed-in visitors receive both oai-authenticated-user-id and oai-authenticated-user-email. Private Sites require every visitor to sign in; public Sites may also have anonymous visitors, for whom neither header is present.
+      statement: Signed-in visitors receive both oai-authenticated-user-id and oai-authenticated-user-email. Private Sites require every visitor to sign in; public Sites may also have anonymous visitors, for whom neither header is present.
+      disposition: SRC
+      src_id: SRC-022
+      requirement_ids:
+      - NFR-005
+    - id: ATOM-066
+      quote: The user ID is stable for the same user on the same Site and different across Sites.
+      statement: The user ID is stable for the same user on the same Site and different across Sites.
+      disposition: SRC
+      src_id: SRC-023
+      requirement_ids:
+      - NFR-005
+    - id: ATOM-067
+      quote: Keep authorization decisions in server-side code for every site.
+      statement: Keep authorization decisions in server-side code for every site.
+      disposition: SRC
+      src_id: SRC-024
+      requirement_ids:
+      - NFR-003
+      - NFR-005
+    - id: ATOM-068
+      quote: Do not add SIWC just because a site is public or published. Add it only when the requested product has a concrete sign-in-gated surface.
+      statement: Do not add SIWC just because a site is public or published. Add it only when the requested product has a concrete sign-in-gated surface.
+      disposition: OUT
+      reason: 是否启用 SIWC 是历史产品选型，不是本期生成代码协议
+  S006-U0001:
+    content_sha256: 3a4ed7e325cc1586a18f26911c76daa7432ada49d7d6861db858c29353daebec
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S006-U0002:
+    content_sha256: 33ae41658b5c291d1bef7b2d5dccbf284e5d700d92800a03fc7e4b19dbe63fca
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-069
+      quote: 体验日期：2026-08-09；
+      statement: 体验日期：2026-08-09；
+      disposition: FACT
+      evidence_id: EV-006
+  S006-U0003:
+    content_sha256: e35d67d148117a68f8af7b75707ea7b65082cd8c816d186167837405ae5d2b2c
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-070
+      quote: 范围为无需账号即可访问的公开首页和登录入口。
+      statement: 范围为无需账号即可访问的公开首页和登录入口。
+      disposition: FACT
+      evidence_id: EV-006
+  S006-U0004:
+    content_sha256: c1adf49ac098ac8cc0b4f1a5af57d2b9fadcce18cdd45deb09da4ab5ada9c28a
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-071
+      quote: 首页第一屏以一句话输入框作为主入口，并提供 SaaS、电子商务、内部工具、个人项目等模板分类。
+      statement: 首页第一屏以一句话输入框作为主入口，并提供 SaaS、电子商务、内部工具、个人项目等模板分类。
+      disposition: FACT
+      evidence_id: EV-006
+  S006-U0005:
+    content_sha256: b684ebe2e9e067be12177d4a8820ff56d42394d12ed36e25feeda8f1dbdccb33
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-072
+      quote: 首页强调八个具名 Agent 的专业分工，并把用户定位为决策者、Agent 定位为研究、规划、构建、测试和增长的执行团队。
+      statement: 首页强调八个具名 Agent 的专业分工，并把用户定位为决策者、Agent 定位为研究、规划、构建、测试和增长的执行团队。
+      disposition: FACT
+      evidence_id: EV-006
+  S006-U0006:
+    content_sha256: 5779a85e73328f46072edd497b4b9b49f47d82ce25405ec7c8d93222c361d11e
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-073
+      quote: 产品价值表达从“生成代码”扩展到“把想法变成可销售产品”，同时强调真实应用、后端、发布和增长。
+      statement: 产品价值表达从“生成代码”扩展到“把想法变成可销售产品”，同时强调真实应用、后端、发布和增长。
+      disposition: FACT
+      evidence_id: EV-006
+  S006-U0007:
+    content_sha256: 13e87dcc1f84ed6107801793334bab1a5f08d4f3ef6566bc78cc9ed8ba7d2719
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-074
+      quote: 登录入口支持 Google 或邮箱，未输入邮箱时继续按钮保持禁用。
+      statement: 登录入口支持 Google 或邮箱，未输入邮箱时继续按钮保持禁用。
+      disposition: FACT
+      evidence_id: EV-006
+  S006-U0008:
+    content_sha256: 849815a35c327a64d644ae5af7ea8214d644f4d369266245e321fb1c57ff9bef
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-075
+      quote: 未使用个人账号继续登录，因此工作区内部行为仍以官方帮助资料为准。
+      statement: 未使用个人账号继续登录，因此工作区内部行为仍以官方帮助资料为准。
+      disposition: FACT
+      evidence_id: EV-006
+  S006-U0009:
+    content_sha256: 9a19a9b7bfcbcd369c28cdc3989b0c541f5eacc94e7be9b06b19eaae484799d2
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S006-U0010:
+    content_sha256: 66fcb5f87c30373018cbeb3caf22ff42ade213ee34fc50032e7b5d4d5da3e00a
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-076
+      quote: Demo 第一屏应直接让用户输入想法，而不是先解释技术架构。
+      statement: Demo 第一屏应直接让用户输入想法，而不是先解释技术架构。
+      disposition: OUT
+      reason: 公开页面观察后的设计建议，不是可验证产品事实
+  S006-U0011:
+    content_sha256: c7e33cd60f74ca73a8843e6e9b2f9987eed0092111f46a0e0058b07fd1416257
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-077
+      quote: 模板示例可以降低空白输入压力，但生成后应快速把视觉焦点交给可操作的应用预览。
+      statement: 模板示例可以降低空白输入压力，但生成后应快速把视觉焦点交给可操作的应用预览。
+      disposition: OUT
+      reason: 公开页面观察后的设计建议，不是可验证产品事实
+  S006-U0012:
+    content_sha256: a94478c7c6044e41abc7db479cbe8f818d52aa58d955db1b50ee3c5713061d12
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-078
+      quote: Agent 角色应有明确职责和阶段产出，避免只有头像装饰。
+      statement: Agent 角色应有明确职责和阶段产出，避免只有头像装饰。
+      disposition: OUT
+      reason: 公开页面观察后的设计建议，不是可验证产品事实
+  S007-U0001:
+    content_sha256: 8e5f51cc036cec5cef3de7b5ffe1b3b64207dc5172a9b1cdcb9d87676cc6ed44
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S007-U0002:
+    content_sha256: 1b049b04fbb67cbd943ca45e65a5926901464ed5409e6f26c0b319dc7efa8680
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S007-U0003:
+    content_sha256: 0a12fe3fb3240642f41f5dff4ad690fc4fe700e580139df5b50a33f9493bbbf7
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-079
+      quote: 用于 CHG-003、CHG-005 与 CHG-006 的模型选择、费用、结构化输出和绑定契约复核。
+      statement: 用于 CHG-003、CHG-005 与 CHG-006 的模型选择、费用、结构化输出和绑定契约复核。
+      disposition: FACT
+      evidence_id: EV-007
+  S007-U0004:
+    content_sha256: 0a52c136b7f821c99699810983dd83fca018f8baa97fa7143ea31a066612eb11
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S007-U0005:
+    content_sha256: c05908490cbafe9472db688713b0c230e00a8dae93cd8d1b5faa93a62eac4630
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-080
+      quote: 'Workers AI pricing: `https://developers.cloudflare.com/workers-ai/platform/pricing/`'
+      statement: 'Workers AI pricing: `https://developers.cloudflare.com/workers-ai/platform/pricing/`'
+      disposition: FACT
+      evidence_id: EV-007
+  S007-U0006:
+    content_sha256: 1d95af26dbf93b23c77f605f603a903bfda133080bfb1dff601b7d247a82b4ae
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-081
+      quote: 'GLM-4.7-Flash: `https://developers.cloudflare.com/workers-ai/models/glm-4.7-flash/`'
+      statement: 'GLM-4.7-Flash: `https://developers.cloudflare.com/workers-ai/models/glm-4.7-flash/`'
+      disposition: FACT
+      evidence_id: EV-007
+  S007-U0007:
+    content_sha256: b9a217839d7bf90c3a167e75782e16e8f78edd52e216b8ed9f2f7d9e6929e157
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-082
+      quote: 'Llama 3.1 8B Instruct Fast: `https://developers.cloudflare.com/workers-ai/models/llama-3.1-8b-instruct-fast/`'
+      statement: 'Llama 3.1 8B Instruct Fast: `https://developers.cloudflare.com/workers-ai/models/llama-3.1-8b-instruct-fast/`'
+      disposition: FACT
+      evidence_id: EV-007
+  S007-U0008:
+    content_sha256: 11a353b7046768cca9bc6e183c9f680b6008b7a5e21eaf5f0c5fa5e8b0636aac
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-083
+      quote: 'JSON Mode: `https://developers.cloudflare.com/workers-ai/features/json-mode/`'
+      statement: 'JSON Mode: `https://developers.cloudflare.com/workers-ai/features/json-mode/`'
+      disposition: FACT
+      evidence_id: EV-007
+  S007-U0009:
+    content_sha256: 88beaeb818c4a91047d9c933b95833e7e5b2da571fe89828bb77e1ba44696e4f
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-084
+      quote: 'Kimi K2.7 Code: `https://developers.cloudflare.com/workers-ai/models/kimi-k2.7-code/`'
+      statement: 'Kimi K2.7 Code: `https://developers.cloudflare.com/workers-ai/models/kimi-k2.7-code/`'
+      disposition: FACT
+      evidence_id: EV-007
+  S007-U0010:
+    content_sha256: f435b036d08afb7276f830a6256a261b4810b3637fe694fffc111d93d07abca5
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S007-U0011:
+    content_sha256: 6147926126f1c66d255927016269ef6a60e6e2ee9b0a70c889b5c2c3d274a7cc
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-085
+      quote: Workers AI Free 与 Paid 计划均包含每日 10,000 Neurons 免费 allocation；
+      statement: Workers AI Free 与 Paid 计划均包含每日 10,000 Neurons 免费 allocation；
+      disposition: FACT
+      evidence_id: EV-007
+  S007-U0012:
+    content_sha256: d4372968d060db1f1932be0bf9a93883b371d4badcd1869ad5686afe4adfa859
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-086
+      quote: 免费计划超过该 allocation 后请求失败，不能产生超额账单。
+      statement: 免费计划超过该 allocation 后请求失败，不能产生超额账单。
+      disposition: FACT
+      evidence_id: EV-007
+  S007-U0013:
+    content_sha256: 08c81aa1b01be855c978d5ba3a681f2468ad3e7d58a4400f69bc57a72e7adb40
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-087
+      quote: '`@cf/zai-org/glm-4.7-flash` 为 Cloudflare-hosted 多语言模型，支持 function calling 与 reasoning；'
+      statement: '`@cf/zai-org/glm-4.7-flash` 为 Cloudflare-hosted 多语言模型，支持 function calling 与 reasoning；'
+      disposition: FACT
+      evidence_id: EV-007
+  S007-U0014:
+    content_sha256: 4406377ddd2a56da69dc3cf23608d7ed99d4313862319c844a9b0b9e86e7f9a7
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-088
+      quote: 上下文 131,072 tokens；
+      statement: 上下文 131,072 tokens；
+      disposition: FACT
+      evidence_id: EV-007
+  S007-U0015:
+    content_sha256: dd05c20b3104cafbcd363c28e6dc4a94722837415ccbba021dc62ec114543b9e
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-089
+      quote: 页面列价为输入 `$0.06/M tokens`、输出 `$0.40/M tokens`。
+      statement: 页面列价为输入 `$0.06/M tokens`、输出 `$0.40/M tokens`。
+      disposition: FACT
+      evidence_id: EV-007
+  S007-U0016:
+    content_sha256: 416102b0b74dffc7f1732a1a600175a03ec168b000ca5df771bbe56317f214e8
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-090
+      quote: 其模型页未标记 paid-only。
+      statement: 其模型页未标记 paid-only。
+      disposition: FACT
+      evidence_id: EV-007
+  S007-U0017:
+    content_sha256: 1e89c717bf452de99d911984e4250b9fdd3e018aa503df1c99c798b141f50ac3
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-091
+      quote: '`@cf/meta/llama-3.1-8b-instruct-fast` 是 Cloudflare-hosted 的 Llama 3.1 8B Fast 版本；'
+      statement: '`@cf/meta/llama-3.1-8b-instruct-fast` 是 Cloudflare-hosted 的 Llama 3.1 8B Fast 版本；'
+      disposition: FACT
+      evidence_id: EV-007
+  S007-U0018:
+    content_sha256: 96d7498a1bf3ba8235f68d3b4d233e8091e0587bc485dbb70b773569c6ec9b8d
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-092
+      quote: 官方 JSON Mode 支持列表明确包含该模型，输入参数使用 `max_tokens`。
+      statement: 官方 JSON Mode 支持列表明确包含该模型，输入参数使用 `max_tokens`。
+      disposition: FACT
+      evidence_id: EV-007
+  S007-U0019:
+    content_sha256: 75a94c015d289fe4e658652ad3b74c397f06a6ac684f37797bfb001963ea9e13
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-093
+      quote: 其职责限定为生成受严格校验的 AppSpec envelope。
+      statement: 其职责限定为生成受严格校验的 AppSpec envelope。
+      disposition: OUT
+      reason: 旧 AppSpec 职责已被 CHG-010 代码包协议取代
+  S007-U0020:
+    content_sha256: 3579b9a48429557cfffc4816afbf076ffd65ab91fdea923fe83bda13af943a17
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-094
+      quote: 官方 JSON Mode 示例在需要结构约束时使用 `response_format.type=json_schema` 并直接传有效 JSON Schema；
+      statement: 官方 JSON Mode 示例在需要结构约束时使用 `response_format.type=json_schema` 并直接传有效 JSON Schema；
+      disposition: FACT
+      evidence_id: EV-007
+  S007-U0021:
+    content_sha256: 2405fc7cdc13262e4e63be4fe1edfc1ac2c540f120345342ea69eddaf9671ae9
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-095
+      quote: 示例同步响应的 `response` 是已解析对象。
+      statement: 示例同步响应的 `response` 是已解析对象。
+      disposition: FACT
+      evidence_id: EV-007
+  S007-U0022:
+    content_sha256: 03ecbe7f10bbb0423e5b50355386d855823753d4d2ea86cfefba61957d10a23f
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-096
+      quote: 官方同时声明 schema 不保证绝对满足，因此服务端二次校验和安全降级必须保留。
+      statement: 官方同时声明 schema 不保证绝对满足，因此服务端二次校验和安全降级必须保留。
+      disposition: FACT
+      evidence_id: EV-007
+  S007-U0023:
+    content_sha256: 45c5bf1552af4b9d3cf89e8952f370823838821c29807ae56f8ff2ef336c68e6
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-097
+      quote: 线上 Worker versions `9ae2badf`、`daa750b2`、`c46db79b` 与 `8b58a341` 对 GLM 的实测分别在 25/25/25/55 秒进入 `MODEL_TIMEOUT`；
+      statement: 线上 Worker versions `9ae2badf`、`daa750b2`、`c46db79b` 与 `8b58a341` 对 GLM 的实测分别在 25/25/25/55 秒进入 `MODEL_TIMEOUT`；
+      disposition: FACT
+      evidence_id: EV-007
+  S007-U0024:
+    content_sha256: 4553f6aecb9d1ca2646d5da8c3a92a36933d6cd6e791e319b62fe468cd761a3b
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-098
+      quote: 因此 CHG-005 切换 Fast 模型，不再继续扩大用户等待预算。
+      statement: 因此 CHG-005 切换 Fast 模型，不再继续扩大用户等待预算。
+      disposition: OUT
+      reason: 旧 CHG-005 模型选择结论，不作为 CHG-010 规范
+  S007-U0025:
+    content_sha256: 49ab51293f5f1a0dcf8c14bea84959d0d34c783b99cc55800fe7164b7449a104
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-099
+      quote: '`@cf/moonshotai/kimi-k2.7-code` 页面明确显示 `Paid access required`，并说明标准 Workers Free billing 不可用，需升级 Workers Paid 或使用预付 AI Gateway credits；'
+      statement: '`@cf/moonshotai/kimi-k2.7-code` 页面明确显示 `Paid access required`，并说明标准 Workers Free billing 不可用，需升级 Workers Paid 或使用预付 AI Gateway credits；'
+      disposition: FACT
+      evidence_id: EV-007
+  S007-U0026:
+    content_sha256: 342f1655d67600364b8e0d0724ca5357d97566faa1c3780737665f5030bbe799
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-100
+      quote: 因此本次免费账户不采用。
+      statement: 因此本次免费账户不采用。
+      disposition: OUT
+      reason: 旧模型排除结论，不作为 CHG-010 规范
+  S007-U0027:
+    content_sha256: b29757613edc940ea6a390bbb7cf9c1376a93dde2e4567e09ca5ba11d577473e
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-101
+      quote: GLM、Llama 与 Kimi 均通过 Worker `AI` binding 的 `env.AI.run(model, input)` 调用；
+      statement: GLM、Llama 与 Kimi 均通过 Worker `AI` binding 的 `env.AI.run(model, input)` 调用；
+      disposition: FACT
+      evidence_id: EV-007
+  S007-U0028:
+    content_sha256: 58194cd587f2709e027b5c30cf62ff82496cd77f115ea5b8bf8d3e20cf34ea30
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-102
+      quote: CHG-003/005/006 不需要第三方 API Key。
+      statement: CHG-003/005/006 不需要第三方 API Key。
+      disposition: FACT
+      evidence_id: EV-007
+  S007-U0029:
+    content_sha256: 01e2833ebfe445710324ad905be237f7a804e2f3cd2e4e6c49349796601c1100
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-103
+      quote: 本期生产选择 Llama，GLM 超时记录和 Kimi 费用事实仅保留为选型依据。
+      statement: 本期生产选择 Llama，GLM 超时记录和 Kimi 费用事实仅保留为选型依据。
+      disposition: OUT
+      reason: 旧生产模型选择已由 CHG-010 的 builder/planner 决策取代
+  S007-U0030:
+    content_sha256: 2f2c2acc8effc779b17f8ea4a9322774f619c832423ab921ee3e03a0e206d320
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S007-U0031:
+    content_sha256: dcc7dd352a24a4371d12ed9ba9a991379679b1f8c4c02315bee240af74dbf50a
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-104
+      quote: 模型目录、价格和计划可用性可能变化。
+      statement: 模型目录、价格和计划可用性可能变化。
+      disposition: FACT
+      evidence_id: EV-007
+  S007-U0032:
+    content_sha256: 1109f33226fa2b5f95ae155a762bfc3afedf32ecfa5b848a1b161f791e5e55da
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-105
+      quote: 发布验收必须以实际 `AI` binding 调用和 `generation_events` 成功记录为准；
+      statement: 发布验收必须以实际 `AI` binding 调用和 `generation_events` 成功记录为准；
+      disposition: OUT
+      reason: 旧快照中的分析者发布建议；当前发布门禁由 S010-U0039~41 重新归责
+  S007-U0033:
+    content_sha256: 762bcbd64bf9a6be77390006b28679415dc6e27d9e8eff1369700fce3dfe363e
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-106
+      quote: 本快照不能替代线上调用证据。
+      statement: 本快照不能替代线上调用证据。
+      disposition: FACT
+      evidence_id: EV-007
+  S008-U0001:
+    content_sha256: 90bba80ffdeaad11ca2c565a80cfbca93bd513e5371f211801923d113a72245d
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S008-U0002:
+    content_sha256: 19a3e91f2e5bb59a452a5a82ce5e2da8d0bf8f9f295a343074ea691bc5aeab05
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S008-U0003:
+    content_sha256: 685569aaf9426b9532c296341ce5b3d46a9c081b9be26a0ff26ad34a3d27919f
+    status: NO_REQUIREMENT
+    reason: 来源说明、过渡文本或用例定位，不单独承载需求
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S008-U0004:
+    content_sha256: 7c885c2a035e34b66e24559d237be0b8bae922b972e980cb32b64fbd29549054
+    status: NO_REQUIREMENT
+    reason: 来源说明、过渡文本或用例定位，不单独承载需求
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S008-U0005:
+    content_sha256: 3f83882156a861b29a94c93021828c47d42c4b5193cad2db1d55545d223508ef
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S008-U0006:
+    content_sha256: 56c04ee0dc3b9f5d70d3bfc3651475a077a17e6b81e3c4986ba824fcee62d3f2
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored:
+    - quote: '```'
+      reason: Markdown 代码围栏，不承载产品语义
+    - quote: text
+      reason: Markdown 代码围栏语言标记，不承载产品语义
+    atoms:
+    - id: ATOM-107
+      quote: '# Communicating with Agents'
+      statement: '# Communicating with Agents'
+      disposition: FACT
+      evidence_id: EV-008
+    - id: ATOM-108
+      quote: 'The Atoms team consists of seven specialized agents, each with specific talents:'
+      statement: 'The Atoms team consists of seven specialized agents, each with specific talents:'
+      disposition: FACT
+      evidence_id: EV-008
+    - id: ATOM-109
+      quote: '* Mike (Team Leader): Distributes tasks and coordinates the team.'
+      statement: '* Mike (Team Leader): Distributes tasks and coordinates the team.'
+      disposition: FACT
+      evidence_id: EV-008
+    - id: ATOM-110
+      quote: '* Emma (Product Manager): Manages product requirement analysis and market research.'
+      statement: '* Emma (Product Manager): Manages product requirement analysis and market research.'
+      disposition: FACT
+      evidence_id: EV-008
+    - id: ATOM-111
+      quote: '* Bob (Architect): Designs system architecture and technical solutions.'
+      statement: '* Bob (Architect): Designs system architecture and technical solutions.'
+      disposition: FACT
+      evidence_id: EV-008
+    - id: ATOM-112
+      quote: '* Alex (Engineer): Focuses on application development, rapid bug fixes, and feature implementation.'
+      statement: '* Alex (Engineer): Focuses on application development, rapid bug fixes, and feature implementation.'
+      disposition: FACT
+      evidence_id: EV-008
+    - id: ATOM-113
+      quote: '* David (Data Analyst): Handles data processing, machine learning, web scraping, and data-driven Q&A tasks.'
+      statement: '* David (Data Analyst): Handles data processing, machine learning, web scraping, and data-driven Q&A tasks.'
+      disposition: FACT
+      evidence_id: EV-008
+    - id: ATOM-114
+      quote: '* Iris (Deep Researcher): Collects, analyzes, and summarizes information for work, study, or decision making.'
+      statement: '* Iris (Deep Researcher): Collects, analyzes, and summarizes information for work, study, or decision making.'
+      disposition: FACT
+      evidence_id: EV-008
+    - id: ATOM-115
+      quote: '* Sarah (SEO Specialist): Generate multilingual SEO content to drive traffic.'
+      statement: '* Sarah (SEO Specialist): Generate multilingual SEO content to drive traffic.'
+      disposition: FACT
+      evidence_id: EV-008
+    - id: ATOM-116
+      quote: 'For complex tasks: Start with a Minimum Viable Product (MVP). Then, improve each module step by step.'
+      statement: 'For complex tasks: Start with a Minimum Viable Product (MVP). Then, improve each module step by step.'
+      disposition: FACT
+      evidence_id: EV-008
+  S008-U0007:
+    content_sha256: e01b61887c4afc45d0f63acd4bb528fa83fc6279d99ce020adfe7f85d8cefcc3
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S008-U0008:
+    content_sha256: 74f624390fabaec7f2ed2652fb797568f3560a8570a6d7be77825fcec93cb312
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored:
+    - quote: '```'
+      reason: Markdown 代码围栏，不承载产品语义
+    - quote: text
+      reason: Markdown 代码围栏语言标记，不承载产品语义
+    atoms:
+    - id: ATOM-117
+      quote: With Supabase, you can easily configure a backend for your websites—no development experience needed.
+      statement: With Supabase, you can easily configure a backend for your websites—no development experience needed.
+      disposition: SRC
+      src_id: SRC-025
+      requirement_ids:
+      - FR-004
+      - NFR-005
+    - id: ATOM-118
+      quote: You can connect with Supabase to solve the problem that your Atoms team only stores in the browser's memory, which can be lost upon refresh or closure. By integrating Atoms with Supabase, you can transform your website into a fully functional application with persistent storage and advanced features.
+      statement: You can connect with Supabase to solve the problem that your Atoms team only stores in the browser's memory, which can be lost upon refresh or closure. By integrating Atoms with Supabase, you can transform your website into a fully functional application with persistent storage and advanced features.
+      disposition: SRC
+      src_id: SRC-026
+      requirement_ids:
+      - FR-004
+      - NFR-005
+    - id: ATOM-119
+      quote: Test the Functionality in Atoms
+      statement: Test the Functionality in Atoms
+      disposition: OUT
+      reason: 帮助文档段落标题，不单独承载需求
+    - id: ATOM-120
+      quote: '* Create sample data in your app, such as adding a few "trip records" through the UI.'
+      statement: '* Create sample data in your app, such as adding a few "trip records" through the UI.'
+      disposition: SRC
+      src_id: SRC-027
+      requirement_ids:
+      - FR-004
+      - NFR-005
+    - id: ATOM-121
+      quote: '* Save the data and refresh the page. The data will be synced to the Supabase database.'
+      statement: '* Save the data and refresh the page. The data will be synced to the Supabase database.'
+      disposition: SRC
+      src_id: SRC-028
+      requirement_ids:
+      - FR-004
+      - NFR-005
+    - id: ATOM-122
+      quote: '* Log in to Supabase and verify whether the newly added data exists in the database.'
+      statement: '* Log in to Supabase and verify whether the newly added data exists in the database.'
+      disposition: SRC
+      src_id: SRC-029
+      requirement_ids:
+      - FR-004
+      - NFR-005
+  S008-U0009:
+    content_sha256: bde6260fb5fa229f39adf1e6a4946cf87b9420491c7e74c207d1349288bc5a49
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S008-U0010:
+    content_sha256: 50539952f9dbd89044832646760ea2a385adc4fed9032e5457528118a0b968fe
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored:
+    - quote: '```'
+      reason: Markdown 代码围栏，不承载产品语义
+    - quote: text
+      reason: Markdown 代码围栏语言标记，不承载产品语义
+    atoms:
+    - id: ATOM-123
+      quote: MGX is now rebranded to Atoms. It was once MetaGPTX, built on MetaGPT and pioneers multi-agent natural language programming. It simulates software development by breaking complex tasks into stages, and supports various LLMs and revolutionizes code generation through natural language.
+      statement: MGX is now rebranded to Atoms. It was once MetaGPTX, built on MetaGPT and pioneers multi-agent natural language programming. It simulates software development by breaking complex tasks into stages, and supports various LLMs and revolutionizes code generation through natural language.
+      disposition: FACT
+      evidence_id: EV-008
+  S008-U0011:
+    content_sha256: bc17fc164c245e10b60614e7ca4e0b5763200819d8466d2418292110488762fb
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S008-U0012:
+    content_sha256: aae800c01a0cf6acac6a074cf23c4136e436a26adbae5fb7844ee7e212873eda
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored:
+    - quote: '```'
+      reason: Markdown 代码围栏，不承载产品语义
+    - quote: text
+      reason: Markdown 代码围栏语言标记，不承载产品语义
+    atoms:
+    - id: ATOM-124
+      quote: What can I build with Atoms?
+      statement: What can I build with Atoms?
+      disposition: OUT
+      reason: FAQ 问题标题；其下一行回答承载产品能力
+    - id: ATOM-125
+      quote: You can build websites, landing pages, portfolios, web apps, dashboards, calculators, reports, and business tools with AI-assisted building.
+      statement: You can build websites, landing pages, portfolios, web apps, dashboards, calculators, reports, and business tools with AI-assisted building.
+      disposition: SRC
+      src_id: SRC-030
+      requirement_ids:
+      - FR-002
+      - FR-003
+    - id: ATOM-126
+      quote: Do I need coding experience to use Atoms?
+      statement: Do I need coding experience to use Atoms?
+      disposition: OUT
+      reason: FAQ 问题标题；其下一行回答承载产品能力
+    - id: ATOM-127
+      quote: No. Describe what you need and share feedback with AI agents; they help plan, build, edit, and improve the project.
+      statement: No. Describe what you need and share feedback with AI agents; they help plan, build, edit, and improve the project.
+      disposition: SRC
+      src_id: SRC-031
+      requirement_ids:
+      - FR-001
+      - FR-002
+      - FR-005
+    - id: ATOM-128
+      quote: How do Atoms agents help with my project?
+      statement: How do Atoms agents help with my project?
+      disposition: OUT
+      reason: FAQ 问题标题；其下一行回答承载产品能力
+    - id: ATOM-129
+      quote: Atoms agents can break down tasks, analyze requirements, write code, manage data, research information, and help turn an idea into a working product.
+      statement: Atoms agents can break down tasks, analyze requirements, write code, manage data, research information, and help turn an idea into a working product.
+      disposition: SRC
+      src_id: SRC-032
+      requirement_ids:
+      - FR-002
+      - FR-004
+    - id: ATOM-130
+      quote: How do I publish or share my project?
+      statement: How do I publish or share my project?
+      disposition: OUT
+      reason: FAQ 问题标题；其下一行回答承载产品能力
+    - id: ATOM-131
+      quote: Use Publish to create a stable public link or connect a custom domain. Use Share to export files, manage permissions, or copy a shareable link.
+      statement: Use Publish to create a stable public link or connect a custom domain. Use Share to export files, manage permissions, or copy a shareable link.
+      disposition: SRC
+      src_id: SRC-033
+      requirement_ids:
+      - NFR-001
+  S009-U0001:
+    content_sha256: bef3768ccc04f87706d1781d45f9cf2fbfe9254c29a7cf1eb88098cf9a71a658
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S009-U0002:
+    content_sha256: 225dee1ee136eb954ca01e66c919a675f471b58da114533d80762cb927a4c6c6
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S009-U0003:
+    content_sha256: ec9e2c998d8e836894b5b4f0d523bb595b1103ebbbe75dca0fdf0daaad069008
+    status: NO_REQUIREMENT
+    reason: 来源说明、过渡文本或用例定位，不单独承载需求
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S009-U0004:
+    content_sha256: f7a8b494654f46f0caae16d8ee719fc7ea5e675c5333ebc8c94fc57a3ad12703
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S009-U0005:
+    content_sha256: 32881d202e4156f857338e716b128745780784f956936543e9495d926808e9dd
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S009-U0006:
+    content_sha256: b00343ee8978450d098d12c03f10263fd68ccdd12128b25e40773153ffb02224
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-132
+      quote: '`sandbox` 属性会对 iframe 内容启用额外限制；'
+      statement: '`sandbox` 属性会对 iframe 内容启用额外限制；'
+      disposition: SRC
+      src_id: SRC-034
+      requirement_ids:
+      - FR-003
+      - NFR-003
+  S009-U0007:
+    content_sha256: 8b234fe2b0efc6280e9f64ab7b7a4e769f8cdd21a50be77237f5042830a3be26
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-133
+      quote: 只有显式 token 会重新开放对应能力。
+      statement: 只有显式 token 会重新开放对应能力。
+      disposition: SRC
+      src_id: SRC-035
+      requirement_ids:
+      - FR-003
+      - NFR-003
+  S009-U0008:
+    content_sha256: 4f4413a281663e6af84f33aca4e2e1e171db6a9dc34a99a08eedecc77e4320ff
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-134
+      quote: 标准列出的 token 包括 `allow-scripts`、`allow-same-origin`、`allow-forms`、`allow-popups`、`allow-downloads` 与多种 top-navigation token。
+      statement: 标准列出的 token 包括 `allow-scripts`、`allow-same-origin`、`allow-forms`、`allow-popups`、`allow-downloads` 与多种 top-navigation token。
+      disposition: SRC
+      src_id: SRC-036
+      requirement_ids:
+      - FR-003
+      - FR-007
+      - NFR-003
+  S009-U0009:
+    content_sha256: 7c4caffc63df219e17946dfd3e42df3862988146c8ae3627c3777af5e3ef7e90
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-135
+      quote: 未启用 `allow-same-origin` 时，内容处于 unique opaque origin。
+      statement: 未启用 `allow-same-origin` 时，内容处于 unique opaque origin。
+      disposition: SRC
+      src_id: SRC-037
+      requirement_ids:
+      - FR-003
+      - NFR-003
+  S009-U0010:
+    content_sha256: bd9347edb2506a167c55a268257e47459cda1f4a77d276bbc2c10aef97a64932
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-136
+      quote: 同时启用 `allow-scripts` 与 `allow-same-origin` 且内容同源，会形成移除 sandbox 属性后逃逸的风险。
+      statement: 同时启用 `allow-scripts` 与 `allow-same-origin` 且内容同源，会形成移除 sandbox 属性后逃逸的风险。
+      disposition: SRC
+      src_id: SRC-038
+      requirement_ids:
+      - FR-003
+      - NFR-003
+  S009-U0011:
+    content_sha256: ddc1c41f129c9bd7fb4b87f382000b3f94ecba9e3fdf83ec884833268190928e
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-137
+      quote: 标准建议潜在恶意内容不要由与宿主页相同的服务器直接提供；
+      statement: 标准建议潜在恶意内容不要由与宿主页相同的服务器直接提供；
+      disposition: SRC
+      src_id: SRC-039
+      requirement_ids:
+      - NFR-003
+  S009-U0012:
+    content_sha256: 032b4c54f7b97ab51c12b9400e0e9f7fea4b263e1021b5fc643bdaa7ac947a08
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-138
+      quote: 使用专用不同域可缩小绕过 iframe 直接访问时的影响。
+      statement: 使用专用不同域可缩小绕过 iframe 直接访问时的影响。
+      disposition: SRC
+      src_id: SRC-040
+      requirement_ids:
+      - NFR-003
+  S009-U0013:
+    content_sha256: 174e2a7c5520988eed4c776f1472c3826d58be465a36b7e55b75fc65e1786fac
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S009-U0014:
+    content_sha256: 7612f38fbf25e15fa25ca8d2aa169afa92b47f7e75caad2b37b65438248c8e0d
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S009-U0015:
+    content_sha256: c702c266f4658e4fc5bd0254b9ca26e69ce8e776887c05c4f3a714fac819e083
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-139
+      quote: '`default-src` 是未单独声明的 fetch directives 的 fallback。'
+      statement: '`default-src` 是未单独声明的 fetch directives 的 fallback。'
+      disposition: SRC
+      src_id: SRC-041
+      requirement_ids:
+      - FR-003
+      - FR-007
+      - NFR-003
+  S009-U0016:
+    content_sha256: 09cdc3078260c9e1b94dd392fd87f955a86690f2ddd5fa86b68f88bde6864c3a
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-140
+      quote: 文档列出的 fallback 范围包括 `connect-src`、`img-src`、`script-src`、`style-src`、`font-src`、`media-src`、`object-src`、`frame-src` 与 `worker-src`；
+      statement: 文档列出的 fallback 范围包括 `connect-src`、`img-src`、`script-src`、`style-src`、`font-src`、`media-src`、`object-src`、`frame-src` 与 `worker-src`；
+      disposition: SRC
+      src_id: SRC-042
+      requirement_ids:
+      - FR-003
+      - FR-007
+      - NFR-003
+  S009-U0017:
+    content_sha256: e418acb9f777805a206443804b83a01106dc1e3ecb4da06882c02058e44a7b78
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-141
+      quote: 该事实本身不等于导航、form action 或消息授权策略。
+      statement: 该事实本身不等于导航、form action 或消息授权策略。
+      disposition: OUT
+      reason: 对官方列表能力边界的分析性提醒，不标为平台 FACT 或本期规范
+  S009-U0018:
+    content_sha256: 3ded4828ce1fd56ec22161c65c4ac8bad2eaee5a7d4573afd1ad7135cf0669b9
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S009-U0019:
+    content_sha256: 9996c197a95ba67f92e869b346ba22273d081acdd2f2910db283412f5dce3c37
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S009-U0020:
+    content_sha256: ccebe9395ff8ca70efc60951897d6d987aa358508fff2e3d9e42016b46912166
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-142
+      quote: message 使用 structured clone 传输。
+      statement: message 使用 structured clone 传输。
+      disposition: SRC
+      src_id: SRC-043
+      requirement_ids:
+      - FR-004
+      - NFR-003
+      - NFR-005
+  S009-U0021:
+    content_sha256: 555017bc87e03acf804006cb85ae728746fddec881c8ca0b4c8c918764bc42b6
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-143
+      quote: '`targetOrigin` 精确匹配 scheme、hostname 和 port；'
+      statement: '`targetOrigin` 精确匹配 scheme、hostname 和 port；'
+      disposition: SRC
+      src_id: SRC-044
+      requirement_ids:
+      - FR-004
+      - NFR-003
+      - NFR-005
+  S009-U0022:
+    content_sha256: 0b3b091893ca442388c9498dca766828547525933b74b5c866386ce92aa0150e
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-144
+      quote: 已知接收方 origin 时不应使用 `"*"`。
+      statement: 已知接收方 origin 时不应使用 `"*"`。
+      disposition: SRC
+      src_id: SRC-045
+      requirement_ids:
+      - FR-004
+      - NFR-003
+      - NFR-005
+  S009-U0023:
+    content_sha256: 7e7e9f633e5ff9f96456a054abefc65a41c375a315f0b95bc53986b0be42681e
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-145
+      quote: '`data:` 等 opaque-origin 目标必须用 `"*"` 发送。'
+      statement: '`data:` 等 opaque-origin 目标必须用 `"*"` 发送。'
+      disposition: SRC
+      src_id: SRC-046
+      requirement_ids:
+      - FR-004
+      - NFR-003
+      - NFR-005
+  S009-U0024:
+    content_sha256: 7afa91680525d467cc346b63b43d5a92caae43b3b8ee7d79bd61e48147bbef6a
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-146
+      quote: 接收消息时必须校验 sender identity 的 `origin` 和可能的 `source`，并继续校验消息语法。
+      statement: 接收消息时必须校验 sender identity 的 `origin` 和可能的 `source`，并继续校验消息语法。
+      disposition: SRC
+      src_id: SRC-047
+      requirement_ids:
+      - FR-004
+      - NFR-003
+      - NFR-005
+  S009-U0025:
+    content_sha256: 0773199e079c537fdbf1edd54fb42f2eced43c6a6becf99889a1834364330916
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S009-U0026:
+    content_sha256: 40b229feb766e681bbfe8189df2a992c9737cae03d6065b8eee9df4e588b37dc
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S009-U0027:
+    content_sha256: 979dbbb1fa94b5087b1012340b0af9efdc0bec907c412b10fb7423cca706bdc5
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-147
+      quote: Workers Free 公开上限包括 10 ms CPU、128 MB memory、50 subrequests/request 和 3 MB Worker size。
+      statement: Workers Free 公开上限包括 10 ms CPU、128 MB memory、50 subrequests/request 和 3 MB Worker size。
+      disposition: SRC
+      src_id: SRC-048
+      requirement_ids:
+      - NFR-006
+  S010-U0001:
+    content_sha256: d6681e037d9e72f4179d7bf6687d182e2b22987a765ee9459bc55e564e1f91a4
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S010-U0002:
+    content_sha256: 244ea9dd1736ca431ab53eb708d237e51a5b9c3d03409341d010b00988523090
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S010-U0003:
+    content_sha256: be26b5f557c9b60af7436a6398ad4b736e40e3c8660692053e7aea211a332432
+    status: NO_REQUIREMENT
+    reason: 来源说明、过渡文本或用例定位，不单独承载需求
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S010-U0004:
+    content_sha256: 425f8385b4ff7bda64206a0ea26b153976c5e4c275de114a13959beea6269ae6
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-148
+      quote: builder 选型、CodeBundle 协议、parser、repair 与发布证据属于后续设计，不包装成官方模型事实。
+      statement: builder 选型、CodeBundle 协议、parser、repair 与发布证据属于后续设计，不包装成官方模型事实。
+      disposition: FACT
+      evidence_id: EV-010
+  S010-U0005:
+    content_sha256: 9e4a185c5791941ab681c3f28ccaaeab3707b1129ea08249645caf2f347563b4
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S010-U0006:
+    content_sha256: 0d43ca17ccaae55dbe8ca0f5b1d054b51d7d3d74b6b7574e8bcaab29767476ff
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S010-U0007:
+    content_sha256: 83c27b51533ee14fd7b880114cb8e77f916788f270740113e1b8c99ed23bd724
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-149
+      quote: 模型 ID：`@cf/qwen/qwen2.5-coder-32b-instruct`，Cloudflare-hosted Text Generation。
+      statement: 模型 ID：`@cf/qwen/qwen2.5-coder-32b-instruct`，Cloudflare-hosted Text Generation。
+      disposition: FACT
+      evidence_id: EV-010
+  S010-U0008:
+    content_sha256: 0a0eea4bf3fb34896bff5f14602342674b7696350c2e409e6fc0d5973e80b661
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-150
+      quote: 官方说明将 Qwen2.5-Coder 定位为 code-specific large language model。
+      statement: 官方说明将 Qwen2.5-Coder 定位为 code-specific large language model。
+      disposition: FACT
+      evidence_id: EV-010
+  S010-U0009:
+    content_sha256: 59e2263df413c193fd9a30e090301ea2a12c1b070c2f687cff13312b365ea2dc
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-151
+      quote: context window 为 32,768 tokens。
+      statement: context window 为 32,768 tokens。
+      disposition: FACT
+      evidence_id: EV-010
+  S010-U0010:
+    content_sha256: 97732dd8ddfa07a4e8e965e990d0d1c61950f6fd97d7e43e445ff5cf1730563f
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-152
+      quote: '同步接口接受 `messages`、`max_tokens`、`temperature` 等参数，返回 `response: string`。'
+      statement: '同步接口接受 `messages`、`max_tokens`、`temperature` 等参数，返回 `response: string`。'
+      disposition: FACT
+      evidence_id: EV-010
+  S010-U0011:
+    content_sha256: ce9181189cd836bf3b31e047611ba70837f229982d76593121377112c3fb2802
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-153
+      quote: 公开页面给出的 `max_tokens` 默认值为 256；
+      statement: 公开页面给出的 `max_tokens` 默认值为 256；
+      disposition: FACT
+      evidence_id: EV-010
+  S010-U0012:
+    content_sha256: 8f96a39f912f3235caac6454d01520525e47eea47198a4ed986533174eec808f
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-154
+      quote: 页面没有承诺本项目所需的输出长度、响应时间或中文代码生成成功率。
+      statement: 页面没有承诺本项目所需的输出长度、响应时间或中文代码生成成功率。
+      disposition: OUT
+      reason: 官方页面未出现项目级承诺属于缺失边界，不标为 Cloudflare 正向 FACT
+  S010-U0013:
+    content_sha256: a7a63907f3cf10e70fd4b7282632c4132d73650c9e26ec3ba46130cb27df22c1
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-155
+      quote: 单价为每百万 input tokens 0.66 美元、output tokens 1.00 美元；
+      statement: 单价为每百万 input tokens 0.66 美元、output tokens 1.00 美元；
+      disposition: FACT
+      evidence_id: EV-010
+  S010-U0014:
+    content_sha256: 69540bebff49a052337e8c3e03d016c64b68346cbcb2911c599bcfaf1bb875ad
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-156
+      quote: Cloudflare pricing 页对应 60,000 neurons/M input、90,909 neurons/M output。
+      statement: Cloudflare pricing 页对应 60,000 neurons/M input、90,909 neurons/M output。
+      disposition: FACT
+      evidence_id: EV-010
+  S010-U0015:
+    content_sha256: e964e102a21c541d28d7608f22e3e164e97dd3667f13ed3bc741db9743cc258b
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S010-U0016:
+    content_sha256: e20ae745bf633bd3c8e4d42587419f5784973cd0dc22bb5ae3aec8d8af2b2e63
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S010-U0017:
+    content_sha256: a0e23c6fdc3895049bbeac154c5872722ddaeefe3889a9f70b30f43c99a3c43d
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-157
+      quote: 模型 ID：`@cf/meta/llama-3.3-70b-instruct-fp8-fast`，Cloudflare-hosted Text Generation。
+      statement: 模型 ID：`@cf/meta/llama-3.3-70b-instruct-fp8-fast`，Cloudflare-hosted Text Generation。
+      disposition: FACT
+      evidence_id: EV-010
+  S010-U0018:
+    content_sha256: 4faad17df21a9dbdcffea7c5d39daa9de109a69d091ee2508ae5a674aa74a7eb
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-158
+      quote: context window 为 24,000 tokens；
+      statement: context window 为 24,000 tokens；
+      disposition: FACT
+      evidence_id: EV-010
+  S010-U0019:
+    content_sha256: 0e3e0b10a03342ebc6296318d06c478861c65e2bc8398aa18f4fbb09ec879348
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-159
+      quote: 接口接受 `messages`、`max_tokens`、`response_format` 等参数。
+      statement: 接口接受 `messages`、`max_tokens`、`response_format` 等参数。
+      disposition: FACT
+      evidence_id: EV-010
+  S010-U0020:
+    content_sha256: a4d4a254b792d5276fa1f0a458d82ecdd4f790728f7a2d474443903defbe87c6
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S010-U0021:
+    content_sha256: 50973c8e55629cdf3c5b67902eab8527bfae3ab9172a74b8932eff37884ce4d3
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S010-U0022:
+    content_sha256: 4ec2163f6528b4f565bb8aa17cb994306a7ca97c49dd2ebf061cf610936b1c69
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-160
+      quote: Workers AI JSON Mode 支持列表包含 Llama 3.3 70B，但不包含 Qwen2.5-Coder-32B-Instruct。
+      statement: Workers AI JSON Mode 支持列表包含 Llama 3.3 70B，但不包含 Qwen2.5-Coder-32B-Instruct。
+      disposition: FACT
+      evidence_id: EV-010
+  S010-U0023:
+    content_sha256: 043767298d42ef54d1b18510340bd1b520e5a6c8886e8404fd1012abc9b6389d
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-161
+      quote: 官方明确说明 JSON Mode 不能保证满足所给 JSON Schema。
+      statement: 官方明确说明 JSON Mode 不能保证满足所给 JSON Schema。
+      disposition: FACT
+      evidence_id: EV-010
+  S010-U0024:
+    content_sha256: 037ecce3af3f530618ef729a598bfd5fc272ebefa7277d842c7058eedc5ec75b
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-162
+      quote: 极端情况下会返回 `JSON Mode couldn't be met`，调用方必须处理。
+      statement: 极端情况下会返回 `JSON Mode couldn't be met`，调用方必须处理。
+      disposition: FACT
+      evidence_id: EV-010
+  S010-U0025:
+    content_sha256: 0c58930478de49bd99e6d092743b40c4e9cfcf571c6965b0f308e120bc722fe9
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-163
+      quote: JSON Mode 当前不支持 streaming。
+      statement: JSON Mode 当前不支持 streaming。
+      disposition: FACT
+      evidence_id: EV-010
+  S010-U0026:
+    content_sha256: 0b9ded8e1a0e62158714885039ee499f548b7fe4960ced00f97abfed6331b02f
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S010-U0027:
+    content_sha256: 762aea3d8f04390fdff2e8c25c8a1c0f473369ce519b9e4bfb078e254a674f2a
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S010-U0028:
+    content_sha256: 163da02256cb9022e7fc5bb2e9c52f9764bc5860e2d3f84c9f1e4046c3b744a2
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-164
+      quote: Workers AI 对 Free 与 Paid Workers 可用。
+      statement: Workers AI 对 Free 与 Paid Workers 可用。
+      disposition: FACT
+      evidence_id: EV-010
+  S010-U0029:
+    content_sha256: 41194922b7f2695025a41c41d58b96e925fb8bd6ae3e563b9b75345d6aa27ab7
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-165
+      quote: 免费额度为每天 10,000 neurons，UTC 00:00 重置，超额后操作失败。
+      statement: 免费额度为每天 10,000 neurons，UTC 00:00 重置，超额后操作失败。
+      disposition: FACT
+      evidence_id: EV-010
+  S010-U0030:
+    content_sha256: 8ad58480c4b9d24d075de1d9f8dbbcef3d2f8d4cdc184fefdb1ffd51b2210d86
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-166
+      quote: text generation 默认公开速率为 300 requests/minute；
+      statement: text generation 默认公开速率为 300 requests/minute；
+      disposition: FACT
+      evidence_id: EV-010
+  S010-U0031:
+    content_sha256: de8171a9f29b6cc19cd94511a33dbb2898647d8b591e5e0f656a91824747e922
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-167
+      quote: Beta 或 model-specific limit 可能更低。
+      statement: Beta 或 model-specific limit 可能更低。
+      disposition: FACT
+      evidence_id: EV-010
+  S010-U0032:
+    content_sha256: b708472baf0a3b203a330f15f57c335d474883991b03484bd27f88a7f75b9b78
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-168
+      quote: 按 Qwen 官方 neuron 单价换算，7,000 output tokens 约 636 neurons；
+      statement: 按 Qwen 官方 neuron 单价换算，7,000 output tokens 约 636 neurons；
+      disposition: FACT
+      evidence_id: EV-010
+  S010-U0033:
+    content_sha256: 51b32828d0d153ef506954f16feb8ef0794300df175803ae2e7eadd75996f1b6
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-169
+      quote: 实际调用总消耗还包含输入 token，免费额度不是无限生成保证。
+      statement: 实际调用总消耗还包含输入 token，免费额度不是无限生成保证。
+      disposition: FACT
+      evidence_id: EV-010
+  S011-U0001:
+    content_sha256: b7b5fbef7dfcaf924462720e2d84ca092b1a890dac9de85560b17d0e8e478082
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S011-U0002:
+    content_sha256: ee8dca2ea089f08fd931bee8ecb4acd5a3138a875bd393db014b1e401fca2228
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-170
+      quote: 状态：`DRAFT`。
+      statement: 状态：`DRAFT`。
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0003:
+    content_sha256: 7c300cd313afda952e610ce6c690d3371bc0eb161ab1c20dfe36dd246a060ab2
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-171
+      quote: 冻结前不得作为开发完成声明。
+      statement: 冻结前不得作为开发完成声明。
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0004:
+    content_sha256: 1ba3220907c9d0f040b486167de7a6222996063f55bcde432cfc243858a67f01
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S011-U0005:
+    content_sha256: b51d5b34c4066539f3b39e541194cd2dfba963c44806c518bf99c9bdc3422cc9
+    status: NO_REQUIREMENT
+    reason: 来源说明、过渡文本或用例定位，不单独承载需求
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S011-U0006:
+    content_sha256: f57d9be8b1dbfa514da7fd654d9ddb406df8b6aacd6ade4994a2ba35b27cf946
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-172
+      quote: 目标用户是希望快速验证想法的非技术创作者。
+      statement: 目标用户是希望快速验证想法的非技术创作者。
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0007:
+    content_sha256: 0931564dcb6fb97a7ed53824760b3009cf3dd27ca0d61298b832ae2b29e67fda
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-173
+      quote: 最终结果是一款在线可用的 AI 应用生成工作区，而不是静态仿站。
+      statement: 最终结果是一款在线可用的 AI 应用生成工作区，而不是静态仿站。
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0008:
+    content_sha256: 753608e35d7b02d1b335259fe72312d8c5b18af0f55b8786d7b1326d31c23f3f
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S011-U0009:
+    content_sha256: 0eda543f5fe3105e943596c01e424c90d99d556c215881e4fb9a90c10a00e583
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S011-U0010:
+    content_sha256: 2340b84d8cb1194dce633a49838846af1b3b72a3a6e1862aa027d9ed1cc4bb32
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S011-U0011:
+    content_sha256: 310eec714acda27caab6599f2c83a8c6d4b2483532e490364d9186edb6efe2ad
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-174
+      quote: '| FR-001 | 首次访问者 | 进入应用 | 看到简短引导、示例提示词和可直接开始的输入区 | 页面加载失败时可刷新重试（DEC-007） |'
+      statement: '| FR-001 | 首次访问者 | 进入应用 | 看到简短引导、示例提示词和可直接开始的输入区 | 页面加载失败时可刷新重试（DEC-007） |'
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0012:
+    content_sha256: 6198db3ce709f6113dc703fa7237cefb0db413395e03199ada9888ea3c49c7ab
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-175
+      quote: '| FR-002 | 已进入工作区 | 输入应用需求并开始生成 | 创建项目并显示 Agent 分工与实时阶段 | 空输入不提交；失败可重试（DEC-007） |'
+      statement: '| FR-002 | 已进入工作区 | 输入应用需求并开始生成 | 创建项目并显示 Agent 分工与实时阶段 | 空输入不提交；失败可重试（DEC-007） |'
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0013:
+    content_sha256: 9e75a036da123f7fadcae29d82e4f01f590df5003c1f11c915d1dbad9b03a0ac
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-176
+      quote: '| FR-003 | Agent 运行中 | 观察执行过程 | 依次看到产品、架构、设计、工程 Agent 的状态和产出摘要 | 任一步失败不覆盖已有成功版本（DEC-007） |'
+      statement: '| FR-003 | Agent 运行中 | 观察执行过程 | 依次看到产品、架构、设计、工程 Agent 的状态和产出摘要 | 任一步失败不覆盖已有成功版本（DEC-007） |'
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0014:
+    content_sha256: af8ee90fba3448894920fbd3664723df53466a75a494de2b9bfe17421f361ff7
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-177
+      quote: '| FR-004 | 构建完成 | 操作右侧预览 | 生成应用具有真实按钮、筛选、表单或状态交互 | 预览异常时保留可读方案并允许恢复（DEC-007） |'
+      statement: '| FR-004 | 构建完成 | 操作右侧预览 | 生成应用具有真实按钮、筛选、表单或状态交互 | 预览异常时保留可读方案并允许恢复（DEC-007） |'
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0015:
+    content_sha256: 28ddb4e865a145d7bb5325e7526f5b8c5b952dfad96f2ab0f3e71edf3cda59a0
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-178
+      quote: '| FR-005 | 已完成至少一次构建 | 刷新或重新打开页面 | 项目、消息和版本从服务端恢复 | 数据读取失败显示明确错误（DEC-007） |'
+      statement: '| FR-005 | 已完成至少一次构建 | 刷新或重新打开页面 | 项目、消息和版本从服务端恢复 | 数据读取失败显示明确错误（DEC-007） |'
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0016:
+    content_sha256: 09295e2d184d89fa388cb06a82579694d2902717856e946c637a6021d6e16cd3
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-179
+      quote: '| FR-006 | 已有生成版本 | 提出颜色、布局或功能修改 | 创建新版本，预览更新；版本菜单可切换新旧结果 | 不支持的修改给出可解释反馈，错误版本号不改变当前状态（DEC-007） |'
+      statement: '| FR-006 | 已有生成版本 | 提出颜色、布局或功能修改 | 创建新版本，预览更新；版本菜单可切换新旧结果 | 不支持的修改给出可解释反馈，错误版本号不改变当前状态（DEC-007） |'
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0017:
+    content_sha256: 0b9f4236b329b3ca2bd54f8c70a8280acf846a2b3c387dddea6e85f0856112b9
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S011-U0018:
+    content_sha256: 8563a80c62ac77c134e2e471cc020e724855c8f107b7f8449480be16e9bda473
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-180
+      quote: 左侧：品牌、项目列表和新建项目。
+      statement: 左侧：品牌、项目列表和新建项目。
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0019:
+    content_sha256: 77755e65d5f973cff4f4b6f09c51676b26194d45a3bffc3577906f9e2cd74605
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-181
+      quote: 中间：对话、Agent 执行轨迹、建议提示词和输入框。
+      statement: 中间：对话、Agent 执行轨迹、建议提示词和输入框。
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0020:
+    content_sha256: 5b56a7fad05a61bf32323d7a237c33eddc6eb6ef4ea723fbcaf3c8789e07be5a
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-182
+      quote: 右侧：生成应用预览、设备尺寸切换、刷新、版本选择和发布状态。
+      statement: 右侧：生成应用预览、设备尺寸切换、刷新、版本选择和发布状态。
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0021:
+    content_sha256: 9ba49e541a33057bc15464f48ac5b10b3e6a528271dad27a31a4c1b173aaf6d5
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-183
+      quote: 空状态突出一句话输入；
+      statement: 空状态突出一句话输入；
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0022:
+    content_sha256: 1f60503888346e4198e94ae96fa5132947b844019ed395eb632dad894426aeb2
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-184
+      quote: 执行态显示可读的阶段进度；
+      statement: 执行态显示可读的阶段进度；
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0023:
+    content_sha256: 3d20321adad82a246db72b653a6eecca16b87cfe0aa82ddfb88a1ea7079543f2
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-185
+      quote: 完成态将预览作为第一视觉焦点；
+      statement: 完成态将预览作为第一视觉焦点；
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0024:
+    content_sha256: 52b49b3e7855eedc0f2bb8aae9d3c2c858f8ef5521389112e3358626cddfeaf1
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-186
+      quote: 错误态保留用户输入并提供重试。
+      statement: 错误态保留用户输入并提供重试。
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0025:
+    content_sha256: 772e8482ee11c20ccc040e55a10df17f10ec12343ec096de5484a55d71ceb085
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S011-U0026:
+    content_sha256: 124c7820996e1f589b7f3b9f4a5649801d61bc17e1afe5b0d793f350b4f718c8
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-187
+      quote: 覆盖 FR-001 至 FR-006；
+      statement: 覆盖 FR-001 至 FR-006；
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0027:
+    content_sha256: c9c415edaedcc32ffeec853d9d5e631f0e7719961f57254af01449611ad4c2aa
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-188
+      quote: 使用服务端持久化；
+      statement: 使用服务端持久化；
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0028:
+    content_sha256: 1bda5c4b0b84977a316b6be4f912486e5bca7c5321becdcc5d8a27cfee95af7a
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-189
+      quote: 发布到可测试在线地址；
+      statement: 发布到可测试在线地址；
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0029:
+    content_sha256: dad36fd2ae50cfaba3aa0e75d2bcf659580b3d199b6b3a85005bf0e2cc217b4d
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-190
+      quote: 提供项目内交付材料和真实运行证据。
+      statement: 提供项目内交付材料和真实运行证据。
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0030:
+    content_sha256: c9e422c1d9dd798fa108bad038f4ebbab8cbc9db551f03ced18afd01bee8a86b
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S011-U0031:
+    content_sha256: e73639d058aeb387bf7354b6e983ae06799d3db466ca2dceaf15948ac409049f
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-191
+      quote: 单仓交付。
+      statement: 单仓交付。
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0032:
+    content_sha256: 71b12e47542c9ab845c53cb17a84142e28e142de6291f9ab928f624ac4d96c24
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-192
+      quote: 外部只依赖 Sites 的 D1 与托管能力；
+      statement: 外部只依赖 Sites 的 D1 与托管能力；
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0033:
+    content_sha256: 099710811f7ce8066fc46c8cedb2e31d1c474eca69144f1b81d546556f102c19
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-193
+      quote: 不连接真实第三方账号。
+      statement: 不连接真实第三方账号。
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0034:
+    content_sha256: 1950b8b80ca3805a0a7f32703a0130d6423cbf1d90c81cbf5263b09daa08e76e
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S011-U0035:
+    content_sha256: 9f9a03d16afed38799a6675291cef025b76568412734706cedf546d762ec7ef3
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-194
+      quote: 不承诺任意代码生成、外部模型调用、真实 GitHub/支付/广告集成、多人协作和企业权限。
+      statement: 不承诺任意代码生成、外部模型调用、真实 GitHub/支付/广告集成、多人协作和企业权限。
+      disposition: OUT
+      reason: 历史“不承诺任意代码生成”被用户 CHG-010 明确变更取代；第三方集成等其余边界由 S002/S009 保留
+  S011-U0036:
+    content_sha256: 44d72071d8e914df9bc6f6a0db8ad5e6bc0804fc1d003aa2a316df83bd6201c9
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S011-U0037:
+    content_sha256: c802f95d6b9e218620cff041ee5f0d4d511a7777ff17dda1f494ff8a3ff7d208
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-195
+      quote: NFR-001 完成度：所有主流程必须真实可操作，构建和类型检查通过，刷新恢复可验证。
+      statement: NFR-001 完成度：所有主流程必须真实可操作，构建和类型检查通过，刷新恢复可验证。
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0038:
+    content_sha256: caac0e38a6d6c6059babdc19e6e9f924026f37a62d02ed888e48133a5269c9eb
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-196
+      quote: NFR-002 工程思维：采用可解释的规则生成器、有限模板和版本化数据模型，避免引入外部模型密钥与不可控成本。
+      statement: NFR-002 工程思维：采用可解释的规则生成器、有限模板和版本化数据模型，避免引入外部模型密钥与不可控成本。
+      disposition: OUT
+      reason: 历史有限模板/无外部模型取舍已被 CHG-010 明确变更取代
+  S011-U0039:
+    content_sha256: 6e7390f1fabb78bc7adf50fb801a0f6dd05283bdb9d674876d769b7e8221cf5d
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-197
+      quote: NFR-003 用户体验：首次进入无需学习文档，输入、执行、预览和错误反馈清晰顺畅；
+      statement: NFR-003 用户体验：首次进入无需学习文档，输入、执行、预览和错误反馈清晰顺畅；
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0040:
+    content_sha256: 42d3bd7c8ff123fbea28a4523173d7670a6543302aace7d4457ddd8919cfe5ac
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-198
+      quote: 窄屏仍可访问关键内容。
+      statement: 窄屏仍可访问关键内容。
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0041:
+    content_sha256: 599f4a91a80208ac79415cc98110318ab7dea3b98d6d2c71af3e6634ebfb1b34
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-199
+      quote: NFR-004 创新性：Agent 输出直接影响生成方案；
+      statement: NFR-004 创新性：Agent 输出直接影响生成方案；
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0042:
+    content_sha256: 9da82a09096bbe136486cd32cf104e5219f364d583bebf1e158133be3611b3f8
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-200
+      quote: 支持“继续修改 + 版本对比”作为延展能力。
+      statement: 支持“继续修改 + 版本对比”作为延展能力。
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0043:
+    content_sha256: a838d183269a560513a504e9eac0ef96cab831c7734739feb2107a7a78ed1d32
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-201
+      quote: NFR-005 可交付性：在线地址可访问，PRD、方案、测试证据、限制与回滚记录完整。
+      statement: NFR-005 可交付性：在线地址可访问，PRD、方案、测试证据、限制与回滚记录完整。
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0044:
+    content_sha256: dc8ade09e29cbd811954744855dad88563d618fd090198a00154b971687d3320
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-202
+      quote: NFR-006 调研可追溯：交付材料记录官方帮助与公开产品体验如何影响设计，事实与设计选择分开管理。
+      statement: NFR-006 调研可追溯：交付材料记录官方帮助与公开产品体验如何影响设计，事实与设计选择分开管理。
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0045:
+    content_sha256: 28358cb621e8e3bbe8df8b88a32b1b007a6b9daf9d9128acacd367e7d55bce50
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-203
+      quote: NFR-007 资源取舍：优先保证初始化、生成、交互预览和持久化；
+      statement: NFR-007 资源取舍：优先保证初始化、生成、交互预览和持久化；
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0046:
+    content_sha256: 783d2b446f9a13319ffe0883080efd082a055facba36ee8cf86dcf5719dfc730
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-204
+      quote: 延展能力只选择“继续修改与版本历史”这一组闭环，不扩展第三方集成。
+      statement: 延展能力只选择“继续修改与版本历史”这一组闭环，不扩展第三方集成。
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0047:
+    content_sha256: 492bf60c25886f9ca6d9b96240ab852ad5aa2bfb2c1afdf5a2a64ad18a8a03be
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S011-U0048:
+    content_sha256: d9fd8a12bd6d3439ae942f0d0acd9e40b0779fae4e586965d013c9e9e15b78ab
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S011-U0049:
+    content_sha256: 027b2d8a4a5d5ea1b6a16d5c7e99226c2afb414450b3c029ab2042619650abe0
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S011-U0050:
+    content_sha256: e4028ad865b98ea64c9559134af54d7560da39e4e408ab10354bb7f677486599
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-205
+      quote: '| D1 绑定可用 | Sites | 发布前 | 预发 | 待验证 |'
+      statement: '| D1 绑定可用 | Sites | 发布前 | 预发 | 待验证 |'
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0051:
+    content_sha256: 43170afa3e02722204c09dac784a11451fc790b8bc604dbd381cad625ac70f80
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-206
+      quote: '| Sites 在线托管可用 | Sites | 发布时 | 发布 | 待验证 |'
+      statement: '| Sites 在线托管可用 | Sites | 发布时 | 发布 | 待验证 |'
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0052:
+    content_sha256: 7e411e9865ed896c40b7c5253587047c3ca8488e8b73c4e6425e1afba7db067d
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S011-U0053:
+    content_sha256: 9fdfec89b414cc543c8d019f6e2ee0a084cfb3e27c180528c4d786d5811c042c
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-207
+      quote: 完成必须同时满足：主流程生成成功、预览真实交互、刷新后恢复、修改生成新版本且可切换历史版本、失败路径不丢数据、不同匿名工作区不可互读、在线地址实际操作通过。
+      statement: 完成必须同时满足：主流程生成成功、预览真实交互、刷新后恢复、修改生成新版本且可切换历史版本、失败路径不丢数据、不同匿名工作区不可互读、在线地址实际操作通过。
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0054:
+    content_sha256: 451c028277f881c757cd254eb6efd3dc56176d00a67760e5d9e687f24cd01876
+    status: NO_REQUIREMENT
+    reason: 来源说明、过渡文本或用例定位，不单独承载需求
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S011-U0055:
+    content_sha256: c5cc0e3fffe434afb11b5bf8005db78a2dcab7e61d8ee5d0dd6e1e0e0f98af93
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S011-U0056:
+    content_sha256: 2d7aa6fb2b7985ed0e3fa0ad5ad5d02d91c89330c4a32925ec656c55453f74de
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S011-U0057:
+    content_sha256: a8e42a24550281e89d46a410020b95416852b3cc2502c59a587af731626ddf67
+    status: NO_REQUIREMENT
+    reason: 来源定位、采集元数据或表格结构，不单独承载语义
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S011-U0058:
+    content_sha256: 98abc6c7feb42a0f04328a50fda0ee9da2731984103f68ad528506eb4c09ab62
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-208
+      quote: '| 完成度 | FR-001~006 全部有运行证据，构建、API、持久化和浏览器主流程通过 |'
+      statement: '| 完成度 | FR-001~006 全部有运行证据，构建、API、持久化和浏览器主流程通过 |'
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0059:
+    content_sha256: 4c90e571ce1c10f4ca9852232574505d2a65b58931e17a99852012f87a36a88c
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-209
+      quote: '| 工程思维 | 技术方案记录规则生成、数据模型、失败保护和明确不做项 |'
+      statement: '| 工程思维 | 技术方案记录规则生成、数据模型、失败保护和明确不做项 |'
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0060:
+    content_sha256: 59653e365f0369cc45a7b8dbc61e1f81191477826c45e7793c4f8e6b786b760b
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-210
+      quote: '| 用户体验 | 首次进入、空/执行/完成/失败状态以及桌面和移动端验收 |'
+      statement: '| 用户体验 | 首次进入、空/执行/完成/失败状态以及桌面和移动端验收 |'
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0061:
+    content_sha256: fdbe6b4e57b67968e82c693900936ff1377a0c5d0276cfc75a7c42bef804b650
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-211
+      quote: '| 创新性 | Agent 可见协作、生成结果随输入变化、继续修改和版本对比 |'
+      statement: '| 创新性 | Agent 可见协作、生成结果随输入变化、继续修改和版本对比 |'
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S011-U0062:
+    content_sha256: 53c6900fef014bdea2cfeb1e2c94abc9b1e213ed151ce1ced5eadf8507d10dc1
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-212
+      quote: '| 可交付性 | 在线链接、文档、测试证据、已知限制和回滚说明齐全 |'
+      statement: '| 可交付性 | 在线链接、文档、测试证据、已知限制和回滚说明齐全 |'
+      disposition: OUT
+      reason: 历史 PRD 的重复或已变更内容；仅版本恢复/切换原子继续作为 CHG-010 输入
+  S012-U0001:
+    content_sha256: 7fa5c6500e7463c2eeaba79ee371ef85b71b95c2fea45947e43a225b9f167a93
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S012-U0002:
+    content_sha256: 4e64a4b734687b7589c8ff23735e606b7ed910af718c8040b05695625d7aa65d
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-213
+      quote: 确认日期：2026-08-10。
+      statement: 确认日期：2026-08-10。
+      disposition: FACT
+      evidence_id: EV-012
+  S012-U0003:
+    content_sha256: 005eab9c043a90a87aef57375edd357bc2f8e1651240bb2dd13814c04b15397a
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S012-U0004:
+    content_sha256: a79ff393a585eeac5785262e7d024574e34aff6addd98e4708f416d6bad5e21e
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-214
+      quote: 这次升级后，线上已经生成的旧 AppSpec 项目/历史版本，是否要继续能打开和切换？
+      statement: 这次升级后，线上已经生成的旧 AppSpec 项目/历史版本，是否要继续能打开和切换？
+      disposition: FACT
+      evidence_id: EV-012
+  S012-U0005:
+    content_sha256: 65eb3b44b258ea1bd0f3b569a3fc93900409f37b1a99c4b13ff0844b263b3f21
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-215
+      quote: 我建议“保留可读可切换；
+      statement: 我建议“保留可读可切换；
+      disposition: FACT
+      evidence_id: EV-012
+  S012-U0006:
+    content_sha256: dd53e6c704843092087773405f5b3d8d3f8552fee432a632814cc62107851c31
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-216
+      quote: 旧项目继续修改时生成新的代码版本”。
+      statement: 旧项目继续修改时生成新的代码版本”。
+      disposition: FACT
+      evidence_id: EV-012
+  S012-U0007:
+    content_sha256: 707a65987d25e6ea46f1e4ec4665b336f7b042f81ae701ab260200f2228580d5
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-217
+      quote: 可以
+      statement: 可以
+      disposition: FACT
+      evidence_id: EV-012
+  S012-U0008:
+    content_sha256: dba7528ad0b5059cb6ba36200ea77f9627f891142137aaff5b405971214c0bbc
+    status: NO_REQUIREMENT
+    reason: 结构标题，不单独承载需求或事实
+    coverage_assertion: ''
+    ignored: []
+    atoms: []
+  S012-U0009:
+    content_sha256: 0efe7b675fca48ca75617b407dedbbe527e5f22270220c495392c47909251771
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-218
+      quote: 线上已有 AppSpec 项目和历史版本必须继续能够打开与切换。
+      statement: 线上已有 AppSpec 项目和历史版本必须继续能够打开与切换。
+      disposition: SRC
+      src_id: SRC-049
+      requirement_ids:
+      - FR-005
+      - NFR-005
+  S012-U0010:
+    content_sha256: c3b8471696321b1939fc101b8812f6d729e7b49cb7422f12c41382b4dad9e335
+    status: ATOMIZED
+    reason: ''
+    coverage_assertion: FULL
+    ignored: []
+    atoms:
+    - id: ATOM-219
+      quote: 用户在旧 AppSpec 项目中继续修改时，创建新的 CodeBundle 版本，不覆盖或改写旧版本。
+      statement: 用户在旧 AppSpec 项目中继续修改时，创建新的 CodeBundle 版本，不覆盖或改写旧版本。
+      disposition: SRC
+      src_id: SRC-050
+      requirement_ids:
+      - FR-005
+review:
+  status: CONFIRMED
+  by: codex-independent-chg010-source-reviewer-r4
+  at: '2026-08-10T16:35:25+08:00'
+  basis_hash: 90bba37a2c0ff064e0063520b56688292756ebb3fb6bc17098838ae87431bdd3
+  report_sha256: 7d84e5103b08dd7181c2509b0ead9cd665fdc38e7d738d8e895c94f2baf12ac8

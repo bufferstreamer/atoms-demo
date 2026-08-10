@@ -1,0 +1,102 @@
+schema_version: 2
+feature:
+  slug: code-sandbox-generation
+  title: CHG-010 Code Sandbox Generation
+  risk: high
+  delivery_mode: full
+  status: ACCEPTANCE_FROZEN
+  owner_repository: atoms-demo
+  participating_repositories:
+  - atoms-demo
+  created_at: '2026-08-10T16:08:00+08:00'
+  updated_at: '2026-08-10T17:07:40+08:00'
+artifacts:
+  context: .feature-delivery/active/code-sandbox-generation/_context.md
+  progress: .feature-delivery/active/code-sandbox-generation/progress.md
+  facts: .feature-delivery/active/code-sandbox-generation/facts.md
+  scope: .feature-delivery/active/code-sandbox-generation/scope.md
+  open_questions: .feature-delivery/active/code-sandbox-generation/open-questions.md
+  source_register: .feature-delivery/active/code-sandbox-generation/source/register.yaml
+  source_units: .feature-delivery/active/code-sandbox-generation/source/units.jsonl
+  source_coverage: .feature-delivery/active/code-sandbox-generation/source/coverage.yaml
+  source_review: .feature-delivery/active/code-sandbox-generation/source/review.md
+  prd: .feature-delivery/active/code-sandbox-generation/reference/prd.md
+  reference_inventory: .feature-delivery/active/code-sandbox-generation/reference/dependencies.md
+  technical_design: .feature-delivery/active/code-sandbox-generation/design/technical-design.md
+  implementation_plan: .feature-delivery/active/code-sandbox-generation/implementation-plan.md
+  cross_repo_contracts: []
+  traceability: .feature-delivery/active/code-sandbox-generation/traceability.md
+  vibetest: .vibetest/code-sandbox-generation
+  freeze_record: .feature-delivery/active/code-sandbox-generation/freeze.md
+  change_log: .feature-delivery/active/code-sandbox-generation/change-log.md
+  agent_work_packet: .feature-delivery/active/code-sandbox-generation/agent-work-packet.md
+  release_record: .feature-delivery/active/code-sandbox-generation/release.md
+dependencies:
+  upstream: []
+  downstream: []
+  external: []
+freeze:
+  scope:
+    status: FROZEN
+    at: '2026-08-10T17:05:26+08:00'
+    by: user-2026-08-10
+    artifacts:
+      .feature-delivery/active/code-sandbox-generation/facts.md: 02e7a8aac19d7a3d231a7212ac80051f326bc835299019c9809627afbb37088b
+      .feature-delivery/active/code-sandbox-generation/scope.md: 2e3b59ed908b0472059dbff0bc6e9a1c351e0154c2673f1996a2f6a2ca7d2228
+      .feature-delivery/active/code-sandbox-generation/open-questions.md: 96bcaffdf0f61f9b0495536aabea354cc620c3b233b9dc7b9da652af7d490415
+      .feature-delivery/active/code-sandbox-generation/reference/prd.md: 3fedf5157fd971b1e1454dc29d28734fd4faaf163bdc9939da433deed03a8e63
+      .feature-delivery/active/code-sandbox-generation/traceability.md: f6cac1902ae0c8135a948b05db2933f7bf13a84abda38a6504c79f2004599d05
+      .feature-delivery/active/code-sandbox-generation/source/register.yaml: 811b6469f2c29ed4cd0cfcccdeae5b3450a08140b397227b2d4b4f99421882be
+      .feature-delivery/active/code-sandbox-generation/source/units.jsonl: 2bbd84780403aa5ae88b68437e75b8db5a42e4b8663a1e25d893285ceb5eb7aa
+      .feature-delivery/active/code-sandbox-generation/source/coverage.yaml: 6ec96ddec63e5b30d3791dc63004f2d92dd84e704b8fd38c8f91919cda3fa37c
+      .feature-delivery/active/code-sandbox-generation/source/review.md: 7d84e5103b08dd7181c2509b0ead9cd665fdc38e7d738d8e895c94f2baf12ac8
+  design:
+    status: FROZEN
+    at: '2026-08-10T17:05:37+08:00'
+    by: codex-independent-chg010-design-reviewer-r4
+    artifacts:
+      .feature-delivery/active/code-sandbox-generation/facts.md: 02e7a8aac19d7a3d231a7212ac80051f326bc835299019c9809627afbb37088b
+      .feature-delivery/active/code-sandbox-generation/scope.md: 2e3b59ed908b0472059dbff0bc6e9a1c351e0154c2673f1996a2f6a2ca7d2228
+      .feature-delivery/active/code-sandbox-generation/open-questions.md: 96bcaffdf0f61f9b0495536aabea354cc620c3b233b9dc7b9da652af7d490415
+      .feature-delivery/active/code-sandbox-generation/reference/prd.md: 3fedf5157fd971b1e1454dc29d28734fd4faaf163bdc9939da433deed03a8e63
+      .feature-delivery/active/code-sandbox-generation/traceability.md: f6cac1902ae0c8135a948b05db2933f7bf13a84abda38a6504c79f2004599d05
+      .feature-delivery/active/code-sandbox-generation/source/register.yaml: 811b6469f2c29ed4cd0cfcccdeae5b3450a08140b397227b2d4b4f99421882be
+      .feature-delivery/active/code-sandbox-generation/source/units.jsonl: 2bbd84780403aa5ae88b68437e75b8db5a42e4b8663a1e25d893285ceb5eb7aa
+      .feature-delivery/active/code-sandbox-generation/source/coverage.yaml: 6ec96ddec63e5b30d3791dc63004f2d92dd84e704b8fd38c8f91919cda3fa37c
+      .feature-delivery/active/code-sandbox-generation/source/review.md: 7d84e5103b08dd7181c2509b0ead9cd665fdc38e7d738d8e895c94f2baf12ac8
+      .feature-delivery/active/code-sandbox-generation/design/technical-design.md: 33839ee0746abfb4b638b15ed4838a52676ea382d02620f4b7db2812c6e0d61f
+      .feature-delivery/active/code-sandbox-generation/implementation-plan.md: 43b9f758a6e734247b50498bb45aee3e97b5bda07d47dfeedd33bbb7431aaae6
+  acceptance:
+    status: FROZEN
+    at: '2026-08-10T17:07:40+08:00'
+    by: codex-independent-chg010-acceptance-reviewer-r2
+    artifacts:
+      .feature-delivery/active/code-sandbox-generation/facts.md: 02e7a8aac19d7a3d231a7212ac80051f326bc835299019c9809627afbb37088b
+      .feature-delivery/active/code-sandbox-generation/scope.md: 2e3b59ed908b0472059dbff0bc6e9a1c351e0154c2673f1996a2f6a2ca7d2228
+      .feature-delivery/active/code-sandbox-generation/open-questions.md: 96bcaffdf0f61f9b0495536aabea354cc620c3b233b9dc7b9da652af7d490415
+      .feature-delivery/active/code-sandbox-generation/reference/prd.md: 3fedf5157fd971b1e1454dc29d28734fd4faaf163bdc9939da433deed03a8e63
+      .feature-delivery/active/code-sandbox-generation/traceability.md: f6cac1902ae0c8135a948b05db2933f7bf13a84abda38a6504c79f2004599d05
+      .feature-delivery/active/code-sandbox-generation/source/register.yaml: 811b6469f2c29ed4cd0cfcccdeae5b3450a08140b397227b2d4b4f99421882be
+      .feature-delivery/active/code-sandbox-generation/source/units.jsonl: 2bbd84780403aa5ae88b68437e75b8db5a42e4b8663a1e25d893285ceb5eb7aa
+      .feature-delivery/active/code-sandbox-generation/source/coverage.yaml: 6ec96ddec63e5b30d3791dc63004f2d92dd84e704b8fd38c8f91919cda3fa37c
+      .feature-delivery/active/code-sandbox-generation/source/review.md: 7d84e5103b08dd7181c2509b0ead9cd665fdc38e7d738d8e895c94f2baf12ac8
+      .feature-delivery/active/code-sandbox-generation/design/technical-design.md: 33839ee0746abfb4b638b15ed4838a52676ea382d02620f4b7db2812c6e0d61f
+      .feature-delivery/active/code-sandbox-generation/implementation-plan.md: 43b9f758a6e734247b50498bb45aee3e97b5bda07d47dfeedd33bbb7431aaae6
+      .vibetest/code-sandbox-generation/rules.md: 720e0055952d76d58684b9b917330cd3655d60da70606a4a13c85b75bc4a6691
+      .vibetest/code-sandbox-generation/cases.md: 50546771d039a9765ec1a48a542c2bbc15c900af562f079218cfe5a4c44ef003
+      .vibetest/code-sandbox-generation/evidence.md: f76cabfa03b024261f2aaa5feeae50f297c7f7262f6fefcd19c6465ff171b196
+      .vibetest/code-sandbox-generation/gaps.md: 9b1ff4ee5234b6b66d7e3b48f2f3e06e0b85b893e1aed837e0b49f4485b29fdf
+      .feature-delivery/active/code-sandbox-generation/agent-work-packet.md: 604a31ffeb23a90f694c45b6e920597c97014d333051f9a93149ace512e53e85
+baseline:
+  status: UNSET
+  commit: null
+  at: null
+verification:
+  status: NOT_RUN
+  evidence: []
+  open_gaps: []
+release:
+  status: NOT_STARTED
+  deployment: null
+  rollback: null
+  at: null

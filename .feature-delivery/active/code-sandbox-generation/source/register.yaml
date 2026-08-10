@@ -1,0 +1,217 @@
+schema_version: 1
+confirmation:
+  status: CONFIRMED
+  by: user-2026-08-10
+  at: '2026-08-10T16:34:16+08:00'
+  source_set_hash: 1429f1f67e861eb5880d41bb41b67c8b14932d9a67b484cabd8802dc16cda113
+facets:
+  product_requirements:
+    status: COVERED
+    source_ids:
+    - S001
+    - S002
+    - S003
+    - S008
+    - S012
+    reason: 原挑战、用户变更请求、生产反例、Atoms 官方帮助与用户兼容决定共同定义本期目标
+  prototype_and_interaction:
+    status: COVERED
+    source_ids:
+    - S001
+    - S006
+    - S008
+    reason: 挑战无独立原型，公开 Atoms 体验与官方帮助作为交互依据
+  current_ui_and_behavior:
+    status: COVERED
+    source_ids:
+    - S003
+    - S004
+    - S006
+    reason: 当前生产结果、代码边界和公开体验均已快照
+  code_and_configuration:
+    status: COVERED
+    source_ids:
+    - S004
+    - S007
+    - S009
+    - S010
+    reason: 当前提交能力边界、沙箱平台和当前模型/binding 事实已快照
+  upstream_contracts:
+    status: COVERED
+    source_ids:
+    - S009
+    - S010
+    reason: 浏览器沙箱、Workers AI 代码模型、JSON Mode 和平台限额契约已登记，发布时重验
+  downstream_contracts:
+    status: NOT_APPLICABLE
+    source_ids: []
+    reason: 本期无外部下游系统，代码包、沙箱和状态 API 均为本仓内部契约
+  data_and_state:
+    status: COVERED
+    source_ids:
+    - S003
+    - S004
+    - S005
+    - S008
+    - S009
+    - S012
+    reason: 生产 D1、当前数据链、Sites/Atoms 持久化、postMessage 平台事实与旧版本恢复决定均已登记
+  security_and_permissions:
+    status: COVERED
+    source_ids:
+    - S002
+    - S004
+    - S005
+    - S009
+    reason: 用户确认服务端任意执行不在范围，现状 owner、Sites 授权与 iframe/CSP/postMessage 官方事实已登记
+  non_functional_and_release:
+    status: COVERED
+    source_ids:
+    - S001
+    - S003
+    - S004
+    - S005
+    - S007
+    - S008
+    - S009
+    - S010
+    reason: 评分、稳定性、平台安全与当前模型容量事实均已登记；项目验收门禁由 PRD/VibeTest 设计
+  review_decisions:
+    status: COVERED
+    source_ids:
+    - S002
+    - S012
+    reason: 用户已明确批准 Code Sandbox Generation、授权开始并确认旧版本兼容策略
+sources:
+- id: S001
+  title: Atoms Demo Challenge Brief
+  kind: markdown
+  path: .feature-delivery/archive/atoms-demo/reference/user-challenge.md
+  authority: challenge owner
+  required: true
+  version: null
+  status: INGESTED
+  sha256: cf273f06ed22336085d9afa9aee0f917ac469ce8fab69c1cf91c792d0cfedd79
+  unit_count: 15
+  ingested_at: '2026-08-10T16:34:10+08:00'
+- id: S002
+  title: CHG-010 User Change Request
+  kind: markdown
+  path: .feature-delivery/active/code-sandbox-generation/reference/user-change-request.md
+  authority: user
+  required: true
+  version: null
+  status: INGESTED
+  sha256: 849dac12d92e51c68a57551753bb5ec1da88ab145214aeba934430e7fc97c624
+  unit_count: 15
+  ingested_at: '2026-08-10T16:34:10+08:00'
+- id: S003
+  title: Production Generation Failure Evidence
+  kind: markdown
+  path: .feature-delivery/active/code-sandbox-generation/reference/production-failure-evidence-2026-08-10.md
+  authority: Cloudflare production D1
+  required: true
+  version: null
+  status: INGESTED
+  sha256: 80d8a43036434c72786e5e90d179c0157745d9d3da2bb7b2ba43ad278d2d1997
+  unit_count: 24
+  ingested_at: '2026-08-10T16:34:10+08:00'
+- id: S004
+  title: Current Code Capability Boundary
+  kind: markdown
+  path: .feature-delivery/active/code-sandbox-generation/reference/current-code-boundary-2026-08-10.md
+  authority: atoms-demo repository
+  required: true
+  version: null
+  status: INGESTED
+  sha256: 47ed4cc3e39ab62052f34b1157ccc09b29c910e0b308f227cf6a5141dc66cb1a
+  unit_count: 31
+  ingested_at: '2026-08-10T16:34:10+08:00'
+- id: S005
+  title: Sites Persistence and Identity Constraints
+  kind: markdown
+  path: .feature-delivery/archive/atoms-demo/reference/raw-sites-platform-capabilities.md
+  authority: Sites official skill documentation
+  required: true
+  version: null
+  status: INGESTED
+  sha256: bf6bec85ca58520055c12eb4586987d58fc81a50eea2e86816064b70f58f84f7
+  unit_count: 5
+  ingested_at: '2026-08-10T16:34:10+08:00'
+- id: S006
+  title: Atoms Public Product Experience
+  kind: markdown
+  path: .feature-delivery/archive/atoms-demo/reference/product-experience-observations.md
+  authority: observed public product UI
+  required: true
+  version: null
+  status: INGESTED
+  sha256: 7f70a2c3947e9f086a626ebc17e4ee212ee3bee0f73d7ed60fe8f09aba6c44cb
+  unit_count: 12
+  ingested_at: '2026-08-10T16:34:10+08:00'
+- id: S007
+  title: Cloudflare Workers AI Model Facts
+  kind: markdown
+  path: .feature-delivery/archive/atoms-demo/reference/workers-ai-model-facts-2026-08-09.md
+  authority: Cloudflare official docs and production evidence
+  required: true
+  version: null
+  status: INGESTED
+  sha256: 9f9e3003b9b4b1d113d351db23e0664220fa1320c0f6fc5496de1035cfd4700a
+  unit_count: 33
+  ingested_at: '2026-08-10T16:34:10+08:00'
+- id: S008
+  title: Atoms Official Help Snapshot
+  kind: markdown
+  path: .feature-delivery/archive/atoms-demo/reference/raw-official-help-snapshot.md
+  authority: Atoms official help center
+  required: true
+  version: null
+  status: INGESTED
+  sha256: 2e364bfdb85d13d5d84e0bef06226414425d8cf261e3abc7de696f4b5da4a231
+  unit_count: 12
+  ingested_at: '2026-08-10T16:34:10+08:00'
+- id: S009
+  title: Browser Sandbox and Hosting Contract
+  kind: markdown
+  path: .feature-delivery/active/code-sandbox-generation/reference/raw-browser-sandbox-contract-2026-08-10.md
+  authority: WHATWG, MDN and Cloudflare official documentation
+  required: true
+  version: null
+  status: INGESTED
+  sha256: 7c8adaa29ee9457784d8a02f1ebf5e2da43af8299d6d12a2bab640fc966aceb6
+  unit_count: 27
+  ingested_at: '2026-08-10T16:34:10+08:00'
+- id: S010
+  title: Workers AI Code Generation Facts
+  kind: markdown
+  path: .feature-delivery/active/code-sandbox-generation/reference/workers-ai-code-generation-facts-2026-08-10.md
+  authority: Cloudflare Workers AI official documentation
+  required: true
+  version: null
+  status: INGESTED
+  sha256: 08c27cdf867210634779581750c90f19e543c2460182b4dc9b4218fd2fcab714
+  unit_count: 33
+  ingested_at: '2026-08-10T16:34:10+08:00'
+- id: S011
+  title: Archived Atoms Demo Product Decisions
+  kind: markdown
+  path: .feature-delivery/archive/atoms-demo/reference/prd.md
+  authority: historical draft retained for context; not an approved compatibility decision
+  required: true
+  version: null
+  status: INGESTED
+  sha256: 5b7d44cf91196d31f52088461f987740c50d35d9aa123bec98b2618abb26e7b0
+  unit_count: 62
+  ingested_at: '2026-08-10T16:34:10+08:00'
+- id: S012
+  title: User Legacy Compatibility Decision
+  kind: markdown
+  path: .feature-delivery/active/code-sandbox-generation/reference/user-legacy-compatibility-decision.md
+  authority: user confirmation on 2026-08-10
+  required: true
+  version: null
+  status: INGESTED
+  sha256: 8a5a8ee304f8a5612ebae60917dc51c3054ac6b01bc6a14bd93c4e1d03afdda8
+  unit_count: 10
+  ingested_at: '2026-08-10T16:34:10+08:00'
